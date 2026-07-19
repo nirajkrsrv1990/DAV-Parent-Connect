@@ -1,0 +1,35 @@
+.dashboard-header{
+    margin-left:260px;
+    height:80px;
+    background:white;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 30px;
+    box-shadow:0 2px 12px rgba(0,0,0,.08);
+}
+
+.dashboard-header h2{
+    color:#0F4C81;
+}
+
+.dashboard-header p{
+    color:#666;
+    font-size:14px;
+}
+
+.header-right{
+    display:flex;
+    align-items:center;
+    gap:30px;
+}
+
+.notification{
+    cursor:pointer;
+}
+
+.profile{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}

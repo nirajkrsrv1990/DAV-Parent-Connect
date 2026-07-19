@@ -1,0 +1,67 @@
+.teacher-sidebar{
+    width:260px;
+    height:100vh;
+    position:fixed;
+    left:0;
+    top:0;
+    background:#0F4C81;
+    color:#fff;
+    overflow-y:auto;
+    box-shadow:2px 0 12px rgba(0,0,0,.15);
+}
+
+.teacher-brand{
+    text-align:center;
+    padding:25px 15px;
+    border-bottom:1px solid rgba(255,255,255,.15);
+}
+
+.teacher-logo{
+    width:75px;
+    margin-bottom:10px;
+}
+
+.teacher-brand h2{
+    margin:8px 0 5px;
+    font-size:24px;
+}
+
+.teacher-brand p{
+    margin:0;
+    font-size:15px;
+}
+
+.teacher-brand small{
+    display:block;
+    margin-top:6px;
+    color:#d8e6f7;
+}
+
+.teacher-menu{
+    display:flex;
+    flex-direction:column;
+    padding:15px 0;
+}
+
+.teacher-link{
+    text-decoration:none;
+    color:#fff;
+}
+
+.teacher-item{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:14px 22px;
+    transition:.25s;
+    cursor:pointer;
+}
+
+.teacher-item:hover{
+    background:#1565C0;
+}
+
+.teacher-item span{
+    font-size:15px;
+    font-weight:500;
+}

@@ -1,0 +1,96 @@
+.dashboard-content{
+    margin-left:260px;
+    margin-top:80px;
+    padding:30px;
+    background:#f4f7fb;
+    min-height:100vh;
+}
+
+.teacher-page{
+    background:white;
+    border-radius:16px;
+    padding:25px;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+.add-link{
+    text-decoration:none;
+}
+
+.teacher-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.teacher-header h1{
+    color:#0F4C81;
+}
+
+.add-btn{
+    background:#1565C0;
+    color:white;
+    border:none;
+    padding:12px 22px;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.add-btn:hover{
+    background:#0F4C81;
+}
+
+.search-box{
+    margin-bottom:20px;
+}
+
+.search-box input{
+    width:100%;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:10px;
+}
+
+.teacher-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.teacher-table th{
+    background:#1565C0;
+    color:white;
+    padding:14px;
+    text-align:left;
+}
+
+.teacher-table td{
+    padding:14px;
+    border-bottom:1px solid #eee;
+}
+
+.empty-row{
+    text-align:center;
+    padding:40px;
+    color:#777;
+}
+.remove-btn {
+
+  background: #d32f2f;
+
+  color: white;
+
+  border: none;
+
+  padding: 7px 14px;
+
+  border-radius: 6px;
+
+  cursor: pointer;
+
+}
+
+.remove-btn:hover {
+
+  background: #b71c1c;
+
+}

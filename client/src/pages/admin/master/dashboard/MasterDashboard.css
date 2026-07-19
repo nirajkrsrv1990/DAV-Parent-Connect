@@ -1,0 +1,46 @@
+.master-dashboard{
+    padding:30px;
+}
+
+.master-dashboard h1{
+    color:#0F4C81;
+    font-size:34px;
+    margin-bottom:8px;
+}
+
+.master-dashboard p{
+    color:#666;
+    margin-bottom:30px;
+}
+
+.master-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+    gap:25px;
+}
+
+.master-card{
+    background:#fff;
+    border-radius:15px;
+    padding:30px;
+    text-align:center;
+    cursor:pointer;
+    transition:.3s;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+.master-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+
+.master-icon{
+    font-size:48px;
+    margin-bottom:18px;
+}
+
+.master-card h3{
+    color:#1565C0;
+    font-size:20px;
+    margin:0;
+}

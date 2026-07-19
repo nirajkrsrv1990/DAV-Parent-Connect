@@ -1,0 +1,62 @@
+.assignment-table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+.assignment-table th{
+    background:#1565C0;
+    color:#fff;
+    padding:12px;
+    text-align:left;
+}
+
+.assignment-table td{
+    border:1px solid #ddd;
+    padding:12px;
+}
+
+.assignment-table select{
+    width:100%;
+    padding:10px;
+    border:1px solid #ddd;
+    border-radius:8px;
+}
+
+.action-buttons{
+    display:flex;
+    gap:8px;
+}
+
+.add-assignment-btn{
+    background:#43A047;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.remove-btn{
+    background:#E53935;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.button-group{
+    display:flex;
+    gap:15px;
+    margin-top:30px;
+}
+
+.cancel-btn{
+    background:#E53935;
+    color:#fff;
+    border:none;
+    padding:14px 28px;
+    border-radius:10px;
+    cursor:pointer;
+}

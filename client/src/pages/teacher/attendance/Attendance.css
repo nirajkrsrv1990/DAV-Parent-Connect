@@ -1,0 +1,136 @@
+.attendance-page{
+    margin-left:260px;
+    margin-top:75px;
+    padding:30px;
+    background:#f4f7fb;
+    min-height:100vh;
+}
+
+.attendance-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.attendance-header h1{
+    color:#0F4C81;
+    font-size:32px;
+}
+
+.save-btn{
+    background:#1565C0;
+    color:#fff;
+    border:none;
+    padding:12px 28px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:600;
+}
+
+.save-btn:hover{
+    background:#0D47A1;
+}
+
+.filter-card{
+    background:#fff;
+    border-radius:15px;
+    padding:25px;
+    margin-bottom:25px;
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+.filter-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+}
+
+.filter-grid label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:600;
+    color:#444;
+}
+
+.filter-grid input,
+.filter-grid select{
+    width:100%;
+    padding:12px;
+    border:1px solid #dcdcdc;
+    border-radius:8px;
+    font-size:15px;
+}
+
+.attendance-table{
+    background:#fff;
+    border-radius:15px;
+    padding:20px;
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+.attendance-table table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.attendance-table th{
+    background:#1565C0;
+    color:#fff;
+    padding:14px;
+    text-align:left;
+}
+
+.attendance-table td{
+    padding:14px;
+    border-bottom:1px solid #ececec;
+}
+
+.attendance-table select{
+    width:90px;
+    padding:8px;
+    border-radius:6px;
+    border:1px solid #ccc;
+}
+
+.attendance-table tr:hover{
+    background:#f8fbff;
+}
+.present-btn{
+
+    background:#E8F5E9;
+    color:#2E7D32;
+    border:1px solid #2E7D32;
+    padding:8px 18px;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:600;
+
+}
+
+.present-btn.active{
+
+    background:#2E7D32;
+    color:white;
+
+}
+
+.absent-btn{
+
+    background:#FFEBEE;
+    color:#C62828;
+    border:1px solid #C62828;
+    padding:8px 18px;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:600;
+
+}
+
+.absent-btn.active{
+
+    background:#C62828;
+    color:white;
+
+}

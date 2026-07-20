@@ -56,12 +56,18 @@ export default function Attendance() {
     );
 
     const result = await response.json();
+    console.log("Class Teacher API:", result);
 
     if (result.success && result.assignment) {
 
       setSelectedClass(result.assignment.class_name);
 
       setSelectedSection(result.assignment.section);
+      console.log(
+"Assigned",
+result.assignment.class_name,
+result.assignment.section
+);
 
     }
 
@@ -76,6 +82,11 @@ export default function Attendance() {
   const loadClasses = useCallback(async () => {
 
     try {
+      console.log(
+"Loading Students",
+selectedClass,
+selectedSection
+);
 
       const response = await fetch(
         "/api/master/class"
@@ -87,11 +98,7 @@ export default function Attendance() {
 
         setClasses(result.classes);
 
-        if (result.success) {
-
-  setClasses(result.classes);
-
-}
+        
 
       }
 
@@ -111,6 +118,9 @@ export default function Attendance() {
     try {
 
       setLoading(true);
+      console.log("Loading Students...");
+console.log("Class:", selectedClass);
+console.log("Section:", selectedSection);
 
       const response = await fetch(
 
@@ -119,6 +129,7 @@ export default function Attendance() {
       );
 
       const result = await response.json();
+      console.log("Students API Result:", result);
 
       if (result.success) {
 

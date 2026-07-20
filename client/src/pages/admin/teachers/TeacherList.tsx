@@ -33,6 +33,9 @@ export default function TeacherList() {
       );
 
       const result = await response.json();
+      console.log("Status:", response.status);
+      console.log("API Result:", result);
+      console.log("Teachers:", result.teachers);
 
       if (result.success) {
 

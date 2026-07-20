@@ -20,7 +20,7 @@ export default function ParentLogin() {
 
       const response = await fetch(
 
-        "http:///api/parents/login",
+        "/api/parents/login",
 
         {
 

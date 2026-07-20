@@ -35,7 +35,7 @@ const loadStudent = async (
 
     const response = await fetch(
 
-      `http:///api/students/admission/${admissionNo}`
+      `/api/students/admission/${admissionNo}`
 
     );
 

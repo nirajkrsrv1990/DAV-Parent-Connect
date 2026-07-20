@@ -29,7 +29,7 @@ export default function TeacherList() {
     try {
 
       const response = await fetch(
-        "http:///api/teachers"
+        "/api/teachers"
       );
 
       const result = await response.json();
@@ -67,7 +67,7 @@ export default function TeacherList() {
 
     const response = await fetch(
 
-      `http:///api/teachers/${id}`,
+      `/api/teachers/${id}`,
 
       {
 

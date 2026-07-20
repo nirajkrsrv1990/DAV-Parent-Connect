@@ -61,7 +61,7 @@ export default function StudentList(){
 
       const response=
         await fetch(
-          "http:///api/students"
+          "/api/students"
         );
 
       const result=

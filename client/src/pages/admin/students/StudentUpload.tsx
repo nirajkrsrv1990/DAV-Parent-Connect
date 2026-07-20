@@ -48,7 +48,7 @@ export default function StudentUpload() {
 
       const response = await fetch(
 
-        "http:///api/students/upload",
+        "/api/students/upload",
 
         {
 

@@ -19,6 +19,10 @@ router.post(
   upload.single("file"),
   uploadStudents
 );
+router.get(
+  "/",
+  getStudents
+);
 
 /* ===========================
    Get Students

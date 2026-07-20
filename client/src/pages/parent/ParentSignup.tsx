@@ -39,7 +39,7 @@ const registerParent = async () => {
 
     const response = await fetch(
 
-      "http:///api/parents/signup",
+      "/api/parents/signup",
 
       {
 

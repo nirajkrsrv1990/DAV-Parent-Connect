@@ -37,7 +37,7 @@ export default function ClassSectionMaster() {
 
     const response = await fetch(
 
-      "http:///api/master/class"
+      "/api/master/class"
 
     );
 
@@ -135,7 +135,7 @@ export default function ClassSectionMaster() {
 
     const response = await fetch(
 
-      "http:///api/master/class",
+      "/api/master/class",
 
       {
 

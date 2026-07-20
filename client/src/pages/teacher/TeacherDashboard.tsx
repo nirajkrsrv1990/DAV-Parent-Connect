@@ -32,7 +32,7 @@ export default function TeacherDashboard() {
       try {
 
         const response = await fetch(
-           `/api/class-teacher/${teacherId}'
+          `/api/class-teacher/${teacherId}`
         );
 
         const result = await response.json();
@@ -52,6 +52,7 @@ if (
   setAssignedClass(
     `${result.assignment.class_name}-${result.assignment.section}`
   );
+  console.log("assignedClass after API:", `${result.assignment.class_name}-${result.assignment.section}`);
 
 } else {
 

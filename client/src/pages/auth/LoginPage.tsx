@@ -20,7 +20,7 @@ const adminLogin = async () => {
 
     const response = await fetch(
 
-      "http://localhost:5000/api/admin/login",
+      "/api/admin/login",
 
       {
 
@@ -77,7 +77,7 @@ const teacherLogin = async () => {
 
     const response = await fetch(
 
-      "http://localhost:5000/api/teachers/login",
+      "/api/teachers/login",
 
       {
 

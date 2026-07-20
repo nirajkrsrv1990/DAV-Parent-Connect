@@ -80,7 +80,7 @@ export default function AddTeacher() {
 
       const response = await fetch(
 
-        "http://localhost:5000/api/teachers/create",
+        "http:///api/teachers/create",
 
         {
 
@@ -131,7 +131,7 @@ export default function AddTeacher() {
 
         const assignResponse = await fetch(
 
-  "http://localhost:5000/api/teachers/assign-class-teacher",
+  "http:///api/teachers/assign-class-teacher",
 
   {
 

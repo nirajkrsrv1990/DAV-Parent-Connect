@@ -48,7 +48,7 @@ export default function StudentUpload() {
 
       const response = await fetch(
 
-        "http://localhost:5000/api/students/upload",
+        "http:///api/students/upload",
 
         {
 

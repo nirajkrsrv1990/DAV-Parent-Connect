@@ -52,7 +52,7 @@ export default function Attendance() {
   try {
 
     const response = await fetch(
-      `http://localhost:5000/api/class-teacher/${teacher.teacher_id}`
+      `http:///api/class-teacher/${teacher.teacher_id}`
     );
 
     const result = await response.json();
@@ -78,7 +78,7 @@ export default function Attendance() {
     try {
 
       const response = await fetch(
-        "http://localhost:5000/api/master/class"
+        "http:///api/master/class"
       );
 
       const result = await response.json();
@@ -114,7 +114,7 @@ export default function Attendance() {
 
       const response = await fetch(
 
-        `http://localhost:5000/api/students?class=${selectedClass}&section=${selectedSection}`
+        `http:///api/students?class=${selectedClass}&section=${selectedSection}`
 
       );
 

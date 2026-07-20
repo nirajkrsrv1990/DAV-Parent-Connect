@@ -32,7 +32,7 @@ export default function TeacherDashboard() {
       try {
 
         const response = await fetch(
-          `http://localhost:5000/api/class-teacher/${teacherId}`
+          `http:///api/class-teacher/${teacherId}`
         );
 
         const result = await response.json();

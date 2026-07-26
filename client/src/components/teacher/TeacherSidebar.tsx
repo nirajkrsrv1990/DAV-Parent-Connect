@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
-import logo from "../../assets/logo/dav_logo.png";
+import logo from "../../../assets/logo/dav_logo.png";
 import "./TeacherSidebar.css";
 
 type TeacherSidebarProps = {
@@ -43,7 +43,7 @@ export default function TeacherSidebar({
           <div
             style={{
               display: "flex",
-              justify: "space-between",
+              justifyContent: "space-between",
               alignItems: "center",
             }}
           >

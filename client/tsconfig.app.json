@@ -18,9 +18,21 @@
 
     /* Linting / Strict Flags Fix */
     "strict": true,
-    "noUnusedLocals": false,        // <-- Isko false karein (Unused import error hat jayega)
-    "noUnusedParameters": false,    // <-- Isko false karein
-    "noFallthroughCasesInSwitch": true
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+
+    /* Path Alias Configuration for TypeScript */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.d.ts",
+    "src/vite-env.d.ts"
+  ]
 }

@@ -1,5 +1,5 @@
 import "./LoginPage.css";
-import logo from "../../assets/logo/dav_logo.png";
+import logo from "@/assets/logo/dav_logo.png";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 

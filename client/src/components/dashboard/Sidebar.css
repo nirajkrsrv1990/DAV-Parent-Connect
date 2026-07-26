@@ -1,189 +1,102 @@
-.sidebar {
-  width: 260px;
-  height: 100vh;
-  background: #0F4C81;
-  color: #ffffff;
-  position: fixed;
-  left: 0;
-  top: 0;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s ease;
-  z-index: 1200;
-  overflow-y: auto;
-}
-
-.sidebar-brand {
-  text-align: center;
-  padding: 20px;
-  border-bottom: 1px solid rgba(255,255,255,.15);
-}
-
-.sidebar-logo {
-  width: 70px;
-  height: 70px;
-  object-fit: contain;
-  margin-bottom: 10px;
-}
-
-.sidebar-brand h2 {
-  margin: 0;
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.sidebar-brand p {
-  margin-top: 5px;
-  font-size: 14px;
-}
-
-.sidebar-brand small {
-  display: block;
-  margin-top: 6px;
-  color: #d9e8ff;
-}
-
-.menu {
-  margin-top: 15px;
-  flex: 1;
-  overflow-y: auto;
-}
-
-.menu-link {
-  text-decoration: none;
-  color: white;
-}
-
-.menu-item {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  padding: 15px 22px;
-  cursor: pointer;
-  transition: 0.25s;
-}
-
-.menu-item:hover {
-  background: rgba(255,255,255,.15);
-  border-left: 5px solid #ffcc00;
-}
-
-.menu-item span {
-  font-size: 15px;
-  font-weight: 500;
-}
-
-/* Close Button */
-
-.close-btn {
-  display: none;
-  border: none;
-  background: transparent;
-  color: #ffffff;
-  cursor: pointer;
-}
-
-/* Overlay */
-
-.sidebar-overlay{
-    display:none;
+.sidebar{
     position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.45);
-    z-index:999;
+    left:0;
+    top:0;
+    width:260px;
+    height:100vh;
+    background:#0F4C81;
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    overflow-y:auto;
+    z-index:1200;
+    transition:transform .30s ease;
 }
 
-/* ==========================
-   MOBILE VIEW
-========================== */
-
-@media (max-width:768px) {
-
-  .sidebar {
-
-    transform: translateX(-100%);
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 260px;
-
-  }
-
-  .sidebar.sidebar-open {
-
-    transform: translateX(0);
-
-  }
-
-  .close-btn {
-
-    display: block;
-
-  }
-
-  .sidebar-overlay {
-
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.45);
-    z-index: 1100;
-
-  }
-
+.sidebar-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
-/* ==========================================
-   CLOSE BUTTON
-========================================== */
 
-.sidebar-overlay{
-    display:none;
+.sidebar-brand{
+    padding:20px;
+    text-align:center;
+    border-bottom:1px solid rgba(255,255,255,.15);
+}
+
+.sidebar-logo{
+    width:70px;
+    height:70px;
+    object-fit:contain;
+}
+
+.sidebar-brand h2{
+    margin:12px 0 0;
+    font-size:24px;
+}
+
+.sidebar-brand p{
+    margin:4px 0;
+}
+
+.sidebar-brand small{
+    color:#d9e8ff;
+}
+
+.menu{
+    flex:1;
+    overflow:auto;
+    margin-top:15px;
+}
+
+.menu-link{
+    text-decoration:none;
+    color:#fff;
+}
+
+.menu-item{
+    display:flex;
+    gap:15px;
+    align-items:center;
+    padding:15px 22px;
+}
+
+.menu-item:hover{
+    background:rgba(255,255,255,.15);
+    border-left:5px solid #ffcc00;
 }
 
 .close-btn{
     display:none;
+    border:none;
+    background:none;
+    color:#fff;
+    cursor:pointer;
 }
 
-/* Sidebar Default Base Styles */
-.sidebar {
-    width: 260px;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    transition: left 0.3s ease-in-out;
+.sidebar-overlay{
+    display:none;
 }
 
-/* ==========================================
-   MOBILE & TABLET RESPONSIVE FIX
-========================================== */
-/* Sidebar default styling */
+@media (max-width:768px){
+
 .sidebar,
-.teacher-sidebar {
-    width: 260px;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    transition: left 0.3s ease-in-out;
+.teacher-sidebar{
+
+left:-260px !important;
+
 }
 
-/* MOBILE FIX: Screen ke baahar bhejo jab tak toggle click na ho */
-@media (max-width: 768px) {
-    .sidebar,
-    .teacher-sidebar {
-        left: -260px !important; /* Standard screen se bahar bhejne ke liye */
-        box-shadow: 4px 0 15px rgba(0,0,0,0.3);
-    }
+.sidebar.sidebar-open,
+.sidebar.open,
+.sidebar.active,
+.teacher-sidebar.teacher-sidebar-open,
+.teacher-sidebar.open,
+.teacher-sidebar.active{
 
-    /* Class Name checks for Open state */
-    .sidebar.open,
-    .sidebar.active,
-    .teacher-sidebar.open,
-    .teacher-sidebar.active {
-        left: 0 !important; /* Menu icon dabaane par saamne aayega */
-    }
+left:0 !important;
+
+}
+
 }

@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
-import logo from "../../../assets/logo/dav_logo.png";
+import logo from "../../assets/logo/dav_logo.png";
 import "./TeacherSidebar.css";
 
 type TeacherSidebarProps = {

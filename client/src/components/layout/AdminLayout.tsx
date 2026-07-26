@@ -7,26 +7,43 @@ import Header from "../dashboard/Header";
 import "./AdminLayout.css";
 
 export default function AdminLayout() {
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  console.log("Sidebar State =", sidebarOpen);
+
+console.log("Admin Sidebar =", sidebarOpen);
 
   return (
-    <>
-      <Sidebar
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-      />
 
-      <div className="content-wrapper">
+    <div className="admin-layout">
+
+      <Sidebar
+  isOpen={sidebarOpen}
+  onClose={() => {
+    console.log("ADMIN SIDEBAR CLOSE");
+    setSidebarOpen(false);
+  }}
+/>
+
+      <div className="layout-container">
 
         <Header
-          onMenuClick={() => setSidebarOpen(true)}
-        />
+  onMenuClick={() => {
+    console.log("ADMIN HEADER CLICK");
+    setSidebarOpen(true);
+  }}
+/>
 
-        <main className="dashboard-content">
+        <main className="layout-content">
+
           <Outlet />
+
         </main>
 
       </div>
-    </>
+
+    </div>
+
   );
+
 }

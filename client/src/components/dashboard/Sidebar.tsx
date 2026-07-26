@@ -15,20 +15,22 @@ import {
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
-import logo from "../../assets/logo/dav_logo.png";
+import logo from "@/assets/logo/dav_logo.png";
 import "./Sidebar.css";
 
 type SidebarProps = {
-  isOpen?: boolean;
-  onClose?: () => void;
+  isOpen: boolean;
+  onClose: () => void;
 };
 
 export default function Sidebar({
-  isOpen = true,
+  isOpen,
   onClose,
 }: SidebarProps) {
+
   return (
     <>
+
       {isOpen && (
         <div
           className="sidebar-overlay"
@@ -36,18 +38,15 @@ export default function Sidebar({
         />
       )}
 
-      <aside
-        className={`sidebar ${isOpen ? "sidebar-open" : ""}`}
-      >
+      console.log("Sidebar Open =", isOpen);
+
+<aside
+className={`sidebar ${isOpen ? "sidebar-open" : ""}`}
+>
+
         <div className="sidebar-brand">
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
+          <div className="sidebar-top">
 
             <img
               src={logo}
@@ -59,7 +58,7 @@ export default function Sidebar({
               className="close-btn"
               onClick={onClose}
             >
-              <X size={22} />
+              <X size={22}/>
             </button>
 
           </div>
@@ -74,137 +73,59 @@ export default function Sidebar({
 
         <nav className="menu">
 
-          <Link
-  to="/admin"
-  className="menu-link"
-  onClick={onClose}
->
-            <div className="menu-item">
-              <LayoutDashboard size={20} />
-              <span>Dashboard</span>
-            </div>
+          <Link to="/admin" className="menu-link" onClick={onClose}>
+            <div className="menu-item"><LayoutDashboard size={20}/><span>Dashboard</span></div>
           </Link>
 
-          <Link
-  to="/admin/students/upload"
-  className="menu-link"
-  onClick={onClose}
->
-            <div className="menu-item">
-              <GraduationCap size={20} />
-              <span>Students</span>
-            </div>
+          <Link to="/admin/students/upload" className="menu-link" onClick={onClose}>
+            <div className="menu-item"><GraduationCap size={20}/><span>Students</span></div>
           </Link>
 
-          <Link
-  to="/admin/teachers"
-  className="menu-link"
-  onClick={onClose}
->
-            <div className="menu-item">
-              <Users size={20} />
-              <span>Teachers</span>
-            </div>
+          <Link to="/admin/teachers" className="menu-link" onClick={onClose}>
+            <div className="menu-item"><Users size={20}/><span>Teachers</span></div>
           </Link>
 
-          <Link
-  to="/parent/dashboard"
-  className="menu-link"
-  onClick={onClose}
->
-            <div className="menu-item">
-              <UserRound size={20} />
-              <span>Parents</span>
-            </div>
+          <Link to="/parent/dashboard" className="menu-link" onClick={onClose}>
+            <div className="menu-item"><UserRound size={20}/><span>Parents</span></div>
           </Link>
 
-          <Link
-  to="/admin/master"
-  className="menu-link"
-  onClick={onClose}
->
-            <div className="menu-item">
-              <School size={20} />
-              <span>Masters</span>
-            </div>
+          <Link to="/admin/master" className="menu-link" onClick={onClose}>
+            <div className="menu-item"><School size={20}/><span>Masters</span></div>
           </Link>
 
-          <Link to="#" className="menu-link">
-            <div className="menu-item">
-              <ClipboardCheck size={20} />
-              <span>Attendance</span>
-            </div>
+          <Link to="#" className="menu-link" onClick={onClose}>
+            <div className="menu-item"><ClipboardCheck size={20}/><span>Attendance</span></div>
           </Link>
 
-          <Link
-  to="#"
-  className="menu-link"
-  onClick={onClose}
->
-            <div className="menu-item">
-              <BookOpen size={20} />
-              <span>Homework</span>
-            </div>
+          <Link to="#" className="menu-link" onClick={onClose}>
+            <div className="menu-item"><BookOpen size={20}/><span>Homework</span></div>
           </Link>
 
-          <Link
-  to="#"
-  className="menu-link"
-  onClick={onClose}
->
-            <div className="menu-item">
-              <FileBarChart size={20} />
-              <span>Results</span>
-            </div>
+          <Link to="#" className="menu-link" onClick={onClose}>
+            <div className="menu-item"><FileBarChart size={20}/><span>Results</span></div>
           </Link>
 
-          <Link
-  to="#"
-  className="menu-link"
-  onClick={onClose}
->
-            <div className="menu-item">
-              <IndianRupee size={20} />
-              <span>Fees</span>
-            </div>
+          <Link to="#" className="menu-link" onClick={onClose}>
+            <div className="menu-item"><IndianRupee size={20}/><span>Fees</span></div>
           </Link>
 
-          <Link
-  to="#"
-  className="menu-link"
-  onClick={onClose}
->
-            <div className="menu-item">
-              <Bell size={20} />
-              <span>Notices</span>
-            </div>
+          <Link to="#" className="menu-link" onClick={onClose}>
+            <div className="menu-item"><Bell size={20}/><span>Notices</span></div>
           </Link>
 
-          <Link
-  to="#"
-  className="menu-link"
-  onClick={onClose}
->
-            <div className="menu-item">
-              <Settings size={20} />
-              <span>Settings</span>
-            </div>
+          <Link to="#" className="menu-link" onClick={onClose}>
+            <div className="menu-item"><Settings size={20}/><span>Settings</span></div>
           </Link>
 
-          <Link
-  to="/"
-  className="menu-link"
-  onClick={onClose}
->
-            <div className="menu-item">
-              <LogOut size={20} />
-              <span>Logout</span>
-            </div>
+          <Link to="/" className="menu-link" onClick={onClose}>
+            <div className="menu-item"><LogOut size={20}/><span>Logout</span></div>
           </Link>
 
         </nav>
 
       </aside>
+
     </>
   );
+
 }

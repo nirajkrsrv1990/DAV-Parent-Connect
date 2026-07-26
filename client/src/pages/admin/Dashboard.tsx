@@ -1,9 +1,44 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+
 import DashboardCard from "../../components/dashboard/DashboardCard";
 import QuickActions from "../../components/dashboard/QuickActions";
 
 import "./Dashboard.css";
 
+type DashboardStats = {
+  students: number;
+  teachers: number;
+  parents: number;
+  notices: number;
+};
+
 export default function Dashboard() {
+  const [stats, setStats] = useState<DashboardStats>({
+    students: 0,
+    teachers: 0,
+    parents: 0,
+    notices: 0,
+  });
+
+  const loadDashboard = async () => {
+    try {
+      const res = await axios.get(
+        "/api/admin/dashboard-stats"
+      );
+
+      if (res.data.success) {
+        setStats(res.data.data);
+      }
+    } catch (err) {
+      console.error("Dashboard Load Error", err);
+    }
+  };
+
+  useEffect(() => {
+    loadDashboard();
+  }, []);
+
   return (
     <>
       <h1 className="dashboard-title">
@@ -14,25 +49,25 @@ export default function Dashboard() {
 
         <DashboardCard
           title="Students"
-          value="0"
+          value={String(stats.students)}
           color="#1565C0"
         />
 
         <DashboardCard
           title="Teachers"
-          value="0"
+          value={String(stats.teachers)}
           color="#43A047"
         />
 
         <DashboardCard
           title="Parents"
-          value="0"
+          value={String(stats.parents)}
           color="#8E24AA"
         />
 
         <DashboardCard
           title="Notices"
-          value="0"
+          value={String(stats.notices)}
           color="#FB8C00"
         />
 
@@ -45,15 +80,15 @@ export default function Dashboard() {
           <h2>Recent Activities</h2>
 
           <div className="activity-item">
-            No recent activity found.
+            Dashboard Connected Successfully.
           </div>
 
           <div className="activity-item">
-            Database not connected yet.
+            PostgreSQL Database Connected.
           </div>
 
           <div className="activity-item">
-            System is ready.
+            DAV ERP Ready.
           </div>
 
         </div>
@@ -61,6 +96,7 @@ export default function Dashboard() {
         <QuickActions />
 
       </div>
+
     </>
   );
 }

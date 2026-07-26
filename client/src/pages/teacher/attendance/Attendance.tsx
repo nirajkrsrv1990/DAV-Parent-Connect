@@ -1,8 +1,6 @@
+
 import { useCallback, useEffect, useState } from "react";
 import "./Attendance.css";
-import TeacherSidebar from "../../../components/teacher/TeacherSidebar";
-import TeacherHeader from "../../../components/teacher/TeacherHeader";
-
 type Student = {
   id: number;
   admission_no: string;
@@ -210,16 +208,16 @@ console.log("Section:", selectedSection);
     alert("Attendance Saved Successfully");
 
   };
+  useEffect(() => {
+
+  window.scrollTo(0, 0);
+
+}, []);
 
   return (
 
     <>
-
-      <TeacherSidebar />
-
-      <TeacherHeader />
-
-      <main className="attendance-page">
+  <div className="attendance-page">
 
         <div className="attendance-header">
 
@@ -381,13 +379,7 @@ console.log("Section:", selectedSection);
 
                     <td>
 
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "center",
-                          gap: "10px",
-                        }}
-                      >
+                      <div className="attendance-action">
 
                         <button
                           className={
@@ -455,9 +447,8 @@ console.log("Section:", selectedSection);
 
         )}
 
-      </main>
-
-    </>
+      </div>
+</>
 
   );
 

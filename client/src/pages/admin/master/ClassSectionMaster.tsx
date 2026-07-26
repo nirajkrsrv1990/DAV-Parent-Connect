@@ -234,9 +234,7 @@ export default function ClassSectionMaster() {
 
   return (
   <>
-    <Sidebar />
-    <Header />
-
+    
     <main className="dashboard-content">
 
       <div className="master-page">

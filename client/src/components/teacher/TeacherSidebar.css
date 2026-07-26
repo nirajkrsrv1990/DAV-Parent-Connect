@@ -1,67 +1,128 @@
-.teacher-sidebar{
-    width:260px;
-    height:100vh;
-    position:fixed;
-    left:0;
-    top:0;
-    background:#0F4C81;
-    color:#fff;
-    overflow-y:auto;
-    box-shadow:2px 0 12px rgba(0,0,0,.15);
+/* ==========================================
+   DESKTOP DEFAULT SIDEBAR
+========================================== */
+.teacher-sidebar {
+    width: 260px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: #0F4C81;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    box-shadow: 4px 0 15px rgba(0,0,0,.15);
+    transition: left 0.3s ease-in-out;
+    z-index: 1200;
 }
 
-.teacher-brand{
-    text-align:center;
-    padding:25px 15px;
-    border-bottom:1px solid rgba(255,255,255,.15);
+.teacher-brand {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,.15);
 }
 
-.teacher-logo{
-    width:75px;
-    margin-bottom:10px;
+.teacher-logo {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    margin-bottom: 10px;
 }
 
-.teacher-brand h2{
-    margin:8px 0 5px;
-    font-size:24px;
+.teacher-brand h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
 }
 
-.teacher-brand p{
-    margin:0;
-    font-size:15px;
+.teacher-brand p {
+    margin-top: 5px;
+    font-size: 14px;
 }
 
-.teacher-brand small{
-    display:block;
-    margin-top:6px;
-    color:#d8e6f7;
+.teacher-brand small {
+    display: block;
+    margin-top: 6px;
+    color: #d9e8ff;
 }
 
-.teacher-menu{
-    display:flex;
-    flex-direction:column;
-    padding:15px 0;
+.teacher-menu {
+    margin-top: 15px;
+    flex: 1;
+    overflow-y: auto;
 }
 
-.teacher-link{
-    text-decoration:none;
-    color:#fff;
+.teacher-link {
+    text-decoration: none;
+    color: #fff;
 }
 
-.teacher-item{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    padding:14px 22px;
-    transition:.25s;
-    cursor:pointer;
+.teacher-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 22px;
+    cursor: pointer;
+    transition: .25s;
 }
 
-.teacher-item:hover{
-    background:#1565C0;
+.teacher-item:hover {
+    background: rgba(255,255,255,.15);
+    border-left: 5px solid #ffcc00;
 }
 
-.teacher-item span{
-    font-size:15px;
-    font-weight:500;
+.teacher-item span {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+/* Close Button (Desktop default hidden) */
+.teacher-close-btn {
+    display: none;
+    border: none;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* Overlay (Desktop default hidden) */
+.teacher-sidebar-overlay {
+    display: none;
+}
+
+/* ==========================================
+   MOBILE & TABLET RESPONSIVE FIX
+========================================== */
+@media (max-width: 992px) {
+    /* 1. Default Sidebar Screen ke bahar Rahega */
+    .teacher-sidebar {
+        left: -270px !important;
+        box-shadow: none;
+    }
+
+    /* 2. Open / Active class par Slide In Hoga */
+    .teacher-sidebar.teacher-sidebar-open,
+    .teacher-sidebar.open,
+    .teacher-sidebar.active {
+        left: 0 !important;
+        box-shadow: 5px 0 25px rgba(0,0,0,0.4) !important;
+    }
+
+    /* 3. Mobile Close Button Show Hoga */
+    .teacher-close-btn {
+        display: block !important;
+    }
+
+    /* 4. Background Overlay Show Hoga */
+    .teacher-sidebar-overlay {
+        display: block !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1100;
+    }
 }

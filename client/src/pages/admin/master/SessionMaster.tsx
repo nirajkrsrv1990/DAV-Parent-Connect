@@ -150,10 +150,7 @@ export default function SessionMaster() {
 
   return (
   <>
-    <Sidebar />
-    <Header />
-
-    <main className="dashboard-content">
+        <main className="dashboard-content">
 
       <div className="master-page">
 

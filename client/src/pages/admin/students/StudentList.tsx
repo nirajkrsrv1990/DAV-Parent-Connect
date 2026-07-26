@@ -4,9 +4,6 @@ import {
   useState,
 } from "react";
 
-import Sidebar from "../../../components/dashboard/Sidebar";
-import Header from "../../../components/dashboard/Header";
-
 import "./StudentList.css";
 
 type Student = {
@@ -128,14 +125,6 @@ export default function StudentList(){
 
     },[students,search]);
     return (
-
-  <>
-
-    <Sidebar />
-
-    <Header />
-
-    <main className="dashboard-content">
 
       <div className="master-page">
 
@@ -327,11 +316,7 @@ export default function StudentList(){
 
         }
 
-      </div>
-
-    </main>
-
-  </>
+            </div>
 
 );
 

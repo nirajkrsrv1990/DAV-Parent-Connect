@@ -1,7 +1,5 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../../../components/dashboard/Sidebar";
-import Header from "../../../components/dashboard/Header";
 import "./StudentUpload.css";
 
 export default function StudentUpload() {
@@ -88,15 +86,7 @@ export default function StudentUpload() {
 
   return (
 
-    <>
-
-      <Sidebar />
-
-      <Header />
-
-      <main className="dashboard-content">
-
-        <div className="upload-page">
+    <div className="upload-page">
 
           <div className="page-header">
 
@@ -188,11 +178,7 @@ export default function StudentUpload() {
 
           </div>
 
-        </div>
-
-      </main>
-
-    </>
+               </div>
 
   );
 

@@ -1,6 +1,4 @@
 import { useMemo, useState } from "react";
-import Sidebar from "../../../components/dashboard/Sidebar";
-import Header from "../../../components/dashboard/Header";
 import "./TeacherAssignment.css";
 
 type Assignment = {
@@ -228,11 +226,6 @@ export default function TeacherAssignment() {
   }, [assignmentList, search]);
 
   return (
-  <>
-    <Sidebar />
-    <Header />
-
-    <main className="dashboard-content">
 
       <div className="master-page">
 
@@ -503,11 +496,8 @@ export default function TeacherAssignment() {
 
         </table>
 
-      </div>
+            </div>
 
-    </main>
-
-  </>
 );
 
 }

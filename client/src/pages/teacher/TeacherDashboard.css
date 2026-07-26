@@ -1,9 +1,7 @@
 .teacher-dashboard{
-    margin-left:260px;
-    margin-top:75px;
-    padding:30px;
-    min-height:100vh;
-    background:#f4f7fb;
+    padding:0;
+    min-height:auto;
+    background:transparent;
 }
 
 .welcome-card{

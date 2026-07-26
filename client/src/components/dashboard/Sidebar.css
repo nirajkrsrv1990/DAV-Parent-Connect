@@ -1,20 +1,23 @@
 .sidebar {
   width: 260px;
   height: 100vh;
-  background: #0f4c81;
-  color: white;
+  background: #0F4C81;
+  color: #ffffff;
   position: fixed;
   left: 0;
   top: 0;
   display: flex;
   flex-direction: column;
   box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+  z-index: 1200;
+  overflow-y: auto;
 }
 
 .sidebar-brand {
   text-align: center;
   padding: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1px solid rgba(255,255,255,.15);
 }
 
 .sidebar-logo {
@@ -43,6 +46,8 @@
 
 .menu {
   margin-top: 15px;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .menu-link {
@@ -55,16 +60,130 @@
   align-items: center;
   gap: 15px;
   padding: 15px 22px;
-  transition: 0.3s;
   cursor: pointer;
+  transition: 0.25s;
 }
 
 .menu-item:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255,255,255,.15);
   border-left: 5px solid #ffcc00;
 }
 
 .menu-item span {
   font-size: 15px;
   font-weight: 500;
+}
+
+/* Close Button */
+
+.close-btn {
+  display: none;
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+/* Overlay */
+
+.sidebar-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    z-index:999;
+}
+
+/* ==========================
+   MOBILE VIEW
+========================== */
+
+@media (max-width:768px) {
+
+  .sidebar {
+
+    transform: translateX(-100%);
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 260px;
+
+  }
+
+  .sidebar.sidebar-open {
+
+    transform: translateX(0);
+
+  }
+
+  .close-btn {
+
+    display: block;
+
+  }
+
+  .sidebar-overlay {
+
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    z-index: 1100;
+
+  }
+
+}
+/* ==========================================
+   CLOSE BUTTON
+========================================== */
+
+.sidebar-overlay{
+    display:none;
+}
+
+.close-btn{
+    display:none;
+}
+
+/* Sidebar Default Base Styles */
+.sidebar {
+    width: 260px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    transition: left 0.3s ease-in-out;
+}
+
+/* ==========================================
+   MOBILE & TABLET RESPONSIVE FIX
+========================================== */
+/* Sidebar default styling */
+.sidebar,
+.teacher-sidebar {
+    width: 260px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    transition: left 0.3s ease-in-out;
+}
+
+/* MOBILE FIX: Screen ke baahar bhejo jab tak toggle click na ho */
+@media (max-width: 768px) {
+    .sidebar,
+    .teacher-sidebar {
+        left: -260px !important; /* Standard screen se bahar bhejne ke liye */
+        box-shadow: 4px 0 15px rgba(0,0,0,0.3);
+    }
+
+    /* Class Name checks for Open state */
+    .sidebar.open,
+    .sidebar.active,
+    .teacher-sidebar.open,
+    .teacher-sidebar.active {
+        left: 0 !important; /* Menu icon dabaane par saamne aayega */
+    }
 }

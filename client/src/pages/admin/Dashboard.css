@@ -1,16 +1,17 @@
-.dashboard-content{
-    margin-left:260px;
-    margin-top:80px;
-    padding:30px;
-    background:#f4f7fb;
-    min-height:100vh;
-}
+/* ==========================================
+   DASHBOARD PAGE
+========================================== */
 
 .dashboard-title{
     color:#0F4C81;
     font-size:32px;
+    font-weight:700;
     margin-bottom:25px;
 }
+
+/* ==========================================
+   DASHBOARD CARDS
+========================================== */
 
 .cards{
     display:grid;
@@ -19,14 +20,22 @@
     margin-bottom:30px;
 }
 
+/* ==========================================
+   MAIN GRID
+========================================== */
+
 .dashboard-grid{
     display:grid;
     grid-template-columns:2fr 1fr;
     gap:25px;
 }
 
+/* ==========================================
+   RECENT ACTIVITY
+========================================== */
+
 .recent-activities{
-    background:white;
+    background:#ffffff;
     border-radius:16px;
     padding:25px;
     box-shadow:0 8px 20px rgba(0,0,0,.08);
@@ -38,19 +47,64 @@
 }
 
 .activity-item{
-    padding:15px;
-    border-bottom:1px solid #eee;
+    padding:15px 0;
+    border-bottom:1px solid #eeeeee;
 }
 
 .activity-item:last-child{
     border-bottom:none;
 }
 
-@media(max-width:900px){
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width:992px){
 
 .dashboard-grid{
 
-grid-template-columns:1fr;
+    grid-template-columns:1fr;
+
+}
+
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width:768px){
+
+.dashboard-title{
+
+    font-size:26px;
+    margin-bottom:18px;
+
+}
+
+.cards{
+
+    grid-template-columns:1fr;
+    gap:16px;
+
+}
+
+.dashboard-grid{
+
+    grid-template-columns:1fr;
+    gap:16px;
+
+}
+
+.recent-activities{
+
+    padding:18px;
+
+}
+
+.activity-item{
+
+    padding:12px 0;
 
 }
 

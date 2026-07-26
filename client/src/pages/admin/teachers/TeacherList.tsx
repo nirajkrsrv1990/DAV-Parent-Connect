@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import Sidebar from "../../../components/dashboard/Sidebar";
-import Header from "../../../components/dashboard/Header";
 import "./TeacherList.css";
 
 type Teacher = {
@@ -114,13 +112,8 @@ export default function TeacherList() {
 
   }, []);
   return (
-  <>
-    <Sidebar />
-    <Header />
 
-    <main className="dashboard-content">
-
-      <div className="teacher-page">
+  <div className="teacher-page">
 
         <div className="teacher-header">
 
@@ -258,13 +251,9 @@ export default function TeacherList() {
 
           </table>
 
-        )}
+                )}
 
       </div>
-
-    </main>
-
-  </>
 
 );
 

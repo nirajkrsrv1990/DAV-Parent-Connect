@@ -158,10 +158,7 @@ export default function SubjectMaster() {
 
   return (
   <>
-    <Sidebar />
-    <Header />
-
-    <main className="dashboard-content">
+        <main className="dashboard-content">
 
       <div className="master-page">
 

@@ -1,9 +1,6 @@
 import "./MasterDashboard.css";
 import { useNavigate } from "react-router-dom";
 
-import Sidebar from "../../../../components/dashboard/Sidebar";
-import Header from "../../../../components/dashboard/Header";
-
 type MasterItem = {
   title: string;
   route: string;
@@ -14,7 +11,6 @@ export default function MasterDashboard() {
   const navigate = useNavigate();
 
   const masters: MasterItem[] = [
-   
     {
       title: "Class & Section",
       route: "/admin/master/class-section",
@@ -46,56 +42,49 @@ export default function MasterDashboard() {
       icon: "🎓",
     },
     {
-    title: "Session Master",
-    route: "/admin/master/session",
-    icon: "📅",
-},
+      title: "Session Master",
+      route: "/admin/master/session",
+      icon: "📅",
+    },
     {
       title: "School Settings",
       route: "/admin/master/settings",
       icon: "⚙️",
     },
     {
-    title: "Teacher Assignment",
-    icon: "👨‍🏫",
-    route: "/admin/teacher-assignment",
-}
+      title: "Teacher Assignment",
+      route: "/admin/teacher-assignment",
+      icon: "👨‍🏫",
+    },
   ];
 
   return (
-    <>
-      <Sidebar />
-      <Header />
+    <div className="master-dashboard">
 
-      <main className="dashboard-content">
-        <div className="master-dashboard">
+      <h1>Master Management</h1>
 
-          <h1>Master Management</h1>
+      <p>
+        Configure all master data for DAV ERP.
+      </p>
 
-          <p>
-            Configure all master data for DAV ERP.
-          </p>
+      <div className="master-grid">
 
-          <div className="master-grid">
+        {masters.map((item) => (
+          <div
+            key={item.title}
+            className="master-card"
+            onClick={() => navigate(item.route)}
+          >
+            <div className="master-icon">
+              {item.icon}
+            </div>
 
-            {masters.map((item) => (
-              <div
-                key={item.title}
-                className="master-card"
-                onClick={() => navigate(item.route)}
-              >
-                <div className="master-icon">
-                  {item.icon}
-                </div>
-
-                <h3>{item.title}</h3>
-              </div>
-            ))}
-
+            <h3>{item.title}</h3>
           </div>
+        ))}
 
-        </div>
-      </main>
-    </>
+      </div>
+
+    </div>
   );
 }

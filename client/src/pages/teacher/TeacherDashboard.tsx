@@ -1,9 +1,12 @@
 import "./TeacherDashboard.css";
-import { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 
-import TeacherSidebar from "../../components/teacher/TeacherSidebar";
-import TeacherHeader from "../../components/teacher/TeacherHeader";
+import {
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
+
+import { useNavigate } from "react-router-dom";
 
 type Teacher = {
   teacher_id: string;
@@ -15,7 +18,6 @@ type Teacher = {
 export default function TeacherDashboard() {
 
   const navigate = useNavigate();
-
   const [teacher, setTeacher] =
     useState<Teacher | null>(null);
 
@@ -103,10 +105,7 @@ void loadClassTeacher(
   }, [navigate, loadClassTeacher]);
     return (
     <>
-      <TeacherSidebar />
-      <TeacherHeader />
-
-      <main className="teacher-dashboard">
+  <div className="teacher-dashboard">
 
         <div className="welcome-card">
 
@@ -216,8 +215,8 @@ void loadClassTeacher(
 
         </div>
 
-      </main>
-    </>
+      </div>
+</>
   );
 
 }

@@ -188,8 +188,6 @@ export default function ExamMaster() {
 
   return (
   <>
-    <Sidebar />
-    <Header />
 
     <main className="dashboard-content">
 

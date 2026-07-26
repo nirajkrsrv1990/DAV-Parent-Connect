@@ -1,19 +1,47 @@
 .dashboard-header{
-    margin-left:260px;
+    margin-left:0;
     height:80px;
-    background:white;
+    background:#ffffff;
     display:flex;
     justify-content:space-between;
     align-items:center;
     padding:0 30px;
     box-shadow:0 2px 12px rgba(0,0,0,.08);
+    position:sticky;
+    top:0;
+    z-index:1000;
+}
+
+.header-left{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    min-width:0;
+}
+
+.menu-btn{
+    display:none;
+    border:none;
+    background:none;
+    cursor:pointer;
+    color:#0F4C81;
+    padding:6px;
+    border-radius:6px;
+}
+
+.menu-btn:hover{
+    background:#eef4fb;
 }
 
 .dashboard-header h2{
+    margin:0;
     color:#0F4C81;
+    font-size:28px;
+    font-weight:700;
 }
 
 .dashboard-header p{
+    margin:2px 0 0;
     color:#666;
     font-size:14px;
 }
@@ -21,10 +49,13 @@
 .header-right{
     display:flex;
     align-items:center;
-    gap:30px;
+    gap:24px;
 }
 
 .notification{
+    display:flex;
+    align-items:center;
+    justify-content:center;
     cursor:pointer;
 }
 
@@ -32,4 +63,104 @@
     display:flex;
     align-items:center;
     gap:10px;
+}
+
+.profile strong{
+    display:block;
+    font-size:16px;
+}
+
+.profile p{
+    margin:0;
+    font-size:13px;
+}
+
+/* ==========================
+   MOBILE
+========================== */
+
+@media (max-width:768px){
+
+.dashboard-header{
+    width:100%;
+    margin:0;
+    height:70px;
+    padding:0 14px;
+    box-sizing:border-box;
+}
+
+.menu-btn{
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+}
+
+.dashboard-header h2{
+
+    font-size:18px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+}
+
+.dashboard-header p{
+
+    font-size:12px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+}
+
+.header-right{
+
+    gap:12px;
+
+}
+
+.profile p{
+
+    display:none;
+
+}
+
+.profile strong{
+
+    font-size:14px;
+
+}
+.school-info{
+    min-width:0;
+}
+
+.school-info h2{
+    font-size:16px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.school-info p{
+    display:none;
+}
+
+.profile-info{
+    display:none;
+}
+
+.notification{
+    display:none;
+}
+
+.header-right{
+    gap:0;
+}
+
+.dashboard-header{
+    justify-content:space-between;
+}
+
 }

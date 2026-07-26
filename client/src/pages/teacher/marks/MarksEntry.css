@@ -1,5 +1,5 @@
 .marks-page{
-    margin-left:260px;
+    margin-left:0;
     margin-top:75px;
     width:calc(100% - 260px);
     min-height:calc(100vh - 75px);

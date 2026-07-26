@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 
 import LoginPage from "../pages/auth/LoginPage";
+import AdminLayout from "../components/layout/AdminLayout";
 
 // ================= ADMIN =================
 import Dashboard from "../pages/admin/Dashboard";
@@ -17,13 +18,14 @@ import StudentList from "../pages/admin/students/StudentList";
 // ================= TEACHERS (ADMIN) =================
 import TeacherList from "../pages/admin/teachers/TeacherList";
 import AddTeacher from "../pages/admin/teachers/AddTeacher";
+import TeacherAssignment from "../pages/admin/teacher-assignment/TeacherAssignment";
 
 // ================= TEACHER PORTAL =================
+import TeacherLayout from "../components/layout/TeacherLayout";
 import TeacherDashboard from "../pages/teacher/TeacherDashboard";
 import Attendance from "../pages/teacher/attendance/Attendance";
 import Homework from "../pages/teacher/homework/Homework";
 import MarksEntry from "../pages/teacher/marks/MarksEntry";
-import TeacherAssignment from "../pages/admin/teacher-assignment/TeacherAssignment";
 
 // ================= PARENTS =================
 import ParentSignup from "../pages/parent/ParentSignup";
@@ -43,81 +45,93 @@ export default function AppRoutes() {
 
       {/* ================= ADMIN ================= */}
 
-      <Route
-        path="/admin"
-        element={<Dashboard />}
-      />
-      <Route
-    path="/admin/master"
-    element={<MasterDashboard />}
-/>
-<Route
-    path="/admin/master/session"
-    element={<SessionMaster />}
-/>
-<Route
-    path="/admin/master/class-section"
-    element={<ClassSectionMaster />}
-/>
-<Route
-    path="/admin/master/subject"
-    element={<SubjectMaster />}
-/>
-<Route
-    path="/admin/master/exam"
-    element={<ExamMaster />}
-/>
-<Route
-    path="/admin/students/list"
-    element={<StudentList />}
-/>
-<Route
-    path="/admin/students/upload"
-    element={<StudentUpload />}
-/>
+      <Route element={<AdminLayout />}>
 
-      {/* ================= STUDENTS ================= */}
+        <Route
+          path="/admin"
+          element={<Dashboard />}
+        />
 
-            <Route
-        path="/admin/students/upload"
-        element={<StudentUpload />}
-      />
+        <Route
+          path="/admin/master"
+          element={<MasterDashboard />}
+        />
 
-      {/* ================= TEACHER MANAGEMENT (ADMIN) ================= */}
+        <Route
+          path="/admin/master/session"
+          element={<SessionMaster />}
+        />
 
-      <Route
-        path="/admin/teachers"
-        element={<TeacherList />}
-      />
+        <Route
+          path="/admin/master/class-section"
+          element={<ClassSectionMaster />}
+        />
 
-      <Route
-        path="/admin/teachers/add"
-        element={<AddTeacher />}
-      />
+        <Route
+          path="/admin/master/subject"
+          element={<SubjectMaster />}
+        />
+
+        <Route
+          path="/admin/master/exam"
+          element={<ExamMaster />}
+        />
+
+        <Route
+          path="/admin/students/upload"
+          element={<StudentUpload />}
+        />
+
+        <Route
+          path="/admin/students/list"
+          element={<StudentList />}
+        />
+
+        <Route
+          path="/admin/teachers"
+          element={<TeacherList />}
+        />
+
+        <Route
+          path="/admin/teachers/add"
+          element={<AddTeacher />}
+        />
+
+        <Route
+          path="/admin/teacher-assignment"
+          element={<TeacherAssignment />}
+        />
+
+      </Route>
 
       {/* ================= TEACHER PORTAL ================= */}
 
       <Route
-        path="/teacher"
-        element={<TeacherDashboard />}
-      />
+  path="/teacher"
+  element={<TeacherLayout />}
+>
 
-      <Route
-        path="/teacher/attendance"
-        element={<Attendance />}
-      />
-      <Route
-    path="/teacher/homework"
+  <Route
+    index
+    element={<TeacherDashboard />}
+  />
+
+  <Route
+    path="attendance"
+    element={<Attendance />}
+  />
+
+  <Route
+    path="homework"
     element={<Homework />}
-/>
-<Route
-    path="/teacher/marks"
+  />
+
+  <Route
+    path="marks"
     element={<MarksEntry />}
-/>
-<Route
-    path="/admin/teacher-assignment"
-    element={<TeacherAssignment />}
-/>
+  />
+
+</Route>
 
       {/* ================= PARENT ================= */}
 
@@ -125,10 +139,11 @@ export default function AppRoutes() {
         path="/parent/signup"
         element={<ParentSignup />}
       />
+
       <Route
-  path="/parent/login"
-  element={<ParentLogin />}
-/>
+        path="/parent/login"
+        element={<ParentLogin />}
+      />
 
       <Route
         path="/parent/dashboard"

@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Sidebar from "../../../components/dashboard/Sidebar";
-import Header from "../../../components/dashboard/Header";
 import "./AddTeacher.css";
 
 export default function AddTeacher() {
@@ -201,15 +199,7 @@ Password : ${result.teacher.password}`
 
   return (
 
-    <>
-
-      <Sidebar />
-
-      <Header />
-
-      <main className="dashboard-content">
-
-        <div className="teacher-form">
+    <div className="teacher-form">
 
           <h1>Add Teacher</h1>
 
@@ -434,11 +424,7 @@ Password : ${result.teacher.password}`
 
         </div>
 
-      </div>
-
-    </main>
-
-  </>
+              </div>
 
 );
 

@@ -6,37 +6,21 @@ export default function QuickActions() {
   const navigate = useNavigate();
 
   return (
-
     <div className="quick-actions">
 
       <h2>Quick Actions</h2>
 
       <button
-        onClick={() => navigate("/admin/students/upload")}
+        style={{ background: "red", color: "white" }}
+        onClick={() => {
+          alert("WORKING");
+          console.log("WORKING");
+        }}
       >
-        ➕ Upload Students
-      </button>
-
-      <button
-        onClick={() => navigate("/admin/teachers/add")}
-      >
-        ➕ Add Teacher
-      </button>
-
-      <button
-        onClick={() => navigate("/parent/signup")}
-      >
-        ➕ Add Parent
-      </button>
-
-      <button
-        onClick={() => alert("Notice Module Coming Next")}
-      >
-        📢 Upload Notice
+        TEST BUTTON
       </button>
 
     </div>
-
   );
 
 }

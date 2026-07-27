@@ -1,3 +1,5 @@
+import AddNotice from "../pages/admin/notices/AddNotice";
+import NoticeList from "../pages/admin/notices/NoticeList";
 import { Routes, Route } from "react-router-dom";
 
 import LoginPage from "../pages/auth/LoginPage";
@@ -37,6 +39,15 @@ export default function AppRoutes() {
     <Routes>
 
       {/* ================= LOGIN ================= */}
+      <Route
+path="/admin/notices"
+element={<NoticeList />}
+/>
+
+<Route
+path="/admin/notices/add"
+element={<AddNotice />}
+/>
 
       <Route
         path="/"

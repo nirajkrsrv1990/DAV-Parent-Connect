@@ -1,3 +1,5 @@
+import noticeRoutes from "./routes/notices.routes";
+import activityRoutes from "./routes/activity.routes";
 import teacherRoutes from "./routes/teacher.routes";
 import adminRoutes from "./routes/admin.routes";
 import masterRoutes from "./routes/master.routes";
@@ -26,6 +28,14 @@ app.use("/api/students", studentRoutes);
 app.use("/api/master", masterRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/teachers", teacherRoutes);
+app.use(
+  "/api/notices",
+  noticeRoutes
+);
+app.use(
+  "/api/activity",
+  activityRoutes
+);
 app.use(
   "/api/class-teacher",
   classTeacherRoutes

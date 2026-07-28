@@ -9,6 +9,8 @@ import dotenv from "dotenv";
 import studentRoutes from "./routes/student.routes";
 import classTeacherRoutes from "./routes/classTeacher.routes";
 import parentRoutes from "./routes/parent.routes";
+import path from "path";
+import homeworkRoutes from "./routes/homework.routes";
 
 dotenv.config();
 
@@ -34,6 +36,11 @@ app.use("/api/class-teacher", classTeacherRoutes);
 // Support both /api/parent and /api/parents
 app.use("/api/parent", parentRoutes);
 app.use("/api/parents", parentRoutes);
+// Expose uploads folder publicly so files can be accessed/downloaded
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+
+// Register homework routes
+app.use("/api/homework", homeworkRoutes);
 
 /* FIXED: Changed /api/parents to /api/parent (matching frontend requests) */
 app.use("/api/parent", parentRoutes);

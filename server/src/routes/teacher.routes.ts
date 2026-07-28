@@ -1,75 +1,29 @@
 import { Router } from "express";
-
-
 import {
+  assignClassTeacher,
   createTeacher,
+  getClassTeacher,
   teacherLogin,
   getTeachers,
-  assignClassTeacher,
-  getClassTeacher,
   deleteTeacher,
+  saveAttendance,
 } from "../controllers/teacher.controller";
 
 const router = Router();
 
-/* ===========================
-   CREATE TEACHER
-=========================== */
+// Auth Routes
+router.post("/login", teacherLogin);
 
-router.post(
-  "/create",
-  createTeacher
-);
+// Teacher CRUD Routes
+router.get("/", getTeachers);
+router.post("/create", createTeacher);
+router.delete("/:id", deleteTeacher);
 
-/* ===========================
-   TEACHER LOGIN
-=========================== */
+// Class Assignment Routes
+router.post("/assign-class", assignClassTeacher);
+router.get("/class-teacher/:teacher_id", getClassTeacher);
 
-router.post(
-  "/login",
-  teacherLogin
-);
+// Attendance Route (Isi route par 404 aa raha tha)
+router.post("/attendance", saveAttendance);
 
-/* ===========================
-   GET ALL TEACHERS
-=========================== */
-
-router.get(
-  "/",
-  getTeachers
-);
-/* ===========================
-   GET ALL TEACHERS
-=========================== */
-
-router.get(
-  "/",
-  getTeachers
-);
-
-/* ===========================
-   ASSIGN CLASS TEACHER
-=========================== */
-
-router.post(
-  "/assign-class-teacher",
-  assignClassTeacher
-);
-
-/* ===========================
-   GET CLASS TEACHER
-=========================== */
-
-router.get(
-  "/class-teacher/:teacher_id",
-  getClassTeacher
-);
-/* ===========================
-   DELETE TEACHER
-=========================== */
-
-router.delete(
-  "/:id",
-  deleteTeacher
-);
 export default router;

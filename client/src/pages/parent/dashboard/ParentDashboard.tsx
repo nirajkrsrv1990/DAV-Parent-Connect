@@ -10,7 +10,7 @@ export default function ParentDashboard() {
   const [attendancePercentage, setAttendancePercentage] = useState<number>(0);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState<boolean>(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false); // NEW STATE FOR MOBILE MENU
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const parentData = localStorage.getItem("parent");
@@ -53,7 +53,6 @@ export default function ParentDashboard() {
     }
   };
 
-  // Helper for closing sidebar on menu click (mobile)
   const closeSidebarOnMobile = () => {
     if (window.innerWidth < 992) {
       setIsSidebarOpen(false);
@@ -61,24 +60,27 @@ export default function ParentDashboard() {
   };
 
   return (
-    <div className={`parent-dashboard ${isSidebarOpen ? "sidebar-open" : ""}`}>
+    <div className="parent-dashboard">
       
-      {/* MOBILE NAV (HEADER) - Appears on < 992px */}
+      {/* MOBILE TOP BAR */}
       <div className="parent-mobile-nav">
-        <div className="hamburger" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+        <div className="hamburger" onClick={() => setIsSidebarOpen(true)}>
           ☰
         </div>
-        <img src={logo} alt="DAV Logo" className="parent-logo-mobile" />
-        <span className="school-name-mobile">DAV Public School</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <img src={logo} alt="DAV Logo" className="parent-logo-mobile" />
+          <span className="school-name-mobile">DAV Parent</span>
+        </div>
+        <div style={{ width: "24px" }}></div> {/* Placeholder for flex alignment */}
       </div>
 
-      {/* PARENT SIDEBAR - With dynamic class */}
+      {/* DRAWER SIDEBAR */}
       <aside className={`parent-sidebar ${isSidebarOpen ? "open" : ""}`}>
         <div className="sidebar-header">
+          <div className="sidebar-close" onClick={() => setIsSidebarOpen(false)}>×</div>
           <img src={logo} alt="DAV Logo" className="parent-logo" />
           <h2>DAV Parent</h2>
           <p>Session : 2026-27</p>
-          <div className="sidebar-close" onClick={() => setIsSidebarOpen(false)}>×</div> {/* Close Button on mobile sidebar */}
         </div>
 
         <nav>
@@ -105,7 +107,7 @@ export default function ParentDashboard() {
       {/* MAIN CONTENT AREA */}
       <div className="parent-content">
         
-        {/* HEADER WITH NOTIFICATION BELL (Keep this similar) */}
+        {/* HEADER WITH NOTIFICATION BELL */}
         <header className="parent-header">
           <div>
             <h1>Welcome, Parent</h1>
@@ -115,25 +117,58 @@ export default function ParentDashboard() {
           <div style={{ position: "relative", cursor: "pointer" }}>
             <div 
               onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
-              style={{ fontSize: "24px", padding: "10px", position: "relative" }}
+              style={{ fontSize: "22px", padding: "8px", position: "relative" }}
             >
               🔔
               {notifications.length > 0 && (
-                <span className="notif-badge">
+                <span style={{
+                  position: "absolute",
+                  top: "2px",
+                  right: "2px",
+                  backgroundColor: "#ef4444",
+                  color: "#fff",
+                  fontSize: "11px",
+                  borderRadius: "50%",
+                  padding: "2px 6px",
+                  fontWeight: "bold"
+                }}>
                   {notifications.length}
                 </span>
               )}
             </div>
 
+            {/* DROPDOWN MENU */}
             {showNotificationDropdown && (
-              <div className="notif-dropdown">
-                {/* ... dropdown content same as before ... */}
+              <div style={{
+                position: "absolute",
+                right: 0,
+                top: "40px",
+                width: "280px",
+                backgroundColor: "#fff",
+                boxShadow: "0px 10px 25px rgba(0,0,0,0.15)",
+                borderRadius: "8px",
+                zIndex: 1000,
+                padding: "12px"
+              }}>
+                <h4 style={{ margin: "0 0 10px 0", borderBottom: "1px solid #f1f5f9", paddingBottom: "6px", fontSize: "14px" }}>
+                  Notifications
+                </h4>
+                {notifications.length === 0 ? (
+                  <p style={{ fontSize: "13px", color: "#64748b", margin: 0 }}>No new notifications</p>
+                ) : (
+                  notifications.map((notif: any, index: number) => (
+                    <div key={index} style={{ padding: "8px 0", borderBottom: "1px solid #f8fafc", fontSize: "12px" }}>
+                      <strong style={{ color: "#ef4444" }}>{notif.title}</strong>
+                      <p style={{ margin: "2px 0 0 0", color: "#334155" }}>{notif.message}</p>
+                    </div>
+                  ))
+                )}
               </div>
             )}
           </div>
         </header>
 
-        {/* TOP ALERT BANNER (If any notification) */}
+        {/* TOP ALERT BANNER */}
         {notifications.length > 0 && (
           <div className="parent-notification-banner">
             <strong>🔔 Notification:</strong> {notifications[0].message}
@@ -141,24 +176,24 @@ export default function ParentDashboard() {
         )}
 
         {/* STUDENT INFO CARD */}
-        <section className="student-card card">
+        <section className="student-card">
           <h2>Student Information</h2>
           <div className="student-grid">
             <div>
               <strong>Student Name</strong>
-              <p>{student?.student_name || "AASHI"}</p> {/* Fallback for testing */}
+              <p>{student?.student_name}</p>
             </div>
             <div>
               <strong>Admission No.</strong>
-              <p>{student?.admission_no || "10703"}</p>
+              <p>{student?.admission_no}</p>
             </div>
             <div>
               <strong>Class</strong>
-              <p>{student?.class || "VII"}</p>
+              <p>{student?.class}</p>
             </div>
             <div>
               <strong>Section</strong>
-              <p>{student?.section || "A"}</p>
+              <p>{student?.section}</p>
             </div>
             <div>
               <strong>Session</strong>
@@ -167,7 +202,7 @@ export default function ParentDashboard() {
           </div>
         </section>
 
-        {/* DASHBOARD SUMMARY GRID */}
+        {/* SUMMARY CARDS GRID */}
         <section className="dashboard-grid">
           <div className="card">
             <h3>Attendance</h3>
@@ -199,6 +234,7 @@ export default function ParentDashboard() {
             <p>Coming Soon</p>
           </div>
         </section>
+
       </div>
     </div>
   );

@@ -28,22 +28,11 @@ app.use("/api/students", studentRoutes);
 app.use("/api/master", masterRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/teachers", teacherRoutes);
-app.use(
-  "/api/notices",
-  noticeRoutes
-);
-app.use(
-  "/api/activity",
-  activityRoutes
-);
-app.use(
-  "/api/class-teacher",
-  classTeacherRoutes
-);
-app.use(
-  "/api/parents",
-  parentRoutes
-);
+app.use("/api/notices", noticeRoutes);
+app.use("/api/activity", activityRoutes);
+app.use("/api/class-teacher", classTeacherRoutes);
 
+/* FIXED: Changed /api/parents to /api/parent (matching frontend requests) */
+app.use("/api/parent", parentRoutes);
 
 export default app;

@@ -31,6 +31,9 @@ app.use("/api/teachers", teacherRoutes);
 app.use("/api/notices", noticeRoutes);
 app.use("/api/activity", activityRoutes);
 app.use("/api/class-teacher", classTeacherRoutes);
+// Support both /api/parent and /api/parents
+app.use("/api/parent", parentRoutes);
+app.use("/api/parents", parentRoutes);
 
 /* FIXED: Changed /api/parents to /api/parent (matching frontend requests) */
 app.use("/api/parent", parentRoutes);

@@ -9,6 +9,7 @@ export default function ParentDashboard() {
   const [student, setStudent] = useState<any>(null);
   const [attendancePercentage, setAttendancePercentage] = useState<number>(0);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [showNotificationDropdown, setShowNotificationDropdown] = useState<boolean>(false);
 
   useEffect(() => {
     const parentData = localStorage.getItem("parent");
@@ -20,14 +21,10 @@ export default function ParentDashboard() {
 
     const parent = JSON.parse(parentData);
 
-    // 1. Load Student Profile Details
     loadStudent(parent.admission_no);
-
-    // 2. Load Attendance % & Daily Notifications Data
     loadDashboardData(parent.admission_no);
   }, []);
 
-  /* Fetch Student Profile Info */
   const loadStudent = async (admissionNo: string) => {
     try {
       const response = await fetch(`/api/students/admission/${admissionNo}`);
@@ -41,10 +38,9 @@ export default function ParentDashboard() {
     }
   };
 
-  /* Fetch Dynamic Attendance % and Notifications */
   const loadDashboardData = async (admissionNo: string) => {
     try {
-      const response = await fetch(`/api/parent/dashboard/${admissionNo}`);
+      const response = await fetch(`/api/parents/dashboard/${admissionNo}`);
       const result = await response.json();
 
       if (result.success) {
@@ -87,20 +83,78 @@ export default function ParentDashboard() {
       </aside>
 
       <div className="parent-content">
-        <header className="parent-header">
+        {/* HEADER WITH NOTIFICATION BELL */}
+        <header className="parent-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative" }}>
           <div>
             <h1>Welcome, Parent</h1>
             <p>DAV PUBLIC SCHOOL, Sasaram</p>
           </div>
+
+          {/* NOTIFICATION BELL ICON */}
+          <div style={{ position: "relative", cursor: "pointer" }}>
+            <div 
+              onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
+              style={{ fontSize: "24px", padding: "10px", position: "relative" }}
+            >
+              🔔
+              {notifications.length > 0 && (
+                <span style={{
+                  position: "absolute",
+                  top: "5px",
+                  right: "5px",
+                  backgroundColor: "#dc3545",
+                  color: "#fff",
+                  fontSize: "12px",
+                  borderRadius: "50%",
+                  padding: "2px 6px",
+                  fontWeight: "bold"
+                }}>
+                  {notifications.length}
+                </span>
+              )}
+            </div>
+
+            {/* DROPDOWN MENU */}
+            {showNotificationDropdown && (
+              <div style={{
+                position: "absolute",
+                right: 0,
+                top: "45px",
+                width: "300px",
+                backgroundColor: "#fff",
+                boxShadow: "0px 4px 12px rgba(0,0,0,0.15)",
+                borderRadius: "8px",
+                zIndex: 1000,
+                padding: "10px"
+              }}>
+                <h4 style={{ margin: "0 0 10px 0", borderBottom: "1px solid #eee", paddingBottom: "5px" }}>Notifications</h4>
+                {notifications.length === 0 ? (
+                  <p style={{ fontSize: "14px", color: "#666" }}>No new notifications</p>
+                ) : (
+                  notifications.map((notif: any, index: number) => (
+                    <div key={index} style={{ padding: "8px 0", borderBottom: "1px solid #f5f5f5", fontSize: "13px" }}>
+                      <strong style={{ color: "#d9534f" }}>{notif.title}</strong>
+                      <p style={{ margin: "3px 0 0 0", color: "#333" }}>{notif.message}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
         </header>
 
-        {/* Real-time Notifications / Alerts Section */}
+        {/* TOP ALERT BANNER (If any notification) */}
         {notifications.length > 0 && (
-          <section className="notifications-section" style={{ marginBottom: "20px" }}>
-            <div style={{ padding: "12px", backgroundColor: "#fff3cd", borderLeft: "5px solid #ffc107", borderRadius: "5px" }}>
-              <strong>🔔 Recent Notification:</strong> {notifications[0]?.message || notifications[0]?.title}
-            </div>
-          </section>
+          <div style={{
+            margin: "15px 0",
+            padding: "12px 16px",
+            backgroundColor: "#fff3cd",
+            borderLeft: "5px solid #ffc107",
+            borderRadius: "4px",
+            color: "#856404"
+          }}>
+            <strong>🔔 Notification:</strong> {notifications[0].message}
+          </div>
         )}
 
         <section className="student-card">
@@ -132,7 +186,6 @@ export default function ParentDashboard() {
         <section className="dashboard-grid">
           <div className="card">
             <h3>Attendance</h3>
-            {/* Dynamic Attendance Percentage */}
             <p>{attendancePercentage}%</p>
           </div>
 

@@ -107,40 +107,41 @@ export default function Attendance() {
   };
 
   const saveAttendance = async () => {
-    try {
-      const teacherData = localStorage.getItem("teacher");
-      if (!teacherData) {
-        alert("Teacher Login Expired");
-        return;
-      }
-
-      const teacher = JSON.parse(teacherData);
-
-      // Verify correct backend API route
-      const response = await fetch("/api/teachers/attendance", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          attendanceDate,
-          teacher_db_id: teacher.id, // Primary key ID (integer)
-          students,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        alert("Attendance & Notifications Saved Successfully!");
-      } else {
-        alert(result.message || "Failed to save");
-      }
-    } catch (err) {
-      console.log(err);
-      alert("Unable to Save Attendance");
+  try {
+    const teacherData = localStorage.getItem("teacher");
+    if (!teacherData) {
+      alert("Teacher Login Expired");
+      return;
     }
-  };
+
+    const teacher = JSON.parse(teacherData);
+
+    // Exact matching backend route
+    const response = await fetch("/api/teachers/attendance", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        attendanceDate,
+        teacher_db_id: teacher.id,
+        teacher_id: teacher.teacher_id,
+        students,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      alert("Attendance Saved Successfully!");
+    } else {
+      alert(result.message || "Failed to save attendance");
+    }
+  } catch (err) {
+    console.log(err);
+    alert("Unable to Save Attendance");
+  }
+};
 
   useEffect(() => {
     window.scrollTo(0, 0);

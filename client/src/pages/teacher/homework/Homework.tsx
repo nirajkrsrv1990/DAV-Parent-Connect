@@ -1,7 +1,6 @@
 import { useState } from "react";
 import "./Homework.css";
 import TeacherSidebar from "../../../components/teacher/TeacherSidebar";
-import TeacherHeader from "../../../components/teacher/TeacherHeader";
 
 type HomeworkItem = {
   id: number;
@@ -94,7 +93,6 @@ export default function Homework() {
   return (
     <>
       <TeacherSidebar />
-      <TeacherHeader />
 
       <main className="homework-page">
         <div className="homework-header">

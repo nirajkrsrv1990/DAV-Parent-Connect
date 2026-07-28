@@ -201,13 +201,62 @@ console.log("Section:", selectedSection);
 
   };
 
-  const saveAttendance = () => {
+  const saveAttendance = async () => {
 
-    console.log(students);
+  try {
 
-    alert("Attendance Saved Successfully");
+    const teacherData = localStorage.getItem("teacher");
 
-  };
+    if (!teacherData) {
+
+      alert("Teacher Login Expired");
+
+      return;
+
+    }
+
+    const teacher = JSON.parse(teacherData);
+
+    const response = await fetch(
+      "/api/teachers/attendance",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+
+          attendanceDate,
+
+          teacher_id: teacher.teacher_id,
+
+          students,
+
+        }),
+      }
+    );
+
+    const result = await response.json();
+
+    if (result.success) {
+
+      alert("Attendance Saved Successfully");
+
+    } else {
+
+      alert(result.message);
+
+    }
+
+  } catch (err) {
+
+    console.log(err);
+
+    alert("Unable to Save Attendance");
+
+  }
+
+};
   useEffect(() => {
 
   window.scrollTo(0, 0);

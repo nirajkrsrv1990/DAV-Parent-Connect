@@ -1,28 +1,45 @@
-.quick-actions{
-    background:white;
-    border-radius:16px;
-    padding:25px;
-    box-shadow:0 6px 18px rgba(0,0,0,.08);
+.quick-actions {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
 
-.quick-actions h2{
-    margin-bottom:20px;
-    color:#0F4C81;
+.quick-actions h2 {
+  margin-bottom: 20px;
+  color: #0F4C81;
+  font-size: 20px;
+  font-weight: 700;
 }
 
-.quick-actions button{
-    width:100%;
-    margin-bottom:12px;
-    padding:12px;
-    border:none;
-    border-radius:10px;
-    background:#1565C0;
-    color:white;
-    cursor:pointer;
-    transition:.3s;
-    font-size:15px;
+.quick-actions button {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  background: #1565C0;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
-.quick-actions button:hover{
-    background:#0F4C81;
+/* Last button ke baad extra space na bacche */
+.quick-actions button:last-child {
+  margin-bottom: 0;
+}
+
+.quick-actions button:hover {
+  background: #0F4C81;
+  transform: translateY(-1px);
+}
+
+.quick-actions button:active {
+  transform: translateY(0);
 }

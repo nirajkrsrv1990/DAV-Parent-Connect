@@ -2,18 +2,21 @@ import { Request, Response } from "express";
 import pool from "../config/db";
 
 /* ===========================
-   PARENT LOGIN
+   PARENT LOGIN (Mapped via admission_no)
 =========================== */
 export const parentLogin = async (req: Request, res: Response) => {
   try {
     const { mobile, password } = req.body;
 
-    // Admission No se Student Record JOIN karke Student ID auto-fetch karein
     const result = await pool.query(
       `
       SELECT 
-        p.*, 
-        s.id AS student_id,
+        p.id AS parent_id,
+        p.admission_no,
+        p.parent_name,
+        p.mobile,
+        p.email,
+        s.id AS student_db_id,
         s.student_name, 
         s.class, 
         s.section 
@@ -38,23 +41,42 @@ export const parentLogin = async (req: Request, res: Response) => {
       parent: result.rows[0],
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      success: false,
-      message: "Unable to Login",
-    });
+    console.error(err);
+    res.status(500).json({ success: false, message: "Unable to Login" });
   }
 };
 
 /* ===========================
-   GET PARENT NOTIFICATIONS / ATTENDANCE
+   GET PARENT DASHBOARD DATA 
+   (Total Working Days % & Daily Real-time Notifications)
 =========================== */
-export const getParentNotifications = async (req: Request, res: Response) => {
+export const getParentDashboard = async (req: Request, res: Response) => {
   try {
     const { admission_no } = req.params;
 
-    // Admission Number se direct Notifications & Attendance records JOIN karke fetch karein
-    const result = await pool.query(
+    // 1. Calculate Attendance Percentage based on Total Working Days
+    const attendanceResult = await pool.query(
+      `
+      SELECT 
+        COUNT(DISTINCT a.attendance_date) AS total_working_days,
+        COUNT(CASE WHEN a.status = 'P' THEN 1 END) AS present_days
+      FROM attendance a
+      JOIN students s ON a.student_id = s.id
+      WHERE s.admission_no = $1
+      `,
+      [admission_no]
+    );
+
+    const totalWorkingDays = parseInt(attendanceResult.rows[0].total_working_days, 10) || 0;
+    const presentDays = parseInt(attendanceResult.rows[0].present_days, 10) || 0;
+    
+    // Percentage Calculation
+    const attendancePercentage = totalWorkingDays > 0 
+      ? Math.round((presentDays / totalWorkingDays) * 100) 
+      : 0;
+
+    // 2. Fetch Daily Notifications (Absent / Present Alerts mapped by admission_no)
+    const notificationResult = await pool.query(
       `
       SELECT pn.* 
       FROM parent_notifications pn
@@ -67,13 +89,13 @@ export const getParentNotifications = async (req: Request, res: Response) => {
 
     res.json({
       success: true,
-      notifications: result.rows,
+      attendancePercentage,
+      totalWorkingDays,
+      presentDays,
+      notifications: notificationResult.rows,
     });
   } catch (err) {
-    console.log("Get Notifications Error:", err);
-    res.status(500).json({
-      success: false,
-      message: "Unable to load notifications",
-    });
+    console.error("Dashboard Data Error:", err);
+    res.status(500).json({ success: false, message: "Unable to load dashboard data" });
   }
 };

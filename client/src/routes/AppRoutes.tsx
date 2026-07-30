@@ -32,6 +32,7 @@ import MarksEntry from "../pages/teacher/marks/MarksEntry";
 // ================= PARENTS =================
 import ParentSignup from "../pages/parent/ParentSignup";
 import ParentDashboard from "../pages/parent/dashboard/ParentDashboard";
+import ParentHomework from "../pages/parent/dashboard/ParentHomework"; // <-- Sahi import path
 import ParentLogin from "../pages/parent/ParentLogin";
 
 export default function AppRoutes() {
@@ -40,14 +41,14 @@ export default function AppRoutes() {
 
       {/* ================= LOGIN ================= */}
       <Route
-path="/admin/notices"
-element={<NoticeList />}
-/>
+        path="/admin/notices"
+        element={<NoticeList />}
+      />
 
-<Route
-path="/admin/notices/add"
-element={<AddNotice />}
-/>
+      <Route
+        path="/admin/notices/add"
+        element={<AddNotice />}
+      />
 
       <Route
         path="/"
@@ -118,31 +119,31 @@ element={<AddNotice />}
       {/* ================= TEACHER PORTAL ================= */}
 
       <Route
-  path="/teacher"
-  element={<TeacherLayout />}
->
+        path="/teacher"
+        element={<TeacherLayout />}
+      >
 
-  <Route
-    index
-    element={<TeacherDashboard />}
-  />
+        <Route
+          index
+          element={<TeacherDashboard />}
+        />
 
-  <Route
-    path="attendance"
-    element={<Attendance />}
-  />
+        <Route
+          path="attendance"
+          element={<Attendance />}
+        />
 
-  <Route
-    path="homework"
-    element={<Homework />}
-  />
+        <Route
+          path="homework"
+          element={<Homework />}
+        />
 
-  <Route
-    path="marks"
-    element={<MarksEntry />}
-  />
+        <Route
+          path="marks"
+          element={<MarksEntry />}
+        />
 
-</Route>
+      </Route>
 
       {/* ================= PARENT ================= */}
 
@@ -159,6 +160,11 @@ element={<AddNotice />}
       <Route
         path="/parent/dashboard"
         element={<ParentDashboard />}
+      />
+
+      <Route
+        path="/parent/homework"
+        element={<ParentHomework />}
       />
 
       {/* ================= 404 ================= */}

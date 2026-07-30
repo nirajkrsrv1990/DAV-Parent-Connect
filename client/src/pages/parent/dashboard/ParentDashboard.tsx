@@ -50,7 +50,6 @@ export default function ParentDashboard() {
         const fetchedNotifications = result.notifications || [];
         setNotifications(fetchedNotifications);
 
-        // Notifications se homework type filter karke count set karein
         const pendingHomeworks = fetchedNotifications.filter(
           (n: any) => n.type === "homework"
         );
@@ -92,10 +91,10 @@ export default function ParentDashboard() {
         </div>
 
         <nav>
-          <a href="#" onClick={closeSidebarOnMobile}>🏠 Dashboard</a>
+          <a href="#" onClick={() => { navigate("/parent/dashboard"); closeSidebarOnMobile(); }}>🏠 Dashboard</a>
           <a href="#" onClick={closeSidebarOnMobile}>👨‍🎓 Student Profile</a>
           <a href="#" onClick={closeSidebarOnMobile}>📅 Attendance</a>
-          <a href="#" onClick={closeSidebarOnMobile}>📚 Homework</a>
+          <a href="#" onClick={() => { navigate("/parent/homework"); closeSidebarOnMobile(); }}>📚 Homework</a>
           <a href="#" onClick={closeSidebarOnMobile}>📝 Results</a>
           <a href="#" onClick={closeSidebarOnMobile}>📢 Notices</a>
           <a href="#" onClick={closeSidebarOnMobile}>💰 Fees</a>
@@ -217,7 +216,7 @@ export default function ParentDashboard() {
             <p>{attendancePercentage}%</p>
           </div>
 
-          <div className="card">
+          <div className="card" onClick={() => navigate("/parent/homework")} style={{ cursor: "pointer" }}>
             <h3>Homework</h3>
             <p>{homeworkCount} Pending</p>
           </div>

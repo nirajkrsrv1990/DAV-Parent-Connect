@@ -64,15 +64,16 @@ export const parentLogin = async (req: Request, res: Response) => {
   try {
     const { admission_no, password } = req.body;
 
+    // Support both admission_no or mobile number login safely
     const parent = await pool.query(
-      `SELECT * FROM parents WHERE admission_no=$1 AND password=$2`,
+      `SELECT * FROM parents WHERE (CAST(admission_no AS TEXT) = $1 OR mobile = $1) AND password = $2`,
       [admission_no, password]
     );
 
     if (parent.rows.length === 0) {
       return res.json({
         success: false,
-        message: "Invalid Admission Number or Password",
+        message: "Invalid Admission Number/Mobile or Password",
       });
     }
 

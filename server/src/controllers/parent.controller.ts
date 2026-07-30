@@ -166,3 +166,41 @@ const homeworkCount = parseInt(
     });
   }
 };
+/* ===========================
+   MARK NOTIFICATIONS AS READ
+=========================== */
+export const markNotificationsAsRead = async (req: Request, res: Response) => {
+  try {
+    const { admission_no } = req.params;
+
+    // 1. Student ki ID nikalein
+    const studentRes = await pool.query(
+      `SELECT id FROM students WHERE admission_no = $1`,
+      [admission_no]
+    );
+
+    if (studentRes.rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Student not found" });
+    }
+
+    const studentId = studentRes.rows[0].id;
+
+    // 2. Sabhi notifications ko read update kar dein (is_read = TRUE)
+    // (Ensure karein ki aapke table mein is_read column ho)
+    await pool.query(
+      `UPDATE parent_notifications SET is_read = TRUE WHERE student_id = $1`,
+      [studentId]
+    );
+
+    return res.json({
+      success: true,
+      message: "Notifications marked as read",
+    });
+  } catch (err) {
+    console.error("Mark Read Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};

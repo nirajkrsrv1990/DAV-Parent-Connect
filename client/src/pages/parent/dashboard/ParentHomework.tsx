@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./ParentDashboard.css"; // Reuse existing styles or create separate
+import "./ParentDashboard.css";
 
 export default function ParentHomework() {
   const navigate = useNavigate();
@@ -19,10 +19,11 @@ export default function ParentHomework() {
 
   const fetchParentHomework = async (admissionNo: string) => {
     try {
-      const response = await fetch(`/api/parents/homework/${admissionNo}`);
+      // Sahi API route yahan set kar diya gaya hai
+      const response = await fetch(`/api/homework/student/${admissionNo}`);
       const result = await response.json();
       if (result.success) {
-        setHomeworkList(result.homeworks || []);
+        setHomeworkList(result.homework || []);
       }
     } catch (err) {
       console.log("Error fetching homework:", err);

@@ -133,15 +133,31 @@ export const getParentDashboard = async (req: Request, res: Response) => {
        LIMIT 10`,
       [studentId]
     );
+    // 4. Fetch Homework Count
+const homeworkRes = await pool.query(
+  `
+  SELECT COUNT(*) AS pending_homework
+  FROM homework
+  WHERE class = $1
+    AND section = $2
+    AND due_date >= CURRENT_DATE
+  `,
+  [student.class, student.section]
+);
+
+const homeworkCount = parseInt(
+  homeworkRes.rows[0]?.pending_homework || "0"
+);
 
     return res.json({
-      success: true,
-      student,
-      attendancePercentage,
-      totalWorkingDays: totalDays,
-      presentDays: presentDays,
-      notifications: notificationsRes.rows,
-    });
+  success: true,
+  student,
+  attendancePercentage,
+  totalWorkingDays: totalDays,
+  presentDays: presentDays,
+  homeworkCount,
+  notifications: notificationsRes.rows,
+});
   } catch (err) {
     console.error("Dashboard Fetch Error:", err);
     return res.status(500).json({

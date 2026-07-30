@@ -50,13 +50,43 @@ export default function ParentDashboard() {
         const fetchedNotifications = result.notifications || [];
         setNotifications(fetchedNotifications);
 
-        const pendingHomeworks = fetchedNotifications.filter(
-          (n: any) => n.type === "homework"
+        // Sirf un notifications ko count karein jo read nahi hui hain (is_read === false)
+        const pendingNotifications = fetchedNotifications.filter(
+          (n: any) => n.is_read === false || n.is_read === 0
         );
-        setHomeworkCount(pendingHomeworks.length);
+
+        // Agar aapko pending homework count backend se mil raha hai toh theek, warna unread notifications se map karein
+        setHomeworkCount(result.homeworkCount !== undefined ? result.homeworkCount : pendingNotifications.filter((n: any) => n.type === "homework").length);
       }
     } catch (err) {
       console.log("Error loading dashboard data:", err);
+    }
+  };
+
+  // Notification ko read mark karne ka function
+  const handleMarkAsRead = async () => {
+    const parentData = localStorage.getItem("parent");
+    if (!parentData) return;
+    const parent = JSON.parse(parentData);
+
+    // Dropdown toggle karein
+    const nextState = !showNotificationDropdown;
+    setShowNotificationDropdown(nextState);
+
+    // Agar dropdown khul raha hai aur notifications hain, toh backend par read mark bhej dein
+    if (nextState && notifications.length > 0) {
+      try {
+        await fetch(`/api/parents/notifications/read/${parent.admission_no}`, {
+          method: "PUT",
+        });
+        
+        // UI par notifications ki is_read ko true kar dein taaki count 0 ho jaye
+        setNotifications((prev) =>
+          prev.map((n) => ({ ...n, is_read: true }))
+        );
+      } catch (err) {
+        console.log("Error marking notifications as read:", err);
+      }
     }
   };
 
@@ -65,6 +95,9 @@ export default function ParentDashboard() {
       setIsSidebarOpen(false);
     }
   };
+
+  // Unread notifications ki count nikalne ke liye
+  const unreadCount = notifications.filter((n: any) => !n.is_read).length;
 
   return (
     <div className="parent-dashboard">
@@ -123,11 +156,11 @@ export default function ParentDashboard() {
 
           <div style={{ position: "relative", cursor: "pointer" }}>
             <div 
-              onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
+              onClick={handleMarkAsRead}
               style={{ fontSize: "22px", padding: "8px", position: "relative" }}
             >
               🔔
-              {notifications.length > 0 && (
+              {unreadCount > 0 && (
                 <span style={{
                   position: "absolute",
                   top: "2px",
@@ -139,7 +172,7 @@ export default function ParentDashboard() {
                   padding: "2px 6px",
                   fontWeight: "bold"
                 }}>
-                  {notifications.length}
+                  {unreadCount}
                 </span>
               )}
             </div>
@@ -176,7 +209,7 @@ export default function ParentDashboard() {
         </header>
 
         {/* TOP ALERT BANNER */}
-        {notifications.length > 0 && (
+        {unreadCount > 0 && notifications.length > 0 && (
           <div className="parent-notification-banner">
             <strong>🔔 Notification:</strong> {notifications[0].message}
           </div>
@@ -228,7 +261,7 @@ export default function ParentDashboard() {
 
           <div className="card">
             <h3>Notices</h3>
-            <p>{notifications.length} New</p>
+            <p>{unreadCount} New</p>
           </div>
 
           <div className="card">

@@ -133,6 +133,15 @@ export const getParentDashboard = async (req: Request, res: Response) => {
        LIMIT 10`,
       [studentId]
     );
+    // Notification count sirf unhi ka hona chahiye jinka is_read = false ho
+    const unreadCountRes = await pool.query(
+      `SELECT COUNT(*) AS unread_count 
+       FROM parent_notifications 
+       WHERE student_id = $1 AND is_read = FALSE`,
+      [studentId]
+    );
+
+    const notificationCount = parseInt(unreadCountRes.rows[0]?.unread_count || "0");
     // 4. Fetch Homework Count
 const homeworkRes = await pool.query(
   `

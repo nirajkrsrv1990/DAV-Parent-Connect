@@ -8,6 +8,7 @@ export default function ParentDashboard() {
 
   const [student, setStudent] = useState<any>(null);
   const [attendancePercentage, setAttendancePercentage] = useState<number>(0);
+  const [homeworkCount, setHomeworkCount] = useState<number>(0);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
@@ -46,7 +47,14 @@ export default function ParentDashboard() {
 
       if (result.success) {
         setAttendancePercentage(result.attendancePercentage);
-        setNotifications(result.notifications || []);
+        const fetchedNotifications = result.notifications || [];
+        setNotifications(fetchedNotifications);
+
+        // Notifications se homework type filter karke count set karein
+        const pendingHomeworks = fetchedNotifications.filter(
+          (n: any) => n.type === "homework"
+        );
+        setHomeworkCount(pendingHomeworks.length);
       }
     } catch (err) {
       console.log("Error loading dashboard data:", err);
@@ -71,7 +79,7 @@ export default function ParentDashboard() {
           <img src={logo} alt="DAV Logo" className="parent-logo-mobile" />
           <span className="school-name-mobile">DAV Parent</span>
         </div>
-        <div style={{ width: "24px" }}></div> {/* Placeholder for flex alignment */}
+        <div style={{ width: "24px" }}></div>
       </div>
 
       {/* DRAWER SIDEBAR */}
@@ -211,7 +219,7 @@ export default function ParentDashboard() {
 
           <div className="card">
             <h3>Homework</h3>
-            <p>0 Pending</p>
+            <p>{homeworkCount} Pending</p>
           </div>
 
           <div className="card">

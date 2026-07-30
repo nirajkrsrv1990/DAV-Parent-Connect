@@ -264,9 +264,13 @@ export default function ParentDashboard() {
             <p>{unreadCount} New</p>
           </div>
 
-          <div className="card">
+          <div 
+            className="card" 
+            onClick={() => window.open("https://davsasaram.com/osm", "_blank")} 
+            style={{ cursor: "pointer" }}
+          >
             <h3>Fees</h3>
-            <p>No Due</p>
+            <p>Pay Online ➔</p>
           </div>
 
           <div className="card">

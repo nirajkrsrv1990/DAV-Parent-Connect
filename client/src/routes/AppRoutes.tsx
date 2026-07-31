@@ -1,5 +1,3 @@
-import AddNotice from "../pages/admin/notices/AddNotice";
-import NoticeList from "../pages/admin/notices/NoticeList";
 import { Routes, Route } from "react-router-dom";
 
 import LoginPage from "../pages/auth/LoginPage";
@@ -12,6 +10,8 @@ import ClassSectionMaster from "../pages/admin/master/ClassSectionMaster";
 import SubjectMaster from "../pages/admin/master/SubjectMaster";
 import SessionMaster from "../pages/admin/master/SessionMaster";
 import ExamMaster from "../pages/admin/master/ExamMaster";
+import AddNotice from "../pages/admin/notices/AddNotice";
+import NoticeList from "../pages/admin/notices/NoticeList";
 
 // ================= STUDENTS =================
 import StudentUpload from "../pages/admin/students/StudentUpload";
@@ -31,159 +31,56 @@ import MarksEntry from "../pages/teacher/marks/MarksEntry";
 
 // ================= PARENTS =================
 import ParentSignup from "../pages/parent/ParentSignup";
-import ParentDashboard from "../pages/parent/dashboard/ParentDashboard";
-import ParentHomework from "../pages/parent/dashboard/ParentHomework"; // <-- Sahi import path
 import ParentLogin from "../pages/parent/ParentLogin";
+import ParentDashboard from "../pages/parent/dashboard/ParentDashboard";
+import ParentHomework from "../pages/parent/dashboard/ParentHomework";
 
 export default function AppRoutes() {
   return (
     <Routes>
-
-      {/* ================= LOGIN ================= */}
-      <Route
-        path="/admin/notices"
-        element={<NoticeList />}
-      />
-
-      <Route
-        path="/admin/notices/add"
-        element={<AddNotice />}
-      />
-
-      <Route
-        path="/"
-        element={<LoginPage />}
-      />
+      {/* ================= LOGIN & NOTICES ================= */}
+      <Route path="/" element={<LoginPage />} />
+      <Route path="/admin/notices" element={<NoticeList />} />
+      <Route path="/admin/notices/add" element={<AddNotice />} />
 
       {/* ================= ADMIN ================= */}
-
       <Route element={<AdminLayout />}>
-
-        <Route
-          path="/admin"
-          element={<Dashboard />}
-        />
-
-        <Route
-          path="/admin/master"
-          element={<MasterDashboard />}
-        />
-
-        <Route
-          path="/admin/master/session"
-          element={<SessionMaster />}
-        />
-
-        <Route
-          path="/admin/master/class-section"
-          element={<ClassSectionMaster />}
-        />
-
-        <Route
-          path="/admin/master/subject"
-          element={<SubjectMaster />}
-        />
-
-        <Route
-          path="/admin/master/exam"
-          element={<ExamMaster />}
-        />
-
-        <Route
-          path="/admin/students/upload"
-          element={<StudentUpload />}
-        />
-
-        <Route
-          path="/admin/students/list"
-          element={<StudentList />}
-        />
-
-        <Route
-          path="/admin/teachers"
-          element={<TeacherList />}
-        />
-
-        <Route
-          path="/admin/teachers/add"
-          element={<AddTeacher />}
-        />
-
-        <Route
-          path="/admin/teacher-assignment"
-          element={<TeacherAssignment />}
-        />
-
+        <Route path="/admin" element={<Dashboard />} />
+        <Route path="/admin/master" element={<MasterDashboard />} />
+        <Route path="/admin/master/session" element={<SessionMaster />} />
+        <Route path="/admin/master/class-section" element={<ClassSectionMaster />} />
+        <Route path="/admin/master/subject" element={<SubjectMaster />} />
+        <Route path="/admin/master/exam" element={<ExamMaster />} />
+        <Route path="/admin/students/upload" element={<StudentUpload />} />
+        <Route path="/admin/students/list" element={<StudentList />} />
+        <Route path="/admin/teachers" element={<TeacherList />} />
+        <Route path="/admin/teachers/add" element={<AddTeacher />} />
+        <Route path="/admin/teacher-assignment" element={<TeacherAssignment />} />
       </Route>
 
       {/* ================= TEACHER PORTAL ================= */}
-
-      <Route
-        path="/teacher"
-        element={<TeacherLayout />}
-      >
-
-        <Route
-          index
-          element={<TeacherDashboard />}
-        />
-
-        <Route
-          path="attendance"
-          element={<Attendance />}
-        />
-
-        <Route
-          path="homework"
-          element={<Homework />}
-        />
-
-        <Route
-          path="marks"
-          element={<MarksEntry />}
-        />
-
+      <Route path="/teacher" element={<TeacherLayout />}>
+        <Route index element={<TeacherDashboard />} />
+        <Route path="attendance" element={<Attendance />} />
+        <Route path="homework" element={<Homework />} />
+        <Route path="marks" element={<MarksEntry />} />
       </Route>
 
-      {/* ================= PARENT ================= */}
-
-      <Route
-        path="/parent/signup"
-        element={<ParentSignup />}
-      />
-
-      <Route
-        path="/parent/login"
-        element={<ParentLogin />}
-      />
-
-      <Route
-        path="/parent/dashboard"
-        element={<ParentDashboard />}
-      />
-
-      <Route
-        path="/parent/homework"
-        element={<ParentHomework />}
-      />
+      {/* ================= PARENT PORTAL ================= */}
+      <Route path="/parent/signup" element={<ParentSignup />} />
+      <Route path="/parent/login" element={<ParentLogin />} />
+      <Route path="/parent/dashboard" element={<ParentDashboard />} />
+      <Route path="/parent/homework" element={<ParentHomework />} />
 
       {/* ================= 404 ================= */}
-
       <Route
         path="*"
         element={
-          <h1
-            style={{
-              textAlign: "center",
-              marginTop: "100px",
-              color: "#0F4C81",
-            }}
-          >
+          <h1 style={{ textAlign: "center", marginTop: "100px", color: "#0F4C81" }}>
             404 - Page Not Found
           </h1>
         }
       />
-
     </Routes>
   );
 }

@@ -13,6 +13,9 @@ export const createNotice = async (
       description,
       notice_date,
     } = req.body;
+    const pdf_url = req.file
+  ? `/uploads/notices/${req.file.filename}`
+  : null;
 
     await pool.query(
       `
@@ -21,15 +24,17 @@ export const createNotice = async (
         title,
         description,
         notice_date
+        pdf_url
       )
       VALUES
-      ($1,$2,$3)
+      ($1,$2,$3,$4)
       `,
       [
-        title,
-        description,
-        notice_date,
-      ]
+    title,
+  description,
+  notice_date,
+  pdf_url,
+]
     );
 
     res.json({

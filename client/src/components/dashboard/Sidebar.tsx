@@ -113,9 +113,16 @@ className={`sidebar ${isOpen ? "sidebar-open" : ""}`}
             <div className="menu-item"><Bell size={20}/><span>Notices</span></div>
           </Link>
 
-          <Link to="#" className="menu-link" onClick={onClose}>
-            <div className="menu-item"><Settings size={20}/><span>Settings</span></div>
-          </Link>
+          <Link
+    to="/admin/notices"
+    className="menu-link"
+    onClick={onClose}
+>
+    <div className="menu-item">
+        <Bell size={20}/>
+        <span>Notices</span>
+    </div>
+</Link>
 
           <Link to="/" className="menu-link" onClick={onClose}>
             <div className="menu-item"><LogOut size={20}/><span>Logout</span></div>

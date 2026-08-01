@@ -42,7 +42,4 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 // Register homework routes
 app.use("/api/homework", homeworkRoutes);
 
-/* FIXED: Changed /api/parents to /api/parent (matching frontend requests) */
-app.use("/api/parent", parentRoutes);
-
 export default app;

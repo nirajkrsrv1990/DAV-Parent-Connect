@@ -30,7 +30,6 @@ export default function Sidebar({
 
   return (
     <>
-
       {isOpen && (
         <div
           className="sidebar-overlay"
@@ -38,16 +37,11 @@ export default function Sidebar({
         />
       )}
 
-      console.log("Sidebar Open =", isOpen);
-
-<aside
-className={`sidebar ${isOpen ? "sidebar-open" : ""}`}
->
-
+      <aside
+        className={`sidebar ${isOpen ? "sidebar-open" : ""}`}
+      >
         <div className="sidebar-brand">
-
           <div className="sidebar-top">
-
             <img
               src={logo}
               alt="DAV Logo"
@@ -60,19 +54,14 @@ className={`sidebar ${isOpen ? "sidebar-open" : ""}`}
             >
               <X size={22}/>
             </button>
-
           </div>
 
           <h2>DAV ERP</h2>
-
           <p>DAV Public School</p>
-
           <small>Session : 2026-27</small>
-
         </div>
 
         <nav className="menu">
-
           <Link to="/admin" className="menu-link" onClick={onClose}>
             <div className="menu-item"><LayoutDashboard size={20}/><span>Dashboard</span></div>
           </Link>
@@ -109,30 +98,19 @@ className={`sidebar ${isOpen ? "sidebar-open" : ""}`}
             <div className="menu-item"><IndianRupee size={20}/><span>Fees</span></div>
           </Link>
 
-          <Link to="#" className="menu-link" onClick={onClose}>
-            <div className="menu-item"><Bell size={20}/><span>Notices</span></div>
+          {/* Direct Add Notice page par jaane ke liye path set kiya gaya hai */}
+          <Link to="/admin/notices/add" className="menu-link" onClick={onClose}>
+            <div className="menu-item">
+              <Bell size={20}/>
+              <span>Notices</span>
+            </div>
           </Link>
-
-          <Link
-    to="/admin/notices"
-    className="menu-link"
-    onClick={onClose}
->
-    <div className="menu-item">
-        <Bell size={20}/>
-        <span>Notices</span>
-    </div>
-</Link>
 
           <Link to="/" className="menu-link" onClick={onClose}>
             <div className="menu-item"><LogOut size={20}/><span>Logout</span></div>
           </Link>
-
         </nav>
-
       </aside>
-
     </>
   );
-
 }

@@ -60,8 +60,9 @@ export const parentSignup = async (req: Request, res: Response) => {
 =========================== */
 export const parentLogin = async (req: Request, res: Response) => {
   try {
-    const { admission_no, mobile, password } = req.body;
-    const loginIdentifier = admission_no || mobile;
+    // Yahan 'email' ko bhi add kar liya kyunki frontend wahi bhej raha hai
+    const { admission_no, mobile, email, password } = req.body;
+    const loginIdentifier = admission_no || mobile || email;
 
     if (!loginIdentifier || !password) {
       return res.json({
@@ -71,7 +72,7 @@ export const parentLogin = async (req: Request, res: Response) => {
     }
 
     const parent = await pool.query(
-      `SELECT * FROM parents WHERE (CAST(admission_no AS TEXT) = $1 OR mobile = $1) AND password = $2`,
+      `SELECT * FROM parents WHERE (CAST(admission_no AS TEXT) = $1 || mobile = $1 || email = $1) AND password = $2`,
       [String(loginIdentifier).trim(), String(password).trim()]
     );
 

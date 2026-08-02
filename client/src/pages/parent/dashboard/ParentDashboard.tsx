@@ -129,7 +129,7 @@ export default function ParentDashboard() {
           <a href="#" onClick={closeSidebarOnMobile}>📅 Attendance</a>
           <a href="#" onClick={() => { navigate("/parent/homework"); closeSidebarOnMobile(); }}>📚 Homework</a>
           <a href="#" onClick={closeSidebarOnMobile}>📝 Results</a>
-          <a href="#" onClick={closeSidebarOnMobile}>📢 Notices</a>
+          <a href="#" onClick={() => { navigate("/parent/notices"); closeSidebarOnMobile(); }}>📢 Notices</a>
           <a href="#" onClick={closeSidebarOnMobile}>💰 Fees</a>
           <a href="#" onClick={closeSidebarOnMobile}>📖 Timetable</a>
           <a href="#" onClick={closeSidebarOnMobile}>📂 Downloads</a>
@@ -259,10 +259,10 @@ export default function ParentDashboard() {
             <p>Not Published</p>
           </div>
 
-          <div className="card">
-            <h3>Notices</h3>
-            <p>{unreadCount} New</p>
-          </div>
+          <div className="card" onClick={() => navigate("/parent/notices")} style={{ cursor: "pointer" }}>
+  <h3>Notices</h3>
+  <p>{unreadCount} New</p>
+</div>
 
           <div 
             className="card" 

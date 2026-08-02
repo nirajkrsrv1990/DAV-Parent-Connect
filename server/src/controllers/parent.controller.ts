@@ -58,17 +58,29 @@ export const parentSignup = async (req: Request, res: Response) => {
 };
 
 /* ===========================
-   PARENT LOGIN
+   PARENT LOGIN (FIXED & ROBUST)
 =========================== */
 export const parentLogin = async (req: Request, res: Response) => {
   try {
-    // Support both frontend sending 'mobile' or 'admission_no'
+    // Frontend se 'admission_no' ya 'mobile' kuch bhi aaye, use catch karein
     const { admission_no, mobile, password } = req.body;
+    
+    // Agar mobile bheja gaya hai ya admission_no, jo bhi non-empty ho use identifier banayein
     const loginIdentifier = admission_no || mobile;
 
+    if (!loginIdentifier || !password) {
+      return res.json({
+        success: false,
+        message: "Please provide credentials",
+      });
+    }
+
+    // Dono columns (admission_no aur mobile) par direct check lagayein string conversion ke sath
     const parent = await pool.query(
-      `SELECT * FROM parents WHERE (CAST(admission_no AS TEXT) = $1 OR mobile = $1) AND password = $2`,
-      [loginIdentifier, password]
+      `SELECT * FROM parents 
+       WHERE (CAST(admission_no AS TEXT) = $1 OR mobile = $1) 
+       AND password = $2`,
+      [String(loginIdentifier).trim(), String(password).trim()]
     );
 
     if (parent.rows.length === 0) {
@@ -83,7 +95,7 @@ export const parentLogin = async (req: Request, res: Response) => {
       parent: parent.rows[0],
     });
   } catch (err) {
-    console.log(err);
+    console.log("Login Error:", err);
     res.status(500).json({
       success: false,
       message: "Login Failed",

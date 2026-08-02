@@ -76,6 +76,7 @@ export default function AppRoutes() {
       <Route path="/parent/login" element={<ParentLogin />} />
       <Route path="/parent/dashboard" element={<ParentDashboard />} />
       <Route path="/parent/homework" element={<ParentHomework />} />
+      <Route path="/parent/notices" element={<NoticeList />} />
 
       {/* ================= 404 ================= */}
       <Route

@@ -61,9 +61,11 @@ export default function AppRoutes() {
       {/* ================= TEACHER PORTAL ================= */}
       <Route path="/teacher" element={<TeacherLayout />}>
         <Route index element={<TeacherDashboard />} />
+        <Route path=":teacherId" element={<TeacherDashboard />} />
         <Route path="attendance" element={<Attendance />} />
         <Route path="homework" element={<Homework />} />
         <Route path="marks" element={<MarksEntry />} />
+        <Route path="notices" element={<NoticeList />} />
       </Route>
 
       {/* ================= PARENT PORTAL ================= */}

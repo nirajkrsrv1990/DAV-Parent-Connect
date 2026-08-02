@@ -72,10 +72,9 @@ export const parentLogin = async (req: Request, res: Response) => {
     }
 
     const parent = await pool.query(
-      `SELECT * FROM parents WHERE (CAST(admission_no AS TEXT) = $1 || mobile = $1 || email = $1) AND password = $2`,
+      `SELECT * FROM parents WHERE (CAST(admission_no AS TEXT) = $1 OR mobile = $1 OR email = $1) AND password = $2`,
       [String(loginIdentifier).trim(), String(password).trim()]
     );
-
     if (parent.rows.length === 0) {
       return res.json({
         success: false,

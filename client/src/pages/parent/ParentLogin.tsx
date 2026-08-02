@@ -7,7 +7,6 @@ import "./ParentSignup.css";
 export default function ParentLogin() {
   const navigate = useNavigate();
 
-  // State ko mobile ya admission_no dono ke liye use kar sakte hain
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
 
@@ -24,7 +23,7 @@ export default function ParentLogin() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          admission_no: identifier, // Backend dono handle kar lega agar query me cast hai
+          admission_no: identifier,
           mobile: identifier,
           password,
         }),

@@ -1,15 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import "../ParentDashboard.css";
 
-export default function NoticeList() {
-  const [notices, setNotices] = useState<any[]>([]);
+export default function ParentNotices() {
   const navigate = useNavigate();
-  const location = useLocation();
-
-  // Check karein ki user kahan se aaya hai (admin, teacher, ya parent)
-  const isParent = location.pathname.includes("/parent");
-  const isTeacher = location.pathname.includes("/teacher");
-  const isAdmin = location.pathname.includes("/admin");
+  const [notices, setNotices] = useState<any[]>([]);
 
   useEffect(() => {
     fetchNotices();
@@ -27,36 +22,20 @@ export default function NoticeList() {
     }
   };
 
-  const handleBack = () => {
-    if (isParent) navigate("/parent/dashboard");
-    else if (isTeacher) navigate("/teacher");
-    else navigate("/admin");
-  };
-
   return (
-    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
+    <div className="parent-dashboard" style={{ padding: "20px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-        <h2>School Notice List</h2>
-        <div style={{ display: "flex", gap: "10px" }}>
-          {isAdmin && (
-            <button 
-              onClick={() => navigate("/admin/notices/add")}
-              style={{ backgroundColor: "#0F4C81", color: "#fff", padding: "8px 16px", border: "none", borderRadius: "4px", cursor: "pointer" }}
-            >
-              + Add Notice
-            </button>
-          )}
-          <button 
-            onClick={handleBack}
-            style={{ backgroundColor: "#64748b", color: "#fff", padding: "8px 16px", border: "none", borderRadius: "4px", cursor: "pointer" }}
-          >
-            Dashboard
-          </button>
-        </div>
+        <h2>School Notices</h2>
+        <button 
+          onClick={() => navigate("/parent/dashboard")}
+          style={{ backgroundColor: "#0F4C81", color: "#fff", padding: "8px 16px", border: "none", borderRadius: "4px", cursor: "pointer" }}
+        >
+          Back to Dashboard
+        </button>
       </div>
 
       {notices.length === 0 ? (
-        <p style={{ color: "#64748b" }}>No notices found.</p>
+        <p style={{ color: "#64748b" }}>No notices available.</p>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           {notices.map((notice, index) => (

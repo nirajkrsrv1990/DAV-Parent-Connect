@@ -5,17 +5,16 @@ export const createNotice = async (
   req: Request,
   res: Response
 ) => {
-
   try {
-
     const {
       title,
       description,
       notice_date,
     } = req.body;
+    
     const pdf_url = req.file
-  ? `/uploads/notices/${req.file.filename}`
-  : null;
+      ? `/uploads/notices/${req.file.filename}`
+      : null;
 
     await pool.query(
       `
@@ -23,18 +22,18 @@ export const createNotice = async (
       (
         title,
         description,
-        notice_date
+        notice_date,
         pdf_url
       )
       VALUES
-      ($1,$2,$3,$4)
+      ($1, $2, $3, $4)
       `,
       [
-    title,
-  description,
-  notice_date,
-  pdf_url,
-]
+        title,
+        description,
+        notice_date,
+        pdf_url,
+      ]
     );
 
     res.json({
@@ -43,25 +42,20 @@ export const createNotice = async (
     });
 
   } catch (err) {
-
     console.error(err);
 
     res.status(500).json({
       success: false,
       message: "Notice upload failed.",
     });
-
   }
-
 };
 
 export const getNotices = async (
   req: Request,
   res: Response
 ) => {
-
   try {
-
     const result = await pool.query(
       `
       SELECT *
@@ -76,14 +70,11 @@ export const getNotices = async (
     });
 
   } catch (err) {
-
     console.error(err);
 
     res.status(500).json({
       success: false,
       message: "Unable to fetch notices.",
     });
-
   }
-
 };

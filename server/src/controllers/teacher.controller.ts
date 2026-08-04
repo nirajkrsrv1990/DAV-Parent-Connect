@@ -41,10 +41,13 @@ export const assignClassTeacher = async (req: Request, res: Response) => {
 };
 
 export const createTeacher = async (req: Request, res: Response) => {
+  const client = await pool.connect();
   try {
-    const { teacher_name, mobile, email, qualification, designation } = req.body;
+    const { teacher_name, mobile, email, qualification, designation, class_name, section } = req.body;
 
-    const count = await pool.query("SELECT COUNT(*) FROM teachers");
+    await client.query("BEGIN"); // Transaction start
+
+    const count = await client.query("SELECT COUNT(*) FROM teachers");
 
     const nextNumber = Number(count.rows[0].count) + 1;
 
@@ -52,7 +55,7 @@ export const createTeacher = async (req: Request, res: Response) => {
 
     const password = "Dav@123";
 
-    const result = await pool.query(
+    const result = await client.query(
       `
       INSERT INTO teachers
       (
@@ -79,16 +82,117 @@ export const createTeacher = async (req: Request, res: Response) => {
       ]
     );
 
+    if (class_name && section) {
+      await client.query(
+        `
+        INSERT INTO class_teacher_master
+        (
+          teacher_id,
+          class_name,
+          section
+        )
+        VALUES
+        ($1, $2, $3)
+        `,
+        [teacher_id, class_name, section]
+      );
+    }
+
+    await client.query("COMMIT");
+
     res.json({
       success: true,
       teacher: result.rows[0],
+      message: "Teacher Added and Assigned Successfully",
     });
   } catch (err) {
+    await client.query("ROLLBACK");
     console.log(err);
     res.status(500).json({
       success: false,
       message: "Unable to Save Teacher",
     });
+  } finally {
+    client.release();
+  }
+};
+
+export const updateTeacher = async (req: Request, res: Response) => {
+  const client = await pool.connect();
+  try {
+    const { id } = req.params;
+    const { teacher_name, mobile, email, qualification, designation, class_name, section, status } = req.body;
+
+    await client.query("BEGIN");
+
+    const teacherResult = await client.query(
+      `
+      UPDATE teachers
+      SET teacher_name = $1,
+          mobile = $2,
+          email = $3,
+          qualification = $4,
+          designation = $5,
+          status = $6
+      WHERE id = $7
+      RETURNING teacher_id
+      `,
+      [teacher_name, mobile, email, qualification, designation, status, id]
+    );
+
+    if (teacherResult.rows.length === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ success: false, message: "Teacher not found" });
+    }
+
+    const teacher_id = teacherResult.rows[0].teacher_id;
+
+    const checkAssignment = await client.query(
+      `SELECT * FROM class_teacher_master WHERE teacher_id = $1`,
+      [teacher_id]
+    );
+
+    if (class_name && section) {
+      if (checkAssignment.rows.length > 0) {
+        await client.query(
+          `
+          UPDATE class_teacher_master
+          SET class_name = $1, section = $2
+          WHERE teacher_id = $3
+          `,
+          [class_name, section, teacher_id]
+        );
+      } else {
+        await client.query(
+          `
+          INSERT INTO class_teacher_master (teacher_id, class_name, section)
+          VALUES ($1, $2, $3)
+          `,
+          [teacher_id, class_name, section]
+        );
+      }
+    } else {
+      await client.query(
+        `DELETE FROM class_teacher_master WHERE teacher_id = $1`,
+        [teacher_id]
+      );
+    }
+
+    await client.query("COMMIT");
+
+    res.json({
+      success: true,
+      message: "Teacher Updated Successfully",
+    });
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: "Unable to Update Teacher",
+    });
+  } finally {
+    client.release();
   }
 };
 
@@ -217,20 +321,16 @@ export const deleteTeacher = async (req: Request, res: Response) => {
   }
 };
 
-// UPDATED SAVE ATTENDANCE FUNCTION
 export const saveAttendance = async (req: Request, res: Response) => {
-  const client = await pool.connect(); // Client connection for SQL Transaction
+  const client = await pool.connect();
 
   try {
     const { attendanceDate, teacher_db_id, teacher_id, students } = req.body;
-
-    // Database Primary Key ID filter: agar teacher_db_id null ho toh teacher_id use karein
     const teacherPrimaryKey = teacher_db_id || teacher_id;
 
-    await client.query("BEGIN"); // Transaction Start
+    await client.query("BEGIN");
 
     for (const item of students) {
-      // 1. Purani attendance delete karein selected date ki
       await client.query(
         `
         DELETE FROM attendance
@@ -241,7 +341,6 @@ export const saveAttendance = async (req: Request, res: Response) => {
         [item.id, attendanceDate]
       );
 
-      // 2. Nayi attendance entry insert karein
       await client.query(
         `
         INSERT INTO attendance
@@ -257,7 +356,6 @@ export const saveAttendance = async (req: Request, res: Response) => {
         [item.id, attendanceDate, item.status, teacherPrimaryKey]
       );
 
-      // 3. Same date and student ki old parent notification delete karein (duplicate rokne ke liye)
       await client.query(
         `
         DELETE FROM parent_notifications
@@ -268,7 +366,6 @@ export const saveAttendance = async (req: Request, res: Response) => {
         [item.id, attendanceDate]
       );
 
-      // 4. Parent ke liye Auto Notification Insert Karein
       const notificationTitle = "Attendance Update";
       const notificationMessage =
         item.status === "P"
@@ -291,14 +388,14 @@ export const saveAttendance = async (req: Request, res: Response) => {
       );
     }
 
-    await client.query("COMMIT"); // Database me final Save Commit Karein
+    await client.query("COMMIT");
 
     res.json({
       success: true,
       message: "Attendance Saved & Parent Notification Created Successfully!",
     });
   } catch (err) {
-    await client.query("ROLLBACK"); // Kuch galat hone par saari entries cancel ho jayengi
+    await client.query("ROLLBACK");
     console.error("Attendance Save Error:", err);
 
     res.status(500).json({
@@ -306,6 +403,6 @@ export const saveAttendance = async (req: Request, res: Response) => {
       message: "Unable to Save Attendance",
     });
   } finally {
-    client.release(); // Connection Release
+    client.release();
   }
 };

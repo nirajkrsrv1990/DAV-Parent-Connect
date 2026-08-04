@@ -276,6 +276,7 @@ export default function AddTeacher() {
               <option>X</option>
               <option>XI</option>
               <option>XII</option>
+              <option>None</option>
 
             </select>
 
@@ -306,6 +307,7 @@ export default function AddTeacher() {
               <option>JEE</option>
               <option>NEET</option>
               <option>COMM</option>
+              <option>None</option>
 
             </select>
 

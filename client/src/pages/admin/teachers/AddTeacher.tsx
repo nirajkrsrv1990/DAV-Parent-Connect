@@ -49,152 +49,61 @@ export default function AddTeacher() {
   ========================== */
 
   const saveTeacher = async () => {
-
     if (!teacherName.trim()) {
-
       alert("Enter Teacher Name");
-
       return;
-
     }
 
     if (!classTeacherClass) {
-
       alert("Select Class");
-
       return;
-
     }
 
     if (!classTeacherSection) {
-
       alert("Select Section");
-
       return;
-
     }
 
     try {
-
       const response = await fetch(
-
         "/api/teachers/create",
-
         {
-
           method: "POST",
-
           headers: {
-
             "Content-Type": "application/json",
-
           },
-
           body: JSON.stringify({
-
             teacher_name: teacherName,
-
             mobile,
-
             email,
-
             qualification,
-
             designation,
-
             joiningDate,
-
             status,
-
             class_name: classTeacherClass,
-
             section: classTeacherSection,
-
           }),
-
         }
-
       );
 
       const result = await response.json();
-            if (result.success) {
-
-        setTeacherId(
-          result.teacher.teacher_id
-        );
-
-        setPassword(
-          result.teacher.password
-        );
-
-        const assignResponse = await fetch(
-
-  "/api/teachers/assign-class-teacher",
-
-  {
-
-    method: "POST",
-
-    headers: {
-
-      "Content-Type": "application/json",
-
-    },
-
-    body: JSON.stringify({
-
-      teacher_id: result.teacher.teacher_id,
-
-      class_name: classTeacherClass,
-
-      section: classTeacherSection,
-
-    }),
-
-  }
-
-);
-
-const assignResult = await assignResponse.json();
-
-if (!assignResult.success) {
-
-  alert(assignResult.message);
-
-  return;
-
-}
+      
+      if (result.success) {
+        setTeacherId(result.teacher.teacher_id);
+        setPassword(result.teacher.password);
 
         alert(
-
-`Teacher Created Successfully
-
-Teacher ID : ${result.teacher.teacher_id}
-
-Password : ${result.teacher.password}`
-
+          `Teacher Created Successfully\n\nTeacher ID : ${result.teacher.teacher_id}\nPassword : ${result.teacher.password}`
         );
 
         navigate("/admin/teachers");
-
+      } else {
+        alert(result.message || "Unable to Save Teacher");
       }
-
-      else {
-
-        alert(result.message);
-
-      }
-
-    }
-
-    catch (err) {
-
+    } catch (err) {
       console.log(err);
-
       alert("Unable to Save Teacher");
-
     }
-
   };
 
   return (

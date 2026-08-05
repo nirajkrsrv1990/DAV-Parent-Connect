@@ -136,19 +136,41 @@ export default function LoginPage() {
           </div>
 
           <button
-            className="login-btn"
+            className="login-dir" // ya jo bhi aapki class hai
             onClick={() => {
               if (role === "admin") {
                 adminLogin();
               } else if (role === "teacher") {
                 teacherLogin();
               } else {
-                parentLogin(); // Ab ye parent ka API call karega
+                parentLogin();
               }
             }}
           >
             LOGIN
           </button>
+
+          {/* Yeh raha Parent Registration Link jo sirf Parent role select hone par dikhega */}
+          {role === "parent" && (
+            <div style={{ textAlign: "center", marginTop: "15px" }}>
+              <span style={{ color: "#fff", fontSize: "14px" }}>Don't have an account? </span>
+              <button
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#ffcc00",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                  display: "inline",
+                  padding: 0
+                }}
+                onClick={() => navigate("/parent-register")}
+              >
+                Register Here
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="footer">

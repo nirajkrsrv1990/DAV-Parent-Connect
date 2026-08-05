@@ -165,7 +165,7 @@ export default function LoginPage() {
                   display: "inline",
                   padding: 0
                 }}
-                onClick={() => navigate("/parent-register")}
+                onClick={() => navigate("/parent/signup")}
               >
                 Register Here
               </button>

@@ -66,8 +66,7 @@ export const uploadStudents = async (
         `,
 
         [
-
-          row["Admission No"],
+          row["Admission"] || row["Admission No"],
           row["Student Name"],
           row["Father Name"],
           row["Mother Name"],
@@ -79,7 +78,6 @@ export const uploadStudents = async (
           row["DOB"],
           row["House"],
           row["Status"]
-
         ]
 
       );

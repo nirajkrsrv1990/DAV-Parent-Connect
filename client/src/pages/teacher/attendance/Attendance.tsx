@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./Attendance.css";
 
 type Student = {
@@ -30,45 +30,7 @@ export default function Attendance() {
   const [classes, setClasses] = useState<ClassMaster[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const loadAssignedClass = useCallback(async () => {
-    const teacherData = localStorage.getItem("teacher");
-    if (!teacherData) return;
-    const teacher = JSON.parse(teacherData);
-    console.log("Sending Teacher ID to API:", teacher.teacher_id);
-
-    try {
-      const response = await fetch(
-  `/api/teachers/class-teacher/${teacher.teacher_id}`
-);
-      const result = await response.json();
-
-      console.log("Assignment API Response:", result);
-
-if (result.success && result.assignment) {
-  console.log("Assigned Class:", result.assignment.class_name);
-  console.log("Assigned Section:", result.assignment.section);
-
-  setSelectedClass(result.assignment.class_name);
-  setSelectedSection(result.assignment.section);
-}
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
-
-  const loadClasses = useCallback(async () => {
-    try {
-      const response = await fetch("/api/master/class");
-      const result = await response.json();
-      if (result.success) {
-        setClasses(result.classes);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
-
-  const loadStudents = useCallback(async () => {
+    const loadStudents = useCallback(async () => {
     if (!selectedClass || !selectedSection) return;
 
     try {
@@ -93,12 +55,35 @@ if (result.success && result.assignment) {
   }, [selectedClass, selectedSection]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      await loadClasses();
-      await loadAssignedClass();
-    };
-    fetchData();
-  }, [loadClasses, loadAssignedClass]);
+  useEffect(() => {
+  const fetchData = async () => {
+    await loadClasses();
+
+    const teacherData = localStorage.getItem("teacher");
+    if (!teacherData) return;
+
+    const teacher = JSON.parse(teacherData);
+
+    try {
+      const response = await fetch(
+        `/api/teachers/class-teacher/${teacher.teacher_id}`
+      );
+
+      const result = await response.json();
+
+      console.log("Assignment API Response:", result);
+
+      if (result.success && result.assignment) {
+        setSelectedClass(result.assignment.class_name);
+        setSelectedSection(result.assignment.section);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  fetchData();
+}, [loadClasses]);
 
   useEffect(() => {
     if (selectedClass && selectedSection) {

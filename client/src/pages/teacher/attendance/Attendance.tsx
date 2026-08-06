@@ -38,14 +38,19 @@ export default function Attendance() {
 
     try {
       const response = await fetch(
-        `/api/class-teacher/${teacher.teacher_id}`
-      );
+  `/api/teachers/class-teacher/${teacher.teacher_id}`
+);
       const result = await response.json();
 
-      if (result.success && result.assignment) {
-        setSelectedClass(result.assignment.class_name);
-        setSelectedSection(result.assignment.section);
-      }
+      console.log("Assignment API Response:", result);
+
+if (result.success && result.assignment) {
+  console.log("Assigned Class:", result.assignment.class_name);
+  console.log("Assigned Section:", result.assignment.section);
+
+  setSelectedClass(result.assignment.class_name);
+  setSelectedSection(result.assignment.section);
+}
     } catch (err) {
       console.log(err);
     }

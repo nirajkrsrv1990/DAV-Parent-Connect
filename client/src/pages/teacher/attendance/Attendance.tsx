@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "./Attendance.css";
 
 type Student = {
@@ -30,7 +30,19 @@ export default function Attendance() {
   const [classes, setClasses] = useState<ClassMaster[]>([]);
   const [loading, setLoading] = useState(false);
 
-    const loadStudents = useCallback(async () => {
+  const loadClasses = useCallback(async () => {
+    try {
+      const response = await fetch("/api/master/class");
+      const result = await response.json();
+      if (result.success) {
+        setClasses(result.classes);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
+
+  const loadStudents = useCallback(async () => {
     if (!selectedClass || !selectedSection) return;
 
     try {
@@ -55,35 +67,34 @@ export default function Attendance() {
   }, [selectedClass, selectedSection]);
 
   useEffect(() => {
-  useEffect(() => {
-  const fetchData = async () => {
-    await loadClasses();
+    const fetchData = async () => {
+      await loadClasses();
 
-    const teacherData = localStorage.getItem("teacher");
-    if (!teacherData) return;
+      const teacherData = localStorage.getItem("teacher");
+      if (!teacherData) return;
 
-    const teacher = JSON.parse(teacherData);
+      const teacher = JSON.parse(teacherData);
 
-    try {
-      const response = await fetch(
-        `/api/teachers/class-teacher/${teacher.teacher_id}`
-      );
+      try {
+        const response = await fetch(
+          `/api/teachers/class-teacher/${teacher.teacher_id}`
+        );
 
-      const result = await response.json();
+        const result = await response.json();
 
-      console.log("Assignment API Response:", result);
+        console.log("Assignment API Response:", result);
 
-      if (result.success && result.assignment) {
-        setSelectedClass(result.assignment.class_name);
-        setSelectedSection(result.assignment.section);
+        if (result.success && result.assignment) {
+          setSelectedClass(result.assignment.class_name);
+          setSelectedSection(result.assignment.section);
+        }
+      } catch (err) {
+        console.log(err);
       }
-    } catch (err) {
-      console.log(err);
-    }
-  };
+    };
 
-  fetchData();
-}, [loadClasses]);
+    void fetchData();
+  }, [loadClasses]);
 
   useEffect(() => {
     if (selectedClass && selectedSection) {
@@ -101,41 +112,41 @@ export default function Attendance() {
   };
 
   const saveAttendance = async () => {
-  try {
-    const teacherData = localStorage.getItem("teacher");
-    if (!teacherData) {
-      alert("Teacher Login Expired");
-      return;
+    try {
+      const teacherData = localStorage.getItem("teacher");
+      if (!teacherData) {
+        alert("Teacher Login Expired");
+        return;
+      }
+
+      const teacher = JSON.parse(teacherData);
+
+      // Exact matching backend route
+      const response = await fetch("/api/teachers/attendance", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          attendanceDate,
+          teacher_db_id: teacher.id,
+          teacher_id: teacher.teacher_id,
+          students,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert("Attendance Saved Successfully!");
+      } else {
+        alert(result.message || "Failed to save attendance");
+      }
+    } catch (err) {
+      console.log(err);
+      alert("Unable to Save Attendance");
     }
-
-    const teacher = JSON.parse(teacherData);
-
-    // Exact matching backend route
-    const response = await fetch("/api/teachers/attendance", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        attendanceDate,
-        teacher_db_id: teacher.id,
-        teacher_id: teacher.teacher_id,
-        students,
-      }),
-    });
-
-    const result = await response.json();
-
-    if (result.success) {
-      alert("Attendance Saved Successfully!");
-    } else {
-      alert(result.message || "Failed to save attendance");
-    }
-  } catch (err) {
-    console.log(err);
-    alert("Unable to Save Attendance");
-  }
-};
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);

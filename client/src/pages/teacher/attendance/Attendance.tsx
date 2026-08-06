@@ -34,6 +34,7 @@ export default function Attendance() {
     const teacherData = localStorage.getItem("teacher");
     if (!teacherData) return;
     const teacher = JSON.parse(teacherData);
+    console.log("Sending Teacher ID to API:", teacher.teacher_id);
 
     try {
       const response = await fetch(
@@ -87,13 +88,16 @@ export default function Attendance() {
   }, [selectedClass, selectedSection]);
 
   useEffect(() => {
-    void loadClasses();
-    void loadAssignedClass();
+    const fetchData = async () => {
+      await loadClasses();
+      await loadAssignedClass();
+    };
+    fetchData();
   }, [loadClasses, loadAssignedClass]);
 
   useEffect(() => {
     if (selectedClass && selectedSection) {
-      loadStudents();
+      void loadStudents();
     }
   }, [selectedClass, selectedSection, loadStudents]);
 

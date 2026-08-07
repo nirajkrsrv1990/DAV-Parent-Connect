@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">DPC</string>
+    <string name="title_activity_main">DPC</string>
+    <string name="package_name">com.dav.parentconnect</string>
+    <string name="custom_url_scheme">com.dav.parentconnect</string>
+</resources>

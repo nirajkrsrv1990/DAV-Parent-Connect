@@ -2,6 +2,7 @@ import "./LoginPage.css";
 import logo from "@/assets/logo/dav_logo.png";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { API_BASE_URL } from "@/config/api";
 
 type Role = "admin" | "teacher" | "parent";
 
@@ -13,7 +14,7 @@ export default function LoginPage() {
 
   const adminLogin = async () => {
     try {
-      const response = await fetch("/api/admin/login", {
+      const response = await fetch(`${API_BASE_URL}/admin/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -33,7 +34,7 @@ export default function LoginPage() {
 
   const teacherLogin = async () => {
     try {
-      const response = await fetch("/api/teachers/login", {
+      const response = await fetch(`${API_BASE_URL}/teachers/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ teacher_id: email, password }),
@@ -54,7 +55,7 @@ export default function LoginPage() {
   // Parent Login Function add kar diya gaya hai
   const parentLogin = async () => {
     try {
-      const response = await fetch("/api/parents/login", {
+      const response = await fetch(`${API_BASE_URL}/parents/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

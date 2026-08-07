@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "@/config/api";
 import "./TeacherDashboard.css";
 
 import {
@@ -34,8 +35,8 @@ export default function TeacherDashboard() {
       try {
 
         const response = await fetch(
-          `/api/class-teacher/${teacherId}`
-        );
+  `${API_BASE_URL}/class-teacher/${teacherId}`
+);
 
         const result = await response.json();
 

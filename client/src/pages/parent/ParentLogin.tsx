@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import logo from "@/assets/logo/dav_logo.png";
 import "./ParentSignup.css";
+import { API_BASE_URL } from "@/config/api";
 
 export default function ParentLogin() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function ParentLogin() {
     }
 
     try {
-      const response = await fetch("/api/parents/login", {
+      const response = await fetch(`${API_BASE_URL}/parents/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

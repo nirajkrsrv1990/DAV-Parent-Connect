@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./Homework.css";
-import TeacherSidebar from "../../../components/teacher/TeacherSidebar";
+import { API_BASE_URL } from "@/config/api";
 
 type HomeworkItem = {
   id: number;
@@ -51,7 +51,7 @@ export default function Homework() {
     if (image) formData.append("image", image);
 
     try {
-      const response = await fetch("/api/homework/create", {
+      const response = await fetch(`${API_BASE_URL}/homework/create", {
         method: "POST",
         body: formData,
       });

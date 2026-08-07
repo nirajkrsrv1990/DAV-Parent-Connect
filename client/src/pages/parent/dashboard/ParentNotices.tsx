@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "@/config/api";
 import "../ParentDashboard.css";
 
 export default function ParentNotices() {
@@ -12,7 +13,7 @@ export default function ParentNotices() {
 
   const fetchNotices = async () => {
     try {
-      const response = await fetch("/api/notices");
+      const response = await fetch(`${API_BASE_URL}/notices`);
       const result = await response.json();
       if (result.success) {
         setNotices(result.data || []);

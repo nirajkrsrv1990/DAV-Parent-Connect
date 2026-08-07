@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { API_BASE_URL } from "@/config/api";
 import "./Attendance.css";
 
 type Student = {
@@ -32,7 +33,7 @@ export default function Attendance() {
 
   const loadClasses = useCallback(async () => {
     try {
-      const response = await fetch("/api/master/class");
+      const response = await fetch(`${API_BASE_URL}/master/class`);
       const result = await response.json();
       if (result.success) {
         setClasses(result.classes);
@@ -48,8 +49,8 @@ export default function Attendance() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/students?class=${selectedClass}&section=${selectedSection}`
-      );
+  `${API_BASE_URL}/students?class=${selectedClass}&section=${selectedSection}`
+);
       const result = await response.json();
 
       if (result.success) {
@@ -77,8 +78,8 @@ export default function Attendance() {
 
       try {
         const response = await fetch(
-          `/api/teachers/class-teacher/${teacher.teacher_id}`
-        );
+  `${API_BASE_URL}/teachers/class-teacher/${teacher.teacher_id}`
+);
 
         const result = await response.json();
 
@@ -122,7 +123,7 @@ export default function Attendance() {
       const teacher = JSON.parse(teacherData);
 
       // Exact matching backend route
-      const response = await fetch("/api/teachers/attendance", {
+      const response = await fetch(`${API_BASE_URL}/teachers/attendance`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

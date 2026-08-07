@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { API_BASE_URL } from "@/config/api";
 
 import "./Notice.css";
 
@@ -30,7 +31,7 @@ export default function AddNotice() {
         formData.append("pdf", pdf);
       }
 
-      const res = await axios.post("/api/notices/create", formData, {
+      const res = await axios.post(`${API_BASE_URL}/notices/create`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

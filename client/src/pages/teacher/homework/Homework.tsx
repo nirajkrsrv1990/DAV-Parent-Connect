@@ -92,8 +92,6 @@ export default function Homework() {
 
   return (
     <>
-      <TeacherSidebar />
-
       <main className="homework-page">
         <div className="homework-header">
           <h1>Homework Management</h1>

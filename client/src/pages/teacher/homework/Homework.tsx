@@ -51,7 +51,7 @@ export default function Homework() {
     if (image) formData.append("image", image);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/homework/create", {
+      const response = await fetch(`${API_BASE_URL}/homework/create`, {
         method: "POST",
         body: formData,
       });

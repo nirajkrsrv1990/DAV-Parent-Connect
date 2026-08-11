@@ -30,18 +30,27 @@ export default function ParentLogin() {
         }),
       });
 
-      const result = await response.json();
+      const text = await response.text();
 
-      if (result.success) {
-        localStorage.setItem("parent", JSON.stringify(result.parent));
-        navigate("/parent/dashboard");
-      } else {
-        alert(result.message);
-      }
-    } catch (err) {
-      console.log(err);
-      alert("Server Error");
-    }
+console.log("Parent Response:", text);
+
+if (!response.ok) {
+  alert("HTTP " + response.status + "\n\n" + text);
+  return;
+}
+
+const result = JSON.parse(text);
+
+if (result.success) {
+  localStorage.setItem("parent", JSON.stringify(result.parent));
+  navigate("/parent/dashboard");
+} else {
+  alert(result.message);
+}
+} catch (err) {
+  console.error(err);
+  alert(String(err));
+}
   };
 
   return (

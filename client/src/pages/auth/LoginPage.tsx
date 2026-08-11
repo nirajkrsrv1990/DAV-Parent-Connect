@@ -13,24 +13,41 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
 
   const adminLogin = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/admin/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const result = await response.json();
-      if (result.success) {
-        localStorage.setItem("admin", JSON.stringify(result.admin));
-        navigate("/admin");
-      } else {
-        alert(result.message);
-      }
-    } catch (err) {
-      console.log(err);
-      alert("Server Error");
+  try {
+    console.log("API URL:", API_BASE_URL);
+
+    const response = await fetch(`${API_BASE_URL}/admin/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    console.log("HTTP Status:", response.status);
+
+    const text = await response.text();
+    console.log("Server Response:", text);
+
+    if (!response.ok) {
+      alert("HTTP " + response.status + "\n\n" + text);
+      return;
     }
-  };
+
+    const result = JSON.parse(text);
+
+    if (result.success) {
+      localStorage.setItem("admin", JSON.stringify(result.admin));
+      navigate("/admin");
+    } else {
+      alert(result.message);
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert(String(err));
+  }
+};
 
   const teacherLogin = async () => {
     try {
@@ -39,17 +56,27 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ teacher_id: email, password }),
       });
-      const result = await response.json();
-      if (result.success) {
-        localStorage.setItem("teacher", JSON.stringify(result.teacher));
-        navigate("/teacher");
-      } else {
-        alert(result.message);
-      }
-    } catch (err) {
-      console.log(err);
-      alert("Server Error");
-    }
+      const text = await response.text();
+
+console.log("Teacher Response:", text);
+
+if (!response.ok) {
+  alert("HTTP " + response.status + "\n\n" + text);
+  return;
+}
+
+const result = JSON.parse(text);
+
+if (result.success) {
+  localStorage.setItem("teacher", JSON.stringify(result.teacher));
+  navigate("/teacher");
+} else {
+  alert(result.message);
+}
+} catch (err) {
+  console.error(err);
+  alert(String(err));
+}
   };
 
   // Parent Login Function add kar diya gaya hai
@@ -67,10 +94,15 @@ export default function LoginPage() {
       } else {
         alert(result.message);
       }
-    } catch (err) {
-      console.log(err);
-      alert("Server Error");
-    }
+   } catch (err: unknown) {
+  console.error(err);
+
+  if (err instanceof Error) {
+    alert(err.message);
+  } else {
+    alert(String(err));
+  }
+}
   };
 
   return (

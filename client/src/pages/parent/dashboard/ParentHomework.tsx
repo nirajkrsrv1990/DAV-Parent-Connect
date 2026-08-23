@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
+import { FileTransfer } from "@capacitor/file-transfer";
 import "./ParentDashboard.css";
 
 import {
@@ -132,9 +133,6 @@ export default function ParentHomework() {
     return `${HOMEWORK_FILE_BASE_URL}${filePath}`;
   };
 
-  // ==========================================
-// DOWNLOAD FILE
-// ==========================================
 const downloadFile = async (
   filePath: string
 ): Promise<void> => {
@@ -147,17 +145,45 @@ const downloadFile = async (
 
   try {
     const fileName =
-      filePath.split("/").pop() ||
-      "download";
+      decodeURIComponent(
+        filePath.split("/").pop() || "download"
+      );
 
     // ========================================
     // ANDROID / CAPACITOR
     // ========================================
     if (Capacitor.isNativePlatform()) {
-      await Filesystem.downloadFile({
+
+      // Request Documents permission if required
+      const permission =
+        await Filesystem.checkPermissions();
+
+      if (
+        permission.publicStorage !== "granted"
+      ) {
+        const requested =
+          await Filesystem.requestPermissions();
+
+        if (
+          requested.publicStorage !== "granted"
+        ) {
+          throw new Error(
+            "Storage permission was not granted."
+          );
+        }
+      }
+
+      // Get the real native file URI
+      const fileInfo =
+        await Filesystem.getUri({
+          directory: Directory.Documents,
+          path: fileName,
+        });
+
+      // Download using FileTransfer
+      await FileTransfer.downloadFile({
         url,
-        path: fileName,
-        directory: Directory.Documents,
+        path: fileInfo.uri,
       });
 
       alert(
@@ -168,7 +194,7 @@ const downloadFile = async (
     }
 
     // ========================================
-    // DESKTOP / BROWSER
+    // DESKTOP / NORMAL BROWSER
     // ========================================
     const response = await fetch(url);
 

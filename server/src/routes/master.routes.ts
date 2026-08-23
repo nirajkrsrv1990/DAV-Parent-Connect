@@ -6,6 +6,7 @@ import {
   saveMarksPattern,
   getMarksPatterns,
   deleteMarksPattern,
+  updateMarksPattern,
 } from "../controllers/master.controller";
 
 const router = Router();
@@ -44,6 +45,10 @@ router.get(
 router.delete(
   "/marks-pattern/:id",
   deleteMarksPattern
+);
+router.put(
+  "/marks-pattern/:id",
+  updateMarksPattern
 );
 
 export default router;

@@ -11,6 +11,7 @@ import ClassSectionMaster from "../pages/admin/master/ClassSectionMaster";
 import SubjectMaster from "../pages/admin/master/SubjectMaster";
 import SessionMaster from "../pages/admin/master/SessionMaster";
 import ExamMaster from "../pages/admin/master/ExamMaster";
+import MarksPatternMaster from "../pages/admin/master/MarksPatternMaster";
 import AddNotice from "../pages/admin/notices/AddNotice";
 import NoticeList from "../pages/admin/notices/NoticeList";
 
@@ -55,6 +56,10 @@ export default function AppRoutes() {
         <Route path="/admin/master/class-section" element={<ClassSectionMaster />} />
         <Route path="/admin/master/subject" element={<SubjectMaster />} />
         <Route path="/admin/master/exam" element={<ExamMaster />} />
+        <Route
+  path="/admin/master/marks-pattern"
+  element={<MarksPatternMaster />}
+/>
         <Route path="/admin/students/upload" element={<StudentUpload />} />
         <Route path="/admin/students/list" element={<StudentList />} />
         <Route path="/admin/teachers" element={<TeacherList />} />

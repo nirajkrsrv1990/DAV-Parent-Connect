@@ -27,6 +27,11 @@ export default function MasterDashboard() {
       icon: "📝",
     },
     {
+  title: "Marks Pattern",
+  route: "/admin/master/marks-pattern",
+  icon: "📊",
+},
+    {
       title: "House Master",
       route: "/admin/master/house",
       icon: "🏆",

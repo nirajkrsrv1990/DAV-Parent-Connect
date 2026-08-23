@@ -396,3 +396,149 @@ export const deleteMarksPattern =
     }
 
   };
+  /* ===========================
+   UPDATE MARKS PATTERN
+=========================== */
+
+export const updateMarksPattern = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+
+    const {
+      examName,
+      className,
+      subjectName,
+      subjectCategory,
+      components,
+      passingMarks,
+      weightage,
+      status,
+    } = req.body;
+
+    if (!examName || !className || !subjectName) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Exam, Class and Subject are required.",
+      });
+    }
+
+    if (
+      !Array.isArray(components) ||
+      components.length === 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "At least one marks component is required.",
+      });
+    }
+
+    const invalidComponent = components.some(
+      (item: any) =>
+        !item.name ||
+        Number(item.fullMarks) < 0
+    );
+
+    if (invalidComponent) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid marks component.",
+      });
+    }
+
+    const totalMarks = components.reduce(
+      (total: number, item: any) =>
+        total + Number(item.fullMarks || 0),
+      0
+    );
+
+    const duplicate = await pool.query(
+      `
+      SELECT id
+      FROM marks_pattern_master
+      WHERE exam_name = $1
+        AND class_name = $2
+        AND subject_name = $3
+        AND id <> $4
+      `,
+      [
+        examName,
+        className,
+        subjectName,
+        id,
+      ]
+    );
+
+    if (duplicate.rows.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Another marks pattern already exists for this Exam, Class and Subject.",
+      });
+    }
+
+    const result = await pool.query(
+      `
+      UPDATE marks_pattern_master
+      SET
+        exam_name = $1,
+        class_name = $2,
+        subject_name = $3,
+        subject_category = $4,
+        components = $5,
+        total_marks = $6,
+        passing_marks = $7,
+        weightage = $8,
+        status = $9,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $10
+      RETURNING *
+      `,
+      [
+        examName,
+        className,
+        subjectName,
+        subjectCategory || "Major",
+        JSON.stringify(components),
+        totalMarks,
+        Number(passingMarks || 0),
+        Number(weightage || 100),
+        status || "Active",
+        id,
+      ]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Marks pattern not found.",
+      });
+    }
+
+    res.json({
+      success: true,
+      pattern: result.rows[0],
+      message:
+        "Marks pattern updated successfully.",
+    });
+
+  } catch (err) {
+    console.error(
+      "UPDATE MARKS PATTERN ERROR:"
+    );
+
+    console.error(err);
+
+    res.status(500).json({
+      success: false,
+      message:
+        "Unable to update marks pattern.",
+    });
+  }
+};

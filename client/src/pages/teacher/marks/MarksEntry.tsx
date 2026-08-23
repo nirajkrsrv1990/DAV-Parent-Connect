@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
+
 import "./MarksEntry.css";
 import TeacherSidebar from "../../../components/teacher/TeacherSidebar";
+import { API_BASE_URL } from "@/config/api";
 
 type StudentMark = {
   id: number;
@@ -47,47 +49,103 @@ export default function MarksEntry() {
   const [search, setSearch] = useState("");
 
   const [students, setStudents] =
-    useState<StudentMark[]>([
-      {
-        id: 1,
-        roll: 1,
-        admissionNo: "2026/DAV/001",
-        studentName: "Rahul Kumar",
-        theory: 18,
-        practical: 0,
-      },
-      {
-        id: 2,
-        roll: 2,
-        admissionNo: "2026/DAV/002",
-        studentName: "Aryan Kumar",
-        theory: 17,
-        practical: 0,
-      },
-      {
-        id: 3,
-        roll: 3,
-        admissionNo: "2026/DAV/003",
-        studentName: "Rohan Kumar",
-        theory: 20,
-        practical: 0,
-      },
-      {
-        id: 4,
-        roll: 4,
-        admissionNo: "2026/DAV/004",
-        studentName: "Neha Kumari",
-        theory: 16,
-        practical: 0,
-      },
-    ]);
+    useState<StudentMark[]>([]);
+
+  const [loadingStudents, setLoadingStudents] =
+    useState(false);
+
+  const [studentError, setStudentError] =
+    useState("");
+
+  /* =====================================================
+     LOAD STUDENTS FROM DATABASE
+  ===================================================== */
+
+  useEffect(() => {
+    const loadStudents = async () => {
+      setLoadingStudents(true);
+      setStudentError("");
+      setStudents([]);
+
+      try {
+        const url =
+          `${API_BASE_URL}/students?class=${encodeURIComponent(
+            selectedClass
+          )}&section=${encodeURIComponent(
+            selectedSection
+          )}`;
+
+        console.log("Marks Students API:", url);
+
+        const response = await fetch(url);
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          throw new Error(
+            result.message ||
+              "Unable to load students"
+          );
+        }
+
+        const studentList =
+          Array.isArray(result.data)
+            ? result.data
+            : Array.isArray(result.students)
+            ? result.students
+            : [];
+
+        const mappedStudents: StudentMark[] =
+          studentList.map((student: any, index: number) => ({
+            id: Number(student.id),
+
+            roll:
+              Number(student.roll_no) ||
+              index + 1,
+
+            admissionNo:
+              student.admission_no || "",
+
+            studentName:
+              student.student_name || "",
+
+            theory: 0,
+
+            practical: 0,
+          }));
+
+        setStudents(mappedStudents);
+
+      } catch (error) {
+        console.error(
+          "Marks Students API Error:",
+          error
+        );
+
+        setStudentError(
+          "Unable to load students."
+        );
+
+      } finally {
+        setLoadingStudents(false);
+      }
+    };
+
+    loadStudents();
+
+    setSearch("");
+  }, [selectedClass, selectedSection]);
+
+  /* =====================================================
+     UPDATE THEORY
+  ===================================================== */
 
   const updateTheory = (
     id: number,
     value: number
   ) => {
-    setStudents(
-      students.map((item) =>
+    setStudents((currentStudents) =>
+      currentStudents.map((item) =>
         item.id === id
           ? {
               ...item,
@@ -98,12 +156,16 @@ export default function MarksEntry() {
     );
   };
 
+  /* =====================================================
+     UPDATE PRACTICAL
+  ===================================================== */
+
   const updatePractical = (
     id: number,
     value: number
   ) => {
-    setStudents(
-      students.map((item) =>
+    setStudents((currentStudents) =>
+      currentStudents.map((item) =>
         item.id === id
           ? {
               ...item,
@@ -114,18 +176,48 @@ export default function MarksEntry() {
     );
   };
 
+  /* =====================================================
+     SEARCH STUDENTS
+  ===================================================== */
+
   const filteredStudents = useMemo(() => {
-    return students.filter((item) =>
-      item.studentName
-        .toLowerCase()
-        .includes(search.toLowerCase())
+    const searchText =
+      search.toLowerCase().trim();
+
+    if (!searchText) {
+      return students;
+    }
+
+    return students.filter(
+      (item) =>
+        item.studentName
+          .toLowerCase()
+          .includes(searchText) ||
+        item.admissionNo
+          .toLowerCase()
+          .includes(searchText)
     );
   }, [students, search]);
 
+  /* =====================================================
+     SAVE MARKS
+  ===================================================== */
+
   const saveMarks = () => {
     alert("Marks Saved Successfully");
-    console.log(students);
+
+    console.log({
+      exam: selectedExam,
+      class: selectedClass,
+      section: selectedSection,
+      subject: selectedSubject,
+      students,
+    });
   };
+
+  /* =====================================================
+     CLASS CHANGE
+  ===================================================== */
 
   const handleClassChange = (
     e: React.ChangeEvent<HTMLSelectElement>
@@ -134,9 +226,12 @@ export default function MarksEntry() {
 
     setSelectedClass(newClass);
 
-    // First section of the selected class
-    const sections = classSections[newClass] || [];
-    setSelectedSection(sections[0] || "");
+    const sections =
+      classSections[newClass] || [];
+
+    setSelectedSection(
+      sections[0] || ""
+    );
   };
 
   return (
@@ -158,91 +253,143 @@ export default function MarksEntry() {
 
         </div>
 
+        {/* =================================================
+            FILTER CARD
+        ================================================= */}
+
         <div className="filter-card">
 
           <div className="filter-grid">
 
             {/* EXAM */}
+
             <div>
               <label>Exam</label>
 
               <select
                 value={selectedExam}
                 onChange={(e) =>
-                  setSelectedExam(e.target.value)
+                  setSelectedExam(
+                    e.target.value
+                  )
                 }
               >
-                <option>1st Pre-Mid</option>
-                <option>2nd Pre-Mid</option>
-                <option>Half Yearly</option>
-                <option>1st Post-Mid</option>
-                <option>2nd Post-Mid</option>
-                <option>Annual</option>
+                <option>
+                  1st Pre-Mid
+                </option>
+
+                <option>
+                  2nd Pre-Mid
+                </option>
+
+                <option>
+                  Half Yearly
+                </option>
+
+                <option>
+                  1st Post-Mid
+                </option>
+
+                <option>
+                  2nd Post-Mid
+                </option>
+
+                <option>
+                  Annual
+                </option>
               </select>
             </div>
 
             {/* CLASS */}
+
             <div>
               <label>Class</label>
 
               <select
                 value={selectedClass}
-                onChange={handleClassChange}
-              >
-                {classOptions.map((className) => (
-                  <option
-                    key={className}
-                    value={className}
-                  >
-                    {className}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* SECTION */}
-            <div>
-              <label>Section</label>
-
-              <select
-                value={selectedSection}
-                onChange={(e) =>
-                  setSelectedSection(e.target.value)
+                onChange={
+                  handleClassChange
                 }
               >
-                {(classSections[selectedClass] || []).map(
-                  (section) => (
+                {classOptions.map(
+                  (className) => (
                     <option
-                      key={section}
-                      value={section}
+                      key={className}
+                      value={className}
                     >
-                      {section}
+                      {className}
                     </option>
                   )
                 )}
               </select>
             </div>
 
+            {/* SECTION */}
+
+            <div>
+              <label>Section</label>
+
+              <select
+                value={selectedSection}
+                onChange={(e) =>
+                  setSelectedSection(
+                    e.target.value
+                  )
+                }
+              >
+                {(
+                  classSections[
+                    selectedClass
+                  ] || []
+                ).map((section) => (
+                  <option
+                    key={section}
+                    value={section}
+                  >
+                    {section}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* SUBJECT */}
+
             <div>
               <label>Subject</label>
 
               <select
                 value={selectedSubject}
                 onChange={(e) =>
-                  setSelectedSubject(e.target.value)
+                  setSelectedSubject(
+                    e.target.value
+                  )
                 }
               >
-                <option>English</option>
-                <option>Hindi</option>
-                <option>Mathematics</option>
-                <option>Science</option>
+                <option>
+                  English
+                </option>
+
+                <option>
+                  Hindi
+                </option>
+
+                <option>
+                  Mathematics
+                </option>
+
+                <option>
+                  Science
+                </option>
               </select>
             </div>
 
           </div>
 
         </div>
+
+        {/* =================================================
+            SEARCH
+        ================================================= */}
 
         <div className="search-box">
 
@@ -251,81 +398,197 @@ export default function MarksEntry() {
             placeholder="Search Student..."
             value={search}
             onChange={(e) =>
-              setSearch(e.target.value)
+              setSearch(
+                e.target.value
+              )
             }
           />
 
         </div>
 
+        {/* =================================================
+            STUDENT TABLE
+        ================================================= */}
+
         <div className="marks-table">
 
-          <table>
+          {loadingStudents && (
+            <p
+              style={{
+                textAlign: "center",
+                padding: "20px",
+              }}
+            >
+              Loading students...
+            </p>
+          )}
 
-            <thead>
-              <tr>
-                <th>Roll</th>
-                <th>Admission No</th>
-                <th>Student Name</th>
-                <th>Theory</th>
-                <th>Practical</th>
-                <th>Total</th>
-              </tr>
-            </thead>
+          {!loadingStudents &&
+            studentError && (
+              <p
+                style={{
+                  textAlign: "center",
+                  padding: "20px",
+                  color: "red",
+                }}
+              >
+                {studentError}
+              </p>
+            )}
 
-            <tbody>
+          {!loadingStudents &&
+            !studentError &&
+            students.length === 0 && (
+              <p
+                style={{
+                  textAlign: "center",
+                  padding: "20px",
+                }}
+              >
+                No students found for{" "}
+                {selectedClass} -{" "}
+                {selectedSection}
+              </p>
+            )}
 
-              {filteredStudents.map((student) => (
+          {!loadingStudents &&
+            !studentError &&
+            students.length > 0 && (
+              <table>
 
-                <tr key={student.id}>
+                <thead>
+                  <tr>
 
-                  <td>{student.roll}</td>
+                    <th>
+                      Roll
+                    </th>
 
-                  <td>{student.admissionNo}</td>
+                    <th>
+                      Admission No
+                    </th>
 
-                  <td>{student.studentName}</td>
+                    <th>
+                      Student Name
+                    </th>
 
-                  <td>
-                    <input
-                      type="number"
-                      value={student.theory}
-                      onChange={(e) =>
-                        updateTheory(
-                          student.id,
-                          Number(e.target.value)
-                        )
-                      }
-                      style={{ width: "80px" }}
-                    />
-                  </td>
+                    <th>
+                      Theory
+                    </th>
 
-                  <td>
-                    <input
-                      type="number"
-                      value={student.practical}
-                      onChange={(e) =>
-                        updatePractical(
-                          student.id,
-                          Number(e.target.value)
-                        )
-                      }
-                      style={{ width: "80px" }}
-                    />
-                  </td>
+                    <th>
+                      Practical
+                    </th>
 
-                  <td>
-                    <strong>
-                      {student.theory +
-                        student.practical}
-                    </strong>
-                  </td>
+                    <th>
+                      Total
+                    </th>
 
-                </tr>
+                  </tr>
+                </thead>
 
-              ))}
+                <tbody>
 
-            </tbody>
+                  {filteredStudents.map(
+                    (student) => (
 
-          </table>
+                      <tr
+                        key={student.id}
+                      >
+
+                        <td>
+                          {student.roll}
+                        </td>
+
+                        <td>
+                          {
+                            student.admissionNo
+                          }
+                        </td>
+
+                        <td>
+                          {
+                            student.studentName
+                          }
+                        </td>
+
+                        <td>
+
+                          <input
+                            type="number"
+                            value={
+                              student.theory
+                            }
+                            onChange={(e) =>
+                              updateTheory(
+                                student.id,
+                                Number(
+                                  e.target
+                                    .value
+                                )
+                              )
+                            }
+                            style={{
+                              width: "80px",
+                            }}
+                          />
+
+                        </td>
+
+                        <td>
+
+                          <input
+                            type="number"
+                            value={
+                              student.practical
+                            }
+                            onChange={(e) =>
+                              updatePractical(
+                                student.id,
+                                Number(
+                                  e.target
+                                    .value
+                                )
+                              )
+                            }
+                            style={{
+                              width: "80px",
+                            }}
+                          />
+
+                        </td>
+
+                        <td>
+
+                          <strong>
+                            {student.theory +
+                              student.practical}
+                          </strong>
+
+                        </td>
+
+                      </tr>
+
+                    )
+                  )}
+
+                </tbody>
+
+              </table>
+            )}
+
+          {!loadingStudents &&
+            !studentError &&
+            students.length > 0 &&
+            filteredStudents.length === 0 && (
+              <p
+                style={{
+                  textAlign: "center",
+                  padding: "20px",
+                }}
+              >
+                No matching student found.
+              </p>
+            )}
 
         </div>
 

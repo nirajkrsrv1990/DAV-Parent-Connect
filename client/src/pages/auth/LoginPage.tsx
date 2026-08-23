@@ -40,9 +40,40 @@ export default function LoginPage() {
     try {
       console.log("API URL:", API_BASE_URL);
 
-      // ============================
+      const loginId = userId.trim();
+
+      // ==============================
+      // TEACHER LOGIN
+      // All Teacher IDs start with DAVT
+      // ==============================
+      if (loginId.toUpperCase().startsWith("DAVT")) {
+        const response = await fetch(`${API_BASE_URL}/teachers/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            teacher_id: loginId,
+            password,
+          }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          saveRememberMe();
+          localStorage.setItem("teacher", JSON.stringify(result.teacher));
+          navigate("/teacher");
+          return;
+        }
+
+        alert(result.message || "Invalid Teacher ID or Password");
+        return;
+      }
+
+      // ==============================
       // ADMIN LOGIN
-      // ============================
+      // ==============================
       try {
         const response = await fetch(`${API_BASE_URL}/admin/login`, {
           method: "POST",
@@ -50,7 +81,7 @@ export default function LoginPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            email: userId,
+            email: loginId,
             password,
           }),
         });
@@ -64,39 +95,12 @@ export default function LoginPage() {
           return;
         }
       } catch (error) {
-        console.log("Admin failed", error);
+        console.log("Admin login request failed", error);
       }
 
-      // ============================
-      // TEACHER LOGIN
-      // ============================
-      try {
-        const response = await fetch(`${API_BASE_URL}/teachers/login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            teacher_id: userId,
-            password,
-          }),
-        });
-
-        const result = await response.json();
-
-        if (response.ok && result.success) {
-          saveRememberMe();
-          localStorage.setItem("teacher", JSON.stringify(result.teacher));
-          navigate("/teacher");
-          return;
-        }
-      } catch (error) {
-        console.log("Teacher failed", error);
-      }
-
-      // ============================
+      // ==============================
       // PARENT LOGIN
-      // ============================
+      // ==============================
       try {
         const response = await fetch(`${API_BASE_URL}/parents/login`, {
           method: "POST",
@@ -104,7 +108,7 @@ export default function LoginPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            email: userId,
+            email: loginId,
             password,
           }),
         });
@@ -118,7 +122,7 @@ export default function LoginPage() {
           return;
         }
       } catch (error) {
-        console.log("Parent failed", error);
+        console.log("Parent login request failed", error);
       }
 
       alert("Invalid ID or Password");

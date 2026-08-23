@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import "./MarksEntry.css";
 import TeacherSidebar from "../../../components/teacher/TeacherSidebar";
-import TeacherHeader from "../../../components/teacher/TeacherHeader";
 
 type StudentMark = {
   id: number;
@@ -12,8 +11,27 @@ type StudentMark = {
   practical: number;
 };
 
-export default function MarksEntry() {
+const classSections: Record<string, string[]> = {
+  NURSERY: ["A"],
+  LKG: ["A"],
+  UKG: ["A", "B"],
+  I: ["A", "B"],
+  II: ["A", "B", "C"],
+  III: ["A", "B", "C", "D"],
+  IV: ["A", "B", "C", "D"],
+  V: ["A", "B", "C", "D", "E", "F"],
+  VI: ["A", "B", "C", "D", "E", "JEE", "NEET"],
+  VII: ["A", "B", "C", "D", "E", "JEE", "NEET"],
+  VIII: ["A", "B", "C", "D", "E", "JEE", "NEET"],
+  IX: ["A", "B", "C", "D", "E", "JEE", "NEET"],
+  X: ["A", "B", "C", "D", "E", "JEE", "NEET"],
+  XI: ["COMM", "JEE", "NEET"],
+  XII: ["COMM", "JEE", "NEET"],
+};
 
+const classOptions = Object.keys(classSections);
+
+export default function MarksEntry() {
   const [selectedExam, setSelectedExam] =
     useState("1st Pre-Mid");
 
@@ -68,7 +86,6 @@ export default function MarksEntry() {
     id: number,
     value: number
   ) => {
-
     setStudents(
       students.map((item) =>
         item.id === id
@@ -79,14 +96,12 @@ export default function MarksEntry() {
           : item
       )
     );
-
   };
 
   const updatePractical = (
     id: number,
     value: number
   ) => {
-
     setStudents(
       students.map((item) =>
         item.id === id
@@ -97,229 +112,224 @@ export default function MarksEntry() {
           : item
       )
     );
-
   };
 
   const filteredStudents = useMemo(() => {
-
     return students.filter((item) =>
       item.studentName
         .toLowerCase()
         .includes(search.toLowerCase())
     );
-
   }, [students, search]);
 
   const saveMarks = () => {
-
     alert("Marks Saved Successfully");
-
     console.log(students);
+  };
 
+  const handleClassChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const newClass = e.target.value;
+
+    setSelectedClass(newClass);
+
+    // First section of the selected class
+    const sections = classSections[newClass] || [];
+    setSelectedSection(sections[0] || "");
   };
 
   return (
-  <>
-    <TeacherSidebar />
-    <TeacherHeader />
+    <>
+      <TeacherSidebar />
 
-    <main className="marks-page">
+      <main className="marks-page">
 
-      <div className="marks-header">
+        <div className="marks-header">
 
-        <h1>Marks Entry</h1>
+          <h1>Marks Entry</h1>
 
-        <button
-          className="save-btn"
-          onClick={saveMarks}
-        >
-          Save Marks
-        </button>
+          <button
+            className="save-btn"
+            onClick={saveMarks}
+          >
+            Save Marks
+          </button>
 
-      </div>
+        </div>
 
-      <div className="filter-card">
+        <div className="filter-card">
 
-        <div className="filter-grid">
+          <div className="filter-grid">
 
-          <div>
+            {/* EXAM */}
+            <div>
+              <label>Exam</label>
 
-            <label>Exam</label>
+              <select
+                value={selectedExam}
+                onChange={(e) =>
+                  setSelectedExam(e.target.value)
+                }
+              >
+                <option>1st Pre-Mid</option>
+                <option>2nd Pre-Mid</option>
+                <option>Half Yearly</option>
+                <option>1st Post-Mid</option>
+                <option>2nd Post-Mid</option>
+                <option>Annual</option>
+              </select>
+            </div>
 
-            <select
-              value={selectedExam}
-              onChange={(e) =>
-                setSelectedExam(e.target.value)
-              }
-            >
-              <option>1st Pre-Mid</option>
-              <option>2nd Pre-Mid</option>
-              <option>Half Yearly</option>
-              <option>1st Post-Mid</option>
-              <option>2nd Post-Mid</option>
-              <option>Annual</option>
-            </select>
+            {/* CLASS */}
+            <div>
+              <label>Class</label>
 
-          </div>
+              <select
+                value={selectedClass}
+                onChange={handleClassChange}
+              >
+                {classOptions.map((className) => (
+                  <option
+                    key={className}
+                    value={className}
+                  >
+                    {className}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div>
+            {/* SECTION */}
+            <div>
+              <label>Section</label>
 
-            <label>Class</label>
+              <select
+                value={selectedSection}
+                onChange={(e) =>
+                  setSelectedSection(e.target.value)
+                }
+              >
+                {(classSections[selectedClass] || []).map(
+                  (section) => (
+                    <option
+                      key={section}
+                      value={section}
+                    >
+                      {section}
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
 
-            <select
-              value={selectedClass}
-              onChange={(e) =>
-                setSelectedClass(e.target.value)
-              }
-            >
-              <option>VIII</option>
-              <option>IX</option>
-              <option>X</option>
-            </select>
+            {/* SUBJECT */}
+            <div>
+              <label>Subject</label>
 
-          </div>
-
-          <div>
-
-            <label>Section</label>
-
-            <select
-              value={selectedSection}
-              onChange={(e) =>
-                setSelectedSection(e.target.value)
-              }
-            >
-              <option>A</option>
-              <option>B</option>
-              <option>C</option>
-            </select>
-
-          </div>
-
-          <div>
-
-            <label>Subject</label>
-
-            <select
-              value={selectedSubject}
-              onChange={(e) =>
-                setSelectedSubject(e.target.value)
-              }
-            >
-              <option>English</option>
-              <option>Hindi</option>
-              <option>Mathematics</option>
-              <option>Science</option>
-            </select>
+              <select
+                value={selectedSubject}
+                onChange={(e) =>
+                  setSelectedSubject(e.target.value)
+                }
+              >
+                <option>English</option>
+                <option>Hindi</option>
+                <option>Mathematics</option>
+                <option>Science</option>
+              </select>
+            </div>
 
           </div>
 
         </div>
 
-      </div>
+        <div className="search-box">
 
-      <div className="search-box">
+          <input
+            type="text"
+            placeholder="Search Student..."
+            value={search}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
+          />
 
-        <input
-          type="text"
-          placeholder="Search Student..."
-          value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
-        />
+        </div>
 
-      </div>
+        <div className="marks-table">
 
-      <div className="marks-table">
+          <table>
 
-        <table>
-
-          <thead>
-
-            <tr>
-
-              <th>Roll</th>
-
-              <th>Admission No</th>
-
-              <th>Student Name</th>
-
-              <th>Theory</th>
-
-              <th>Practical</th>
-
-              <th>Total</th>
-
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            {filteredStudents.map((student) => (
-
-              <tr key={student.id}>
-
-                <td>{student.roll}</td>
-
-                <td>{student.admissionNo}</td>
-
-                <td>{student.studentName}</td>
-
-                <td>
-
-                  <input
-                    type="number"
-                    value={student.theory}
-                    onChange={(e) =>
-                      updateTheory(
-                        student.id,
-                        Number(e.target.value)
-                      )
-                    }
-                    style={{ width: "80px" }}
-                  />
-
-                </td>
-
-                <td>
-
-                  <input
-                    type="number"
-                    value={student.practical}
-                    onChange={(e) =>
-                      updatePractical(
-                        student.id,
-                        Number(e.target.value)
-                      )
-                    }
-                    style={{ width: "80px" }}
-                  />
-
-                </td>
-
-                <td>
-
-                  <strong>
-                    {student.theory + student.practical}
-                  </strong>
-
-                </td>
-
+            <thead>
+              <tr>
+                <th>Roll</th>
+                <th>Admission No</th>
+                <th>Student Name</th>
+                <th>Theory</th>
+                <th>Practical</th>
+                <th>Total</th>
               </tr>
+            </thead>
 
-            ))}
+            <tbody>
 
-          </tbody>
+              {filteredStudents.map((student) => (
 
-        </table>
+                <tr key={student.id}>
 
-      </div>
+                  <td>{student.roll}</td>
 
-    </main>
+                  <td>{student.admissionNo}</td>
 
-  </>
-);
+                  <td>{student.studentName}</td>
 
+                  <td>
+                    <input
+                      type="number"
+                      value={student.theory}
+                      onChange={(e) =>
+                        updateTheory(
+                          student.id,
+                          Number(e.target.value)
+                        )
+                      }
+                      style={{ width: "80px" }}
+                    />
+                  </td>
+
+                  <td>
+                    <input
+                      type="number"
+                      value={student.practical}
+                      onChange={(e) =>
+                        updatePractical(
+                          student.id,
+                          Number(e.target.value)
+                        )
+                      }
+                      style={{ width: "80px" }}
+                    />
+                  </td>
+
+                  <td>
+                    <strong>
+                      {student.theory +
+                        student.practical}
+                    </strong>
+                  </td>
+
+                </tr>
+
+              ))}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </main>
+    </>
+  );
 }

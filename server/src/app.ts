@@ -11,6 +11,8 @@ import classTeacherRoutes from "./routes/classTeacher.routes";
 import parentRoutes from "./routes/parent.routes";
 import path from "path";
 import homeworkRoutes from "./routes/homework.routes";
+import teacherStudentRoutes from "./routes/teacherStudent.routes";
+import academicCalendarRoutes from "./routes/academic-calendar.routes";
 
 dotenv.config();
 
@@ -27,6 +29,10 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/api/students", studentRoutes);
+app.use(
+  "/api/teacher-students",
+  teacherStudentRoutes
+);
 app.use("/api/master", masterRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/teachers", teacherRoutes);
@@ -41,5 +47,6 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // Register homework routes
 app.use("/api/homework", homeworkRoutes);
+app.use("/api/academic-calendar", academicCalendarRoutes);
 
 export default app;

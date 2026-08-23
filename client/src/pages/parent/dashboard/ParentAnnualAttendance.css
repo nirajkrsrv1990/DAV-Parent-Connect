@@ -1,0 +1,457 @@
+.annual-attendance-page {
+
+    min-height:100vh;
+    background:#f4f5f7;
+    font-family:Arial, Helvetica, sans-serif;
+
+}
+
+
+/* ================= HEADER ================= */
+
+.annual-header {
+
+    height:70px;
+    background:#2fa0b3;
+    color:white;
+
+    display:flex;
+    align-items:center;
+
+    padding:0 20px;
+    gap:20px;
+
+}
+
+
+.annual-header h1 {
+
+    margin:0;
+    font-size:26px;
+
+}
+
+
+.annual-header p {
+
+    margin:2px 0;
+    font-size:14px;
+
+}
+
+
+
+.annual-back {
+
+    background:none;
+    border:none;
+
+    color:white;
+    font-size:38px;
+
+    cursor:pointer;
+
+}
+
+
+
+/* ================= STUDENT INFO ================= */
+
+
+.annual-student-bar {
+
+    background:#dedede;
+
+    padding:12px 20px;
+
+    display:flex;
+
+    gap:15px;
+
+    font-size:16px;
+
+    flex-wrap:wrap;
+
+}
+
+
+
+/* ================= SESSION ================= */
+
+
+.session-title {
+
+    text-align:center;
+
+    font-size:22px;
+
+    font-weight:bold;
+
+    color:#2478bd;
+
+    padding:15px;
+
+}
+
+
+
+/* ================= SUMMARY ================= */
+
+
+.attendance-summary {
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:15px;
+
+    padding:10px;
+
+}
+
+
+
+.attendance-summary div {
+
+    background:white;
+
+    padding:15px;
+
+    width:100px;
+
+    text-align:center;
+
+    border-radius:8px;
+
+    box-shadow:0 2px 5px #ccc;
+
+}
+
+
+.attendance-summary h3 {
+
+    font-size:14px;
+
+    margin:0;
+
+}
+
+
+.attendance-summary p {
+
+    font-size:22px;
+
+    font-weight:bold;
+
+    margin:8px;
+
+}
+
+
+
+/* ================= MONTH CARD ================= */
+
+
+.month-card {
+
+    background:white;
+
+    margin:15px;
+
+    padding:15px;
+
+    border-radius:8px;
+
+    box-shadow:0 2px 5px #ddd;
+
+}
+
+
+
+.month-card h2 {
+
+    text-align:center;
+
+    color:#2478bd;
+
+    margin-bottom:15px;
+
+}
+
+
+
+/* ================= WEEK HEADER ================= */
+
+
+.week-header {
+
+    display:grid;
+
+    grid-template-columns:repeat(7,1fr);
+
+    text-align:center;
+
+    font-weight:bold;
+
+    font-size:14px;
+
+    color:#0F4C81;
+
+    margin-bottom:8px;
+
+}
+
+
+
+/* ================= CALENDAR GRID ================= */
+
+
+.days-grid {
+
+    display:grid;
+
+    grid-template-columns:repeat(7,1fr);
+
+    gap:4px;
+
+}
+
+
+
+/* ================= DAY BOX ================= */
+
+
+.day-box {
+
+    min-height:45px;
+
+    border:1px solid #ddd;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:14px;
+
+    background:white;
+
+}
+
+
+
+.day-box small {
+
+    font-size:11px;
+
+    font-weight:bold;
+
+}
+
+
+
+/* ================= STATUS COLORS ================= */
+
+
+.day-box.present {
+
+    background:#229d59;
+
+    color:white;
+
+}
+
+
+
+.day-box.absent {
+
+    background:#fa6669;
+
+    color:white;
+
+}
+
+
+
+.day-box.holiday {
+
+    background:#a50e14;
+
+    color:white;
+
+}
+
+
+
+.day-box.sunday {
+
+    background:#2698e5;
+
+    color:white;
+
+}
+
+
+
+.day-box.empty {
+
+    background:white;
+
+    color:#999;
+
+}
+
+
+
+/* ================= LEGEND ================= */
+
+
+.legend {
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:15px;
+
+    padding:20px;
+
+    font-size:14px;
+
+}
+
+
+
+/* ================= MOBILE ================= */
+
+
+@media(max-width:600px){
+
+
+    .annual-header h1 {
+
+        font-size:20px;
+
+    }
+
+
+    .attendance-summary div {
+
+        width:80px;
+
+        padding:10px;
+
+    }
+
+
+    .day-box {
+
+        min-height:40px;
+
+        font-size:13px;
+
+    }
+
+
+    .week-header {
+
+        font-size:12px;
+
+    }
+
+
+}
+.month-summary{
+
+margin-top:15px;
+
+background:#f8fafc;
+
+padding:12px;
+
+border-radius:8px;
+
+border:1px solid #ddd;
+
+}
+
+
+.month-summary h3{
+
+text-align:center;
+
+font-size:16px;
+
+color:#0F4C81;
+
+margin-bottom:12px;
+
+}
+
+
+
+.summary-grid{
+
+display:grid;
+
+grid-template-columns:
+repeat(4,1fr);
+
+gap:10px;
+
+}
+
+
+
+.summary-grid div{
+
+background:white;
+
+padding:10px;
+
+text-align:center;
+
+border-radius:6px;
+
+box-shadow:0 1px 3px #ddd;
+
+}
+
+
+
+.summary-grid span{
+
+display:block;
+
+font-size:12px;
+
+color:#666;
+
+}
+
+
+
+.summary-grid b{
+
+font-size:18px;
+
+color:#0F4C81;
+
+}
+
+
+
+@media(max-width:600px){
+
+.summary-grid{
+
+grid-template-columns:
+repeat(2,1fr);
+
+}
+
+}

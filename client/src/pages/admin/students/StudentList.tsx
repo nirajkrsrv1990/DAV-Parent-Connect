@@ -4,320 +4,772 @@ import {
   useState,
 } from "react";
 
+import apiClient from "../../../services/apiClient";
+
 import "./StudentList.css";
 
 type Student = {
-
-  id:number;
-
-  admission_no:string;
-
-  student_name:string;
-
-  father_name:string;
-
-  mother_name:string;
-
-  mobile_no:string;
-
-  class:string;
-
-  section:string;
-
-  roll_no:number;
-
-  gender:string;
-
-  dob:string;
-
-  house:string;
-
-  status:string;
-
+  id: number;
+  admission_no: string;
+  student_name: string;
+  father_name: string;
+  mother_name: string;
+  mobile_no: string;
+  class: string;
+  section: string;
+  roll_no: number;
+  gender: string;
+  dob: string;
+  house: string;
+  status: string;
 };
 
-export default function StudentList(){
+export default function StudentList() {
+  const [students, setStudents] = useState<Student[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [students,setStudents]=
-    useState<Student[]>([]);
+  // =====================================================
+  // FILTER STATES
+  // =====================================================
 
-  const [loading,setLoading]=
-    useState(true);
+  const [admissionFilter, setAdmissionFilter] = useState("");
+  const [classFilter, setClassFilter] = useState("");
+  const [sectionFilter, setSectionFilter] = useState("");
 
-  const [search,setSearch]=
-    useState("");
-
-  const [error,setError]=
-    useState("");
-
-  const loadStudents=async()=>{
-
-    try{
-
-      setLoading(true);
-
-      const response=
-        await fetch(
-          "/api/students"
-        );
-
-      const result=
-        await response.json();
-
-      if(result.success){
-
-        setStudents(result.students);
-
-      }
-
-      else{
-
-        setError(result.message);
-
-      }
-
-    }
-
-    catch{
-
-      setError(
-        "Unable to connect server."
-      );
-
-    }
-
-    finally{
-
-      setLoading(false);
-
-    }
-
-  };
+  // =====================================================
+  // LOAD STUDENTS
+  // =====================================================
 
   useEffect(() => {
+    let cancelled = false;
 
-  const fetchStudents = async () => {
-    await loadStudents();
+    const fetchStudents = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await apiClient.get("/students");
+
+        const result = response.data;
+
+        console.log("Student List API Response:", result);
+
+        if (cancelled) return;
+
+        if (result.success) {
+          setStudents(result.students || []);
+        } else {
+          setError(result.message || "Unable to load students.");
+        }
+      } catch (err) {
+        if (cancelled) return;
+
+        console.error("Student List Load Error:", err);
+
+        setError("Unable to connect server.");
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void fetchStudents();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // =====================================================
+  // CLASS OPTIONS
+  // =====================================================
+
+  const classOptions = useMemo(() => {
+    return Array.from(
+      new Set(
+        students
+          .map((student) => student.class?.trim())
+          .filter(Boolean)
+      )
+    ).sort((a, b) =>
+      a.localeCompare(b, undefined, {
+        numeric: true,
+      })
+    );
+  }, [students]);
+
+  // =====================================================
+  // SECTION OPTIONS
+  // =====================================================
+
+  const sectionOptions = useMemo(() => {
+    const filteredForSections = classFilter
+      ? students.filter(
+          (student) => student.class === classFilter
+        )
+      : students;
+
+    return Array.from(
+      new Set(
+        filteredForSections
+          .map((student) => student.section?.trim())
+          .filter(Boolean)
+      )
+    ).sort();
+  }, [students, classFilter]);
+
+  // =====================================================
+  // FILTER STUDENTS
+  // =====================================================
+
+  const filteredStudents = useMemo(() => {
+    const admissionText = admissionFilter
+      .trim()
+      .toLowerCase();
+
+    return students.filter((student) => {
+      const admissionMatch =
+        !admissionText ||
+        String(student.admission_no ?? "")
+          .toLowerCase()
+          .includes(admissionText);
+
+      const classMatch =
+        !classFilter ||
+        student.class === classFilter;
+
+      const sectionMatch =
+        !sectionFilter ||
+        student.section === sectionFilter;
+
+      return (
+        admissionMatch &&
+        classMatch &&
+        sectionMatch
+      );
+    });
+  }, [
+    students,
+    admissionFilter,
+    classFilter,
+    sectionFilter,
+  ]);
+
+  // =====================================================
+  // CLEAR FILTERS
+  // =====================================================
+
+  const clearFilters = () => {
+    setAdmissionFilter("");
+    setClassFilter("");
+    setSectionFilter("");
   };
 
-  fetchStudents();
+  // =====================================================
+  // CLASS CHANGE
+  // =====================================================
 
-}, []);
+  const handleClassChange = (
+    value: string
+  ) => {
+    setClassFilter(value);
 
-  const filteredStudents=
-    useMemo(()=>{
+    // Reset section when class changes
+    setSectionFilter("");
+  };
 
-      return students.filter(
+  // =====================================================
+  // EDIT STUDENT
+  // =====================================================
 
-        (student)=>
+  const handleEdit = (
+    student: Student
+  ) => {
+    console.log(
+      "Edit Student:",
+      student
+    );
 
-          student.student_name
+    alert(
+      `Edit option selected for:\n\n` +
+      `Student: ${student.student_name}\n` +
+      `Admission No.: ${student.admission_no}`
+    );
+  };
 
-          .toLowerCase()
+  // =====================================================
+  // DELETE STUDENT
+  // =====================================================
 
-          .includes(
-
-            search.toLowerCase()
-
-          )
-
+  const handleDelete = (
+    student: Student
+  ) => {
+    const confirmed =
+      window.confirm(
+        `Are you sure you want to delete ${student.student_name}?`
       );
 
-    },[students,search]);
-    return (
+    if (!confirmed) return;
 
-      <div className="master-page">
+    console.log(
+      "Delete Student:",
+      student
+    );
 
-        <div className="page-header">
+    alert(
+      "Delete API is not connected yet."
+    );
+  };
 
+  // =====================================================
+  // FORMAT DATE
+  // =====================================================
+
+  const formatDate = (
+    value: string
+  ) => {
+    if (!value) return "-";
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    return date.toLocaleDateString(
+      "en-IN"
+    );
+  };
+
+  // =====================================================
+  // RENDER
+  // =====================================================
+
+  return (
+    <div className="student-list-page">
+
+      {/* =================================================
+          PAGE HEADER
+      ================================================= */}
+
+      <div className="student-list-header">
+        <div>
           <h1>Student List</h1>
 
+          {!loading && !error && (
+            <p className="student-subtitle">
+              Showing{" "}
+              <strong>
+                {filteredStudents.length}
+              </strong>{" "}
+              of{" "}
+              <strong>
+                {students.length}
+              </strong>{" "}
+              students
+            </p>
+          )}
         </div>
+      </div>
 
-        <div className="search-box">
+      {/* =================================================
+          FILTER PANEL
+      ================================================= */}
+
+      <div className="student-filter-panel">
+
+        {/* Admission Number */}
+
+        <div className="student-filter-group">
+          <label htmlFor="admission-filter">
+            Admission No.
+          </label>
 
           <input
+            id="admission-filter"
             type="text"
-            placeholder="Search Student..."
-            value={search}
-            onChange={(e)=>
-              setSearch(e.target.value)
+            placeholder="Enter Admission No."
+            value={admissionFilter}
+            onChange={(e) =>
+              setAdmissionFilter(
+                e.target.value
+              )
             }
           />
-
         </div>
 
-        {
+        {/* Class */}
 
-          loading &&
+        <div className="student-filter-group">
+          <label htmlFor="class-filter">
+            Class
+          </label>
 
-          <h3
-            style={{
-              textAlign:"center",
-              marginTop:"40px"
-            }}
+          <select
+            id="class-filter"
+            value={classFilter}
+            onChange={(e) =>
+              handleClassChange(
+                e.target.value
+              )
+            }
           >
+            <option value="">
+              All Classes
+            </option>
+
+            {classOptions.map(
+              (className) => (
+                <option
+                  key={className}
+                  value={className}
+                >
+                  {className}
+                </option>
+              )
+            )}
+          </select>
+        </div>
+
+        {/* Section */}
+
+        <div className="student-filter-group">
+          <label htmlFor="section-filter">
+            Section
+          </label>
+
+          <select
+            id="section-filter"
+            value={sectionFilter}
+            onChange={(e) =>
+              setSectionFilter(
+                e.target.value
+              )
+            }
+          >
+            <option value="">
+              All Sections
+            </option>
+
+            {sectionOptions.map(
+              (section) => (
+                <option
+                  key={section}
+                  value={section}
+                >
+                  {section}
+                </option>
+              )
+            )}
+          </select>
+        </div>
+
+        {/* Clear */}
+
+        <div className="student-filter-action">
+          <button
+            type="button"
+            className="clear-filter-btn"
+            onClick={clearFilters}
+          >
+            Clear Filters
+          </button>
+        </div>
+
+      </div>
+
+      {/* =================================================
+          LOADING
+      ================================================= */}
+
+      {loading && (
+        <div className="student-list-message">
+          <div className="loading-spinner"></div>
+
+          <p>
             Loading Students...
-          </h3>
+          </p>
+        </div>
+      )}
 
-        }
+      {/* =================================================
+          ERROR
+      ================================================= */}
 
-        {
+      {!loading && error && (
+        <div className="student-list-message error">
 
-          error &&
+          <p>{error}</p>
 
-          <h3
-            style={{
-              textAlign:"center",
-              color:"red",
-              marginTop:"40px"
-            }}
+          <button
+            type="button"
+            className="clear-filter-btn"
+            onClick={() =>
+              window.location.reload()
+            }
           >
-            {error}
-          </h3>
+            Retry
+          </button>
 
-        }
+        </div>
+      )}
 
-        {
+      {/* =================================================
+          NO STUDENT DATA
+      ================================================= */}
 
-          !loading && !error &&
+      {!loading &&
+        !error &&
+        students.length === 0 && (
+          <div className="student-list-message">
+            <p>
+              No Student Data Found.
+            </p>
+          </div>
+        )}
 
-          <table className="master-table">
+      {/* =================================================
+          FILTER RESULT EMPTY
+      ================================================= */}
 
-            <thead>
+      {!loading &&
+        !error &&
+        students.length > 0 &&
+        filteredStudents.length === 0 && (
+          <div className="student-list-message">
 
-              <tr>
+            <p>
+              No student found for the
+              selected filters.
+            </p>
 
-                <th>Adm No</th>
+            <button
+              type="button"
+              className="clear-filter-btn"
+              onClick={clearFilters}
+            >
+              Clear Filters
+            </button>
 
-                <th>Student Name</th>
+          </div>
+        )}
 
-                <th>Class</th>
+      {/* =================================================
+          DESKTOP / TABLET TABLE
+      ================================================= */}
 
-                <th>Section</th>
+      {!loading &&
+        !error &&
+        filteredStudents.length > 0 && (
+          <div className="student-table-container">
 
-                <th>Roll</th>
+            <table className="student-table">
 
-                <th>Mobile</th>
+              <thead>
+                <tr>
+                  <th>Adm No.</th>
+                  <th>Roll No.</th>
+                  <th>Student Name</th>
+                  <th>Class</th>
+                  <th>Section</th>
+                  <th>Father's Name</th>
+                  <th>Mother's Name</th>
+                  <th>Mobile No.</th>
+                  <th>Gender</th>
+                  <th>DOB</th>
+                  <th>House</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
 
-                <th>Status</th>
+              <tbody>
 
-                <th>Action</th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {
-
-                filteredStudents.map(
-
-                  (student)=>(
-
+                {filteredStudents.map(
+                  (student) => (
                     <tr
                       key={student.id}
                     >
 
                       <td>
-
-                        {student.admission_no}
-
+                        {student.admission_no || "-"}
                       </td>
 
                       <td>
+                        {student.roll_no ?? "-"}
+                      </td>
 
-                        {student.student_name}
-
+                      <td className="student-name-cell">
+                        {student.student_name || "-"}
                       </td>
 
                       <td>
-
-                        {student.class}
-
+                        {student.class || "-"}
                       </td>
 
                       <td>
-
-                        {student.section}
-
+                        {student.section || "-"}
                       </td>
 
                       <td>
-
-                        {student.roll_no}
-
+                        {student.father_name || "-"}
                       </td>
 
                       <td>
-
-                        {student.mobile_no}
-
+                        {student.mother_name || "-"}
                       </td>
 
                       <td>
-
-                        {student.status}
-
+                        {student.mobile_no || "-"}
                       </td>
 
                       <td>
+                        {student.gender || "-"}
+                      </td>
 
-                        <button
-                          className="edit-btn"
+                      <td>
+                        {formatDate(student.dob)}
+                      </td>
+
+                      <td>
+                        {student.house || "-"}
+                      </td>
+
+                      <td>
+                        <span
+                          className={
+                            student.status
+                              ?.toLowerCase() ===
+                            "active"
+                              ? "status-active"
+                              : "status-other"
+                          }
                         >
-                          Edit
-                        </button>
+                          {student.status || "-"}
+                        </span>
+                      </td>
 
-                        <button
-                          className="delete-btn"
-                          style={{
-                            marginLeft:"8px"
-                          }}
-                        >
-                          Delete
-                        </button>
+                      <td>
+                        <div className="student-actions">
 
+                          <button
+                            type="button"
+                            className="student-edit-btn"
+                            onClick={() =>
+                              handleEdit(
+                                student
+                              )
+                            }
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            className="student-delete-btn"
+                            onClick={() =>
+                              handleDelete(
+                                student
+                              )
+                            }
+                          >
+                            Delete
+                          </button>
+
+                        </div>
                       </td>
 
                     </tr>
-
                   )
+                )}
 
-                )
+              </tbody>
 
-              }
-                            {
+            </table>
 
-                filteredStudents.length===0 && (
+          </div>
+        )}
 
-                  <tr>
+      {/* =================================================
+          MOBILE STUDENT CARDS
+      ================================================= */}
 
-                    <td
-                      colSpan={8}
-                      style={{
-                        textAlign:"center",
-                        padding:"20px"
-                      }}
+      {!loading &&
+        !error &&
+        filteredStudents.length > 0 && (
+          <div className="mobile-student-list">
+
+            {filteredStudents.map(
+              (student) => (
+                <div
+                  className="mobile-student-card"
+                  key={student.id}
+                >
+
+                  {/* STUDENT HEADER */}
+
+                  <div className="mobile-student-top">
+
+                    <div>
+                      <h3>
+                        {student.student_name || "-"}
+                      </h3>
+
+                      <span>
+                        Admission No.:{" "}
+                        {student.admission_no || "-"}
+                      </span>
+                    </div>
+
+                    <span
+                      className={
+                        student.status
+                          ?.toLowerCase() ===
+                        "active"
+                          ? "status-active"
+                          : "status-other"
+                      }
                     >
-                      No Student Found
-                    </td>
+                      {student.status || "-"}
+                    </span>
 
-                  </tr>
+                  </div>
 
-                )
+                  {/* ALL STUDENT DETAILS */}
 
-              }
+                  <div className="mobile-student-details">
 
-            </tbody>
+                    <div>
+                      <small>
+                        Roll No.
+                      </small>
+                      <strong>
+                        {student.roll_no ?? "-"}
+                      </strong>
+                    </div>
 
-          </table>
+                    <div>
+                      <small>
+                        Class
+                      </small>
+                      <strong>
+                        {student.class || "-"}
+                      </strong>
+                    </div>
 
-        }
+                    <div>
+                      <small>
+                        Section
+                      </small>
+                      <strong>
+                        {student.section || "-"}
+                      </strong>
+                    </div>
 
-            </div>
+                    <div>
+                      <small>
+                        Father's Name
+                      </small>
+                      <strong>
+                        {student.father_name || "-"}
+                      </strong>
+                    </div>
 
-);
+                    <div>
+                      <small>
+                        Mother's Name
+                      </small>
+                      <strong>
+                        {student.mother_name || "-"}
+                      </strong>
+                    </div>
 
+                    <div>
+                      <small>
+                        Mobile No.
+                      </small>
+                      <strong>
+                        {student.mobile_no || "-"}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <small>
+                        Gender
+                      </small>
+                      <strong>
+                        {student.gender || "-"}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <small>
+                        Date of Birth
+                      </small>
+                      <strong>
+                        {formatDate(student.dob)}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <small>
+                        House
+                      </small>
+                      <strong>
+                        {student.house || "-"}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <small>
+                        Status
+                      </small>
+                      <strong>
+                        {student.status || "-"}
+                      </strong>
+                    </div>
+
+                  </div>
+
+                  {/* ACTION BUTTONS */}
+
+                  <div className="mobile-student-actions">
+
+                    <button
+                      type="button"
+                      className="student-edit-btn"
+                      onClick={() =>
+                        handleEdit(
+                          student
+                        )
+                      }
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      type="button"
+                      className="student-delete-btn"
+                      onClick={() =>
+                        handleDelete(
+                          student
+                        )
+                      }
+                    >
+                      Delete
+                    </button>
+
+                  </div>
+
+                </div>
+              )
+            )}
+
+          </div>
+        )}
+
+    </div>
+  );
 }

@@ -1,3 +1,4 @@
+import TeacherStudentList from "../pages/teacher/TeacherStudentList";
 import { Routes, Route } from "react-router-dom";
 
 import LoginPage from "../pages/auth/LoginPage";
@@ -34,6 +35,9 @@ import ParentSignup from "../pages/parent/ParentSignup";
 import ParentLogin from "../pages/parent/ParentLogin";
 import ParentDashboard from "../pages/parent/dashboard/ParentDashboard";
 import ParentHomework from "../pages/parent/dashboard/ParentHomework";
+import ParentAttendance from "../pages/parent/dashboard/ParentAttendance";
+import ParentAnnualCalendar from "../pages/parent/dashboard/ParentAnnualCalendar";
+import ParentAnnualAttendance from "../pages/parent/dashboard/ParentAnnualAttendance";
 
 export default function AppRoutes() {
   return (
@@ -66,7 +70,10 @@ export default function AppRoutes() {
         <Route path="homework" element={<Homework />} />
         <Route path="marks" element={<MarksEntry />} />
         <Route path="notices" element={<NoticeList />} />
-        <Route path="students" element={<StudentList />} />
+        <Route
+  path="students"
+  element={<TeacherStudentList />}
+/>
         <Route path="profile" element={<TeacherDashboard />} />
         <Route path="change-password" element={<TeacherDashboard />} />
       </Route>
@@ -76,7 +83,14 @@ export default function AppRoutes() {
       <Route path="/parent/login" element={<ParentLogin />} />
       <Route path="/parent/dashboard" element={<ParentDashboard />} />
       <Route path="/parent/homework" element={<ParentHomework />} />
+      <Route path="/parent/attendance" element={<ParentAttendance />} />
+      <Route 
+  path="/parent/annual-attendance" 
+  element={<ParentAnnualAttendance />} 
+/>
+       <Route path="/parent/annual-calendar"  element={<ParentAnnualCalendar />} />
       <Route path="/parent/notices" element={<NoticeList />} />
+     
 
       {/* ================= 404 ================= */}
       <Route

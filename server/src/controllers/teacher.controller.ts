@@ -406,3 +406,44 @@ export const saveAttendance = async (req: Request, res: Response) => {
     client.release();
   }
 };
+export const getAttendance = async (req: Request, res: Response) => {
+  try {
+    const { attendanceDate, teacher_id } = req.query;
+
+    if (!attendanceDate || !teacher_id) {
+      return res.status(400).json({
+        success: false,
+        message: "Attendance date and teacher ID are required",
+      });
+    }
+
+    const result = await pool.query(
+      `
+      SELECT
+        a.student_id,
+        a.status
+      FROM attendance a
+      WHERE
+        a.attendance_date = $1
+        AND a.teacher_id = (
+          SELECT id
+          FROM teachers
+          WHERE teacher_id = $2
+        )
+      `,
+      [attendanceDate, teacher_id]
+    );
+
+    res.json({
+      success: true,
+      attendance: result.rows,
+    });
+  } catch (err) {
+    console.error("Get Attendance Error:", err);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to Load Attendance",
+    });
+  }
+};

@@ -370,3 +370,26 @@ gap:10px;
 }
 
 }
+.password-box{
+  position: relative;
+  width: 100%;
+}
+
+.password-box input{
+  width: 100%;
+  padding-right: 45px; /* Icon ke liye space chodne ke liye */
+}
+
+.eye-btn{
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

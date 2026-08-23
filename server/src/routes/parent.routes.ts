@@ -1,9 +1,11 @@
 import { Router } from "express";
 import {
-  parentSignup,
-  parentLogin,
-  getParentDashboard,
-  markNotificationsAsRead,
+ parentSignup,
+ parentLogin,
+ getParentDashboard,
+ markNotificationsAsRead,
+ getAnnualAttendance,
+ getParentAttendance
 } from "../controllers/parent.controller";
 
 const router = Router();
@@ -21,7 +23,22 @@ router.post("/login", parentLogin);
 /* ===========================
    PARENT DASHBOARD & NOTIFICATIONS
 =========================== */
-router.get("/dashboard/:admission_no", getParentDashboard);
+router.get(
+  "/annual-attendance/:admission_no",
+  getAnnualAttendance
+);
+router.get(
+ "/dashboard/:admission_no",
+ getParentDashboard
+);
+// ============================
+// MONTHLY ATTENDANCE
+// ============================
+
+router.get(
+ "/attendance/:admission_no",
+ getParentAttendance
+);
 
 /* ===========================
    MARK NOTIFICATIONS AS READ

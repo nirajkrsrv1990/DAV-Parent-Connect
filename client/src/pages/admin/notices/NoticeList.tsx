@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { API_BASE_URL } from "@/config/api";
+import { API_BASE_URL, FILE_BASE_URL } from "@/config/api";
 
 export default function NoticeList() {
   const [notices, setNotices] = useState<any[]>([]);
@@ -67,7 +67,15 @@ export default function NoticeList() {
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b" }}>
                 <span>Date: {notice.notice_date ? notice.notice_date.split("T")[0] : ""}</span>
                 {notice.pdf_url && (
-                  <a href={`${API_BASE_URL.replace("/api", "")}${notice.pdf_url}`} target="_blank" rel="noopener noreferrer" style={{ color: "#2563eb", fontWeight: "bold" }}>
+                  <a
+  href={`${FILE_BASE_URL}${notice.pdf_url}`}
+  target="_blank"
+  rel="noopener noreferrer"
+  style={{
+    color: "#2563eb",
+    fontWeight: "bold",
+  }}
+>
                     📥 Download PDF Notice
                   </a>
                 )}

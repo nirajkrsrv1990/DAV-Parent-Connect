@@ -28,8 +28,9 @@ export default function Attendance() {
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedSection, setSelectedSection] = useState("");
   const [students, setStudents] = useState<Student[]>([]);
-  const [classes, setClasses] = useState<ClassMaster[]>([]);
-  const [loading, setLoading] = useState(false);
+const [classes, setClasses] = useState<ClassMaster[]>([]);
+const [loading, setLoading] = useState(false);
+const [attendanceMarked, setAttendanceMarked] = useState(false);
 
   const loadClasses = useCallback(async () => {
     try {
@@ -44,28 +45,73 @@ export default function Attendance() {
   }, []);
 
   const loadStudents = useCallback(async () => {
-    if (!selectedClass || !selectedSection) return;
+  if (!selectedClass || !selectedSection) return;
 
-    try {
-      setLoading(true);
-      const response = await fetch(
-  `${API_BASE_URL}/students?class=${selectedClass}&section=${selectedSection}`
-);
-      const result = await response.json();
+  try {
+    setLoading(true);
 
-      if (result.success) {
-        const data: Student[] = result.students.map((item: Student) => ({
-          ...item,
-          status: "P", // Default Present
-        }));
-        setStudents(data);
-      }
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
+    // 1. Load class students
+    const studentsResponse = await fetch(
+      `${API_BASE_URL}/students?class=${selectedClass}&section=${selectedSection}`
+    );
+
+    const studentsResult = await studentsResponse.json();
+
+    if (!studentsResult.success) {
+      setStudents([]);
+      return;
     }
-  }, [selectedClass, selectedSection]);
+
+    // 2. Load saved attendance for selected date
+    const teacherData = localStorage.getItem("teacher");
+
+    if (!teacherData) {
+      alert("Teacher Login Expired");
+      return;
+    }
+
+    const teacher = JSON.parse(teacherData);
+
+    const attendanceResponse = await fetch(
+      `/api/teachers/attendance?attendanceDate=${attendanceDate}&teacher_id=${teacher.teacher_id}`
+    );
+
+    const attendanceResult = await attendanceResponse.json();
+
+    // 3. Convert saved attendance into a quick lookup
+    const attendanceMap = new Map<number, "P" | "A">();
+
+    if (
+      attendanceResult.success &&
+      Array.isArray(attendanceResult.attendance)
+    ) {
+      attendanceResult.attendance.forEach(
+        (item: { student_id: number; status: "P" | "A" }) => {
+          attendanceMap.set(item.student_id, item.status);
+        }
+      );
+    }
+    setAttendanceMarked(
+  attendanceResult.success &&
+  Array.isArray(attendanceResult.attendance) &&
+  attendanceResult.attendance.length > 0
+);
+
+    // 4. Apply saved attendance to students
+    const data: Student[] = studentsResult.students.map(
+      (item: Student) => ({
+        ...item,
+        status: attendanceMap.get(item.id) || "P",
+      })
+    );
+
+    setStudents(data);
+  } catch (err) {
+    console.log("Attendance Load Error:", err);
+  } finally {
+    setLoading(false);
+  }
+}, [selectedClass, selectedSection, attendanceDate]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -139,8 +185,9 @@ export default function Attendance() {
       const result = await response.json();
 
       if (result.success) {
-        alert("Attendance Saved Successfully!");
-      } else {
+  setAttendanceMarked(true);
+  alert("Attendance Saved Successfully!");
+} else {
         alert(result.message || "Failed to save attendance");
       }
     } catch (err) {
@@ -199,64 +246,165 @@ export default function Attendance() {
         </div>
       </div>
 
-      {loading && <h2 style={{ textAlign: "center" }}>Loading Students...</h2>}
+      {loading && (
+  <h2 style={{ textAlign: "center" }}>
+    Loading Students...
+  </h2>
+)}
 
-      {!loading && (
-        <div className="attendance-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Roll</th>
-                <th>Admission No</th>
-                <th>Student Name</th>
-                <th style={{ textAlign: "center" }}>Attendance</th>
-              </tr>
-            </thead>
-            <tbody>
-              {students.map((student) => (
-                <tr key={student.id}>
-                  <td>{student.roll_no}</td>
-                  <td>{student.admission_no}</td>
-                  <td>{student.student_name}</td>
-                  <td>
-                    <div className="attendance-action">
-                      <button
-                        className={
-                          student.status === "P"
-                            ? "present-btn active"
-                            : "present-btn"
-                        }
-                        onClick={() => markAttendance(student.id, "P")}
-                      >
-                        Present
-                      </button>
+{!loading && (
+  <>
+    {/* Attendance Table */}
+    <div className="attendance-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Roll</th>
+            <th>Admission No</th>
+            <th>Student Name</th>
+            <th style={{ textAlign: "center" }}>
+              Attendance
+            </th>
+          </tr>
+        </thead>
 
-                      <button
-                        className={
-                          student.status === "A"
-                            ? "absent-btn active"
-                            : "absent-btn"
-                        }
-                        onClick={() => markAttendance(student.id, "A")}
-                      >
-                        Absent
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+        <tbody>
+          {students.map((student) => (
+            <tr key={student.id}>
+              <td>{student.roll_no}</td>
 
-              {students.length === 0 && (
-                <tr>
-                  <td colSpan={4} style={{ textAlign: "center", padding: "30px" }}>
-                    No Students Found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+              <td>{student.admission_no}</td>
+
+              <td>{student.student_name}</td>
+
+              <td>
+                <div className="attendance-action">
+
+                  <button
+                    className={
+                      student.status === "P"
+                        ? "present-btn active"
+                        : "present-btn"
+                    }
+                    onClick={() =>
+                      markAttendance(student.id, "P")
+                    }
+                  >
+                    Present
+                  </button>
+
+                  <button
+                    className={
+                      student.status === "A"
+                        ? "absent-btn active"
+                        : "absent-btn"
+                    }
+                    onClick={() =>
+                      markAttendance(student.id, "A")
+                    }
+                  >
+                    Absent
+                  </button>
+
+                </div>
+              </td>
+            </tr>
+          ))}
+
+          {students.length === 0 && (
+            <tr>
+              <td
+                colSpan={4}
+                style={{
+                  textAlign: "center",
+                  padding: "30px",
+                }}
+              >
+                No Students Found
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+
+    {/* Attendance Summary */}
+    {attendanceMarked && (
+      <div
+        style={{
+          marginTop: "15px",
+          padding: "15px",
+          background: "#ffffff",
+          borderRadius: "10px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+        }}
+      >
+        <div
+          style={{
+            fontWeight: "700",
+            color: "#15803d",
+            marginBottom: "10px",
+          }}
+        >
+          ✓ Attendance Marked for {attendanceDate}
         </div>
-      )}
+
+        <div style={{ marginBottom: "10px" }}>
+          <strong>Total:</strong> {students.length}
+          {" | "}
+          <strong>Present:</strong>{" "}
+          {students.filter(
+            (student) => student.status === "P"
+          ).length}
+          {" | "}
+          <strong>Absent:</strong>{" "}
+          {students.filter(
+            (student) => student.status === "A"
+          ).length}
+        </div>
+
+        <div
+          style={{
+            fontWeight: "700",
+            color: "#dc2626",
+            marginBottom: "8px",
+          }}
+        >
+          Today's Absent Students
+        </div>
+
+        {students.filter(
+          (student) => student.status === "A"
+        ).length === 0 ? (
+          <div style={{ color: "#15803d" }}>
+            No student is absent today.
+          </div>
+        ) : (
+          <ol
+            style={{
+              margin: 0,
+              paddingLeft: "20px",
+            }}
+          >
+            {students
+              .filter(
+                (student) => student.status === "A"
+              )
+              .map((student) => (
+                <li
+                  key={student.id}
+                  style={{ marginBottom: "5px" }}
+                >
+                  {student.student_name} — Admission No:{" "}
+                  {student.admission_no}
+                </li>
+              ))}
+          </ol>
+        )}
+            </div>
+    )}
+  </>
+)}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import apiClient from "../../services/apiClient";
 
 import DashboardCard from "../../components/dashboard/DashboardCard";
 import QuickActions from "../../components/dashboard/QuickActions";
@@ -23,9 +23,10 @@ export default function Dashboard() {
 
   const loadDashboard = async () => {
     try {
-      const res = await axios.get(
-        "/api/admin/dashboard-stats"
-      );
+      const res = await apiClient.get(
+  "/admin/dashboard-stats"
+);
+console.log("Dashboard API Response:", res.data);
 
       if (res.data.success) {
         setStats(res.data.data);

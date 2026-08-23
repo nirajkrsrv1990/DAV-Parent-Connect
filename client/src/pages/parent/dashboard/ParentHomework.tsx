@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ParentDashboard.css";
+import {
+  API_BASE_URL,
+  HOMEWORK_FILE_BASE_URL,
+} from "@/config/api";
 
 export default function ParentHomework() {
   const navigate = useNavigate();
@@ -20,7 +24,9 @@ export default function ParentHomework() {
   const fetchParentHomework = async (admissionNo: string) => {
     try {
       // Sahi API route yahan set kar diya gaya hai
-      const response = await fetch(`/api/homework/student/${admissionNo}`);
+      const response = await fetch(
+  `${API_BASE_URL}/homework/student/${admissionNo}`
+);
       const result = await response.json();
       if (result.success) {
         setHomeworkList(result.homework || []);
@@ -68,15 +74,35 @@ export default function ParentHomework() {
               
               <div style={{ display: "flex", gap: "15px", marginTop: "12px" }}>
                 {hw.pdf_url && (
-                  <a href={hw.pdf_url} target="_blank" rel="noopener noreferrer" style={{ color: "#2563eb", textDecoration: "none", fontWeight: 600, fontSize: "13px" }}>
-                    📄 View PDF
-                  </a>
-                )}
+  <a
+    href={`${HOMEWORK_FILE_BASE_URL}${hw.pdf_url}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    style={{
+      color: "#2563eb",
+      textDecoration: "none",
+      fontWeight: 600,
+      fontSize: "13px",
+    }}
+  >
+    📄 View PDF
+  </a>
+)}
                 {hw.image_url && (
-                  <a href={hw.image_url} target="_blank" rel="noopener noreferrer" style={{ color: "#16a34a", textDecoration: "none", fontWeight: 600, fontSize: "13px" }}>
-                    🖼 View Image
-                  </a>
-                )}
+  <a
+    href={`${HOMEWORK_FILE_BASE_URL}${hw.image_url}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    style={{
+      color: "#16a34a",
+      textDecoration: "none",
+      fontWeight: 600,
+      fontSize: "13px",
+    }}
+  >
+    🖼 View Image
+  </a>
+)}
               </div>
             </div>
           ))}

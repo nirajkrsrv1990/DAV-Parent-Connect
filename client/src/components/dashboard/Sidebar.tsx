@@ -9,11 +9,13 @@ import {
   FileBarChart,
   IndianRupee,
   Bell,
-  Settings,
   LogOut,
   X,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "@/assets/logo/dav_logo.png";
 import "./Sidebar.css";
@@ -28,8 +30,15 @@ export default function Sidebar({
   onClose,
 }: SidebarProps) {
 
+  const [studentsOpen, setStudentsOpen] =
+    useState(false);
+
   return (
     <>
+      {/* =====================================================
+          MOBILE SIDEBAR OVERLAY
+      ===================================================== */}
+
       {isOpen && (
         <div
           className="sidebar-overlay"
@@ -37,11 +46,24 @@ export default function Sidebar({
         />
       )}
 
+      {/* =====================================================
+          SIDEBAR
+      ===================================================== */}
+
       <aside
-        className={`sidebar ${isOpen ? "sidebar-open" : ""}`}
+        className={`sidebar ${
+          isOpen ? "sidebar-open" : ""
+        }`}
       >
+
+        {/* =================================================
+            SIDEBAR BRAND
+        ================================================= */}
+
         <div className="sidebar-brand">
+
           <div className="sidebar-top">
+
             <img
               src={logo}
               alt="DAV Logo"
@@ -49,67 +71,327 @@ export default function Sidebar({
             />
 
             <button
+              type="button"
               className="close-btn"
               onClick={onClose}
+              aria-label="Close Sidebar"
             >
-              <X size={22}/>
+              <X size={22} />
             </button>
+
           </div>
 
           <h2>DAV ERP</h2>
-          <p>DAV Public School</p>
-          <small>Session : 2026-27</small>
+
+          <p>
+            DAV Public School
+          </p>
+
+          <small>
+            Session : 2026-27
+          </small>
+
         </div>
 
+
+        {/* =================================================
+            MENU
+        ================================================= */}
+
         <nav className="menu">
-          <Link to="/admin" className="menu-link" onClick={onClose}>
-            <div className="menu-item"><LayoutDashboard size={20}/><span>Dashboard</span></div>
-          </Link>
 
-          <Link to="/admin/students/upload" className="menu-link" onClick={onClose}>
-            <div className="menu-item"><GraduationCap size={20}/><span>Students</span></div>
-          </Link>
+          {/* =================================================
+              DASHBOARD
+          ================================================= */}
 
-          <Link to="/admin/teachers" className="menu-link" onClick={onClose}>
-            <div className="menu-item"><Users size={20}/><span>Teachers</span></div>
-          </Link>
-
-          <Link to="/parent/dashboard" className="menu-link" onClick={onClose}>
-            <div className="menu-item"><UserRound size={20}/><span>Parents</span></div>
-          </Link>
-
-          <Link to="/admin/master" className="menu-link" onClick={onClose}>
-            <div className="menu-item"><School size={20}/><span>Masters</span></div>
-          </Link>
-
-          <Link to="#" className="menu-link" onClick={onClose}>
-            <div className="menu-item"><ClipboardCheck size={20}/><span>Attendance</span></div>
-          </Link>
-
-          <Link to="#" className="menu-link" onClick={onClose}>
-            <div className="menu-item"><BookOpen size={20}/><span>Homework</span></div>
-          </Link>
-
-          <Link to="#" className="menu-link" onClick={onClose}>
-            <div className="menu-item"><FileBarChart size={20}/><span>Results</span></div>
-          </Link>
-
-          <Link to="#" className="menu-link" onClick={onClose}>
-            <div className="menu-item"><IndianRupee size={20}/><span>Fees</span></div>
-          </Link>
-
-          {/* Direct Add Notice page par jaane ke liye path set kiya gaya hai */}
-          <Link to="/admin/notices/add" className="menu-link" onClick={onClose}>
+          <Link
+            to="/admin"
+            className="menu-link"
+            onClick={onClose}
+          >
             <div className="menu-item">
-              <Bell size={20}/>
-              <span>Notices</span>
+
+              <LayoutDashboard size={20} />
+
+              <span>
+                Dashboard
+              </span>
+
             </div>
           </Link>
 
-          <Link to="/" className="menu-link" onClick={onClose}>
-            <div className="menu-item"><LogOut size={20}/><span>Logout</span></div>
+
+          {/* =================================================
+              STUDENTS
+          ================================================= */}
+
+          <div className="students-menu">
+
+            {/* Students Main Button */}
+
+            <button
+              type="button"
+              className="students-main-link"
+              onClick={() =>
+                setStudentsOpen(
+                  (previous) => !previous
+                )
+              }
+            >
+
+              <div className="menu-item students-menu-item">
+
+                <GraduationCap size={20} />
+
+                <span>
+                  Students
+                </span>
+
+                <span className="students-arrow">
+
+                  {studentsOpen ? (
+                    <ChevronDown size={17} />
+                  ) : (
+                    <ChevronRight size={17} />
+                  )}
+
+                </span>
+
+              </div>
+
+            </button>
+
+
+            {/* =================================================
+                STUDENTS SUBMENU
+            ================================================= */}
+
+            {studentsOpen && (
+              <div className="students-submenu">
+
+                {/* Student List */}
+
+                <Link
+  to="/admin/students/list"
+  className="students-submenu-link"
+  onClick={onClose}
+>
+                  <span>📋</span>
+                  <span>
+                    Student List
+                  </span>
+                </Link>
+
+
+                {/* Student Excel Upload */}
+
+                <Link
+                  to="/admin/students/upload"
+                  className="students-submenu-link"
+                  onClick={onClose}
+                >
+                  <span>📤</span>
+                  <span>
+                    Student Excel Upload
+                  </span>
+                </Link>
+
+              </div>
+            )}
+
+          </div>
+
+
+          {/* =================================================
+              TEACHERS
+          ================================================= */}
+
+          <Link
+            to="/admin/teachers"
+            className="menu-link"
+            onClick={onClose}
+          >
+            <div className="menu-item">
+
+              <Users size={20} />
+
+              <span>
+                Teachers
+              </span>
+
+            </div>
           </Link>
+
+
+          {/* =================================================
+              PARENTS
+          ================================================= */}
+
+          <Link
+            to="/parent/dashboard"
+            className="menu-link"
+            onClick={onClose}
+          >
+            <div className="menu-item">
+
+              <UserRound size={20} />
+
+              <span>
+                Parents
+              </span>
+
+            </div>
+          </Link>
+
+
+          {/* =================================================
+              MASTERS
+          ================================================= */}
+
+          <Link
+            to="/admin/master"
+            className="menu-link"
+            onClick={onClose}
+          >
+            <div className="menu-item">
+
+              <School size={20} />
+
+              <span>
+                Masters
+              </span>
+
+            </div>
+          </Link>
+
+
+          {/* =================================================
+              ATTENDANCE
+          ================================================= */}
+
+          <Link
+            to="#"
+            className="menu-link"
+            onClick={onClose}
+          >
+            <div className="menu-item">
+
+              <ClipboardCheck size={20} />
+
+              <span>
+                Attendance
+              </span>
+
+            </div>
+          </Link>
+
+
+          {/* =================================================
+              HOMEWORK
+          ================================================= */}
+
+          <Link
+            to="#"
+            className="menu-link"
+            onClick={onClose}
+          >
+            <div className="menu-item">
+
+              <BookOpen size={20} />
+
+              <span>
+                Homework
+              </span>
+
+            </div>
+          </Link>
+
+
+          {/* =================================================
+              RESULTS
+          ================================================= */}
+
+          <Link
+            to="#"
+            className="menu-link"
+            onClick={onClose}
+          >
+            <div className="menu-item">
+
+              <FileBarChart size={20} />
+
+              <span>
+                Results
+              </span>
+
+            </div>
+          </Link>
+
+
+          {/* =================================================
+              FEES
+          ================================================= */}
+
+          <Link
+            to="#"
+            className="menu-link"
+            onClick={onClose}
+          >
+            <div className="menu-item">
+
+              <IndianRupee size={20} />
+
+              <span>
+                Fees
+              </span>
+
+            </div>
+          </Link>
+
+
+          {/* =================================================
+              NOTICES
+          ================================================= */}
+
+          <Link
+            to="/admin/notices/add"
+            className="menu-link"
+            onClick={onClose}
+          >
+            <div className="menu-item">
+
+              <Bell size={20} />
+
+              <span>
+                Notices
+              </span>
+
+            </div>
+          </Link>
+
+
+          {/* =================================================
+              LOGOUT
+          ================================================= */}
+
+          <Link
+            to="/"
+            className="menu-link"
+            onClick={onClose}
+          >
+            <div className="menu-item">
+
+              <LogOut size={20} />
+
+              <span>
+                Logout
+              </span>
+
+            </div>
+          </Link>
+
         </nav>
+
       </aside>
     </>
   );

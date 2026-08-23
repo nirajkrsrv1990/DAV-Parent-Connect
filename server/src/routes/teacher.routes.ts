@@ -7,6 +7,7 @@ import {
   getTeachers,
   deleteTeacher,
   saveAttendance,
+  getAttendance,
 } from "../controllers/teacher.controller";
 
 const router = Router();
@@ -23,7 +24,8 @@ router.delete("/:id", deleteTeacher);
 router.post("/assign-class", assignClassTeacher);
 router.get("/class-teacher/:teacher_id", getClassTeacher);
 
-// Attendance Route (Isi route par 404 aa raha tha)
+// Attendance Routes
 router.post("/attendance", saveAttendance);
+router.get("/attendance", getAttendance);
 
 export default router;

@@ -242,42 +242,110 @@ export default function ParentDashboard() {
           </div>
         </section>
 
-        {/* SUMMARY CARDS GRID */}
-        <section className="dashboard-grid">
-          <div className="card">
-            <h3>Attendance</h3>
-            <p>{attendancePercentage}%</p>
-          </div>
+        {/* PARENT APP MENU GRID */}
+<section className="parent-menu-grid">
 
-          <div className="card" onClick={() => navigate("/parent/homework")} style={{ cursor: "pointer" }}>
-            <h3>Homework</h3>
-            <p>{homeworkCount} Pending</p>
-          </div>
+  <div
+    className="parent-menu-item"
+    onClick={() => navigate("/parent/attendance")}
+  >
+    <div className="menu-icon">📅</div>
+    <div className="menu-title">Attendance</div>
+  </div>
 
-          <div className="card">
-            <h3>Results</h3>
-            <p>Not Published</p>
-          </div>
+  <div
+    className="parent-menu-item"
+    onClick={() => navigate("/parent/homework")}
+  >
+    <div className="menu-icon">📚</div>
+    <div className="menu-title">Homework</div>
+  </div>
 
-          <div className="card" onClick={() => navigate("/parent/notices")} style={{ cursor: "pointer" }}>
-  <h3>Notices</h3>
-  <p>{unreadCount} New</p>
+  <div
+    className="parent-menu-item"
+    onClick={() => navigate("/parent/notices")}
+  >
+    <div className="menu-icon">📢</div>
+    <div className="menu-title">Announcement</div>
+  </div>
+
+  <div
+    className="parent-menu-item"
+    onClick={() => navigate("/parent/results")}
+  >
+    <div className="menu-icon">⭐</div>
+    <div className="menu-title">Marks</div>
+  </div>
+
+  <div
+    className="parent-menu-item"
+    onClick={() => navigate("/parent/homework")}
+  >
+    <div className="menu-icon">📖</div>
+    <div className="menu-title">E-Content</div>
+  </div>
+
+  <div
+    className="parent-menu-item"
+    onClick={() => window.open("https://davsasaram.com/osm", "_blank")}
+  >
+    <div className="menu-icon">💳</div>
+    <div className="menu-title">Fees Payment</div>
+  </div>
+
+  <div
+  className="menu-item"
+  onClick={() => navigate("/parent/annual-calendar")}
+>
+  <div className="menu-icon">📅</div>
+  <div className="menu-title">Annual Calendar</div>
 </div>
+    
 
-          <div 
-            className="card" 
-            onClick={() => window.open("https://davsasaram.com/osm", "_blank")} 
-            style={{ cursor: "pointer" }}
-          >
-            <h3>Fees</h3>
-            <p>Pay Online ➔</p>
-          </div>
+  <div className="parent-menu-item">
+    <div className="menu-icon">💬</div>
+    <div className="menu-title">Comments</div>
+  </div>
 
-          <div className="card">
-            <h3>Downloads</h3>
-            <p>Coming Soon</p>
-          </div>
-        </section>
+  <div className="parent-menu-item">
+    <div className="menu-icon">📍</div>
+    <div className="menu-title">Bus Location</div>
+  </div>
+
+  <div
+    className="parent-menu-item"
+    onClick={() => navigate("/parent/notices")}
+  >
+    <div className="menu-icon">📋</div>
+    <div className="menu-title">Notice Board</div>
+  </div>
+
+  <div className="parent-menu-item">
+    <div className="menu-icon">👤</div>
+    <div className="menu-title">Profile</div>
+  </div>
+
+  <div className="parent-menu-item">
+    <div className="menu-icon">⚙️</div>
+    <div className="menu-title">Settings</div>
+  </div>
+
+  <div className="parent-menu-item">
+    <div className="menu-icon">✍️</div>
+    <div className="menu-title">Write To School</div>
+  </div>
+
+  <div className="parent-menu-item">
+    <div className="menu-icon">🎥</div>
+    <div className="menu-title">Online Class</div>
+  </div>
+
+  <div className="parent-menu-item">
+    <div className="menu-icon">📝</div>
+    <div className="menu-title">Online Test</div>
+  </div>
+
+</section>
 
       </div>
     </div>

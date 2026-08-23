@@ -210,3 +210,253 @@ export const markNotificationsAsRead = async (req: Request, res: Response) => {
     });
   }
 };
+// ============================================
+// GET ANNUAL ATTENDANCE
+// ============================================
+
+export const getAnnualAttendance = async (
+  req: Request,
+  res: Response
+) => {
+
+  try {
+
+    const { admission_no } = req.params;
+
+
+    // ========================================
+    // FIND STUDENT USING ADMISSION NO
+    // ========================================
+
+    const studentResult = await pool.query(
+      `
+      SELECT 
+        id,
+        admission_no,
+        student_name,
+        class,
+        section
+      FROM students
+      WHERE admission_no = $1
+      `,
+      [admission_no]
+    );
+
+
+    if (studentResult.rows.length === 0) {
+
+      return res.status(404).json({
+        success:false,
+        message:"Student not found"
+      });
+
+    }
+
+
+    const student =
+      studentResult.rows[0];
+
+
+    // ========================================
+    // GET COMPLETE ATTENDANCE
+    // ========================================
+
+    const attendanceResult =
+      await pool.query(
+        `
+        SELECT
+          attendance_date,
+          status
+        FROM attendance
+        WHERE student_id = $1
+        ORDER BY attendance_date
+        `,
+        [
+          student.id
+        ]
+      );
+
+
+    // ========================================
+    // GET HOLIDAY / VACATION DATA
+    // ========================================
+
+    const calendarResult =
+      await pool.query(
+        `
+        SELECT
+          title,
+          event_type,
+          start_date,
+          end_date
+        FROM academic_calendar
+        WHERE session = '2026-27'
+        AND is_active = true
+        AND event_type = 'HOLIDAY'
+        ORDER BY start_date
+        `
+      );
+
+
+    // ========================================
+    // RESPONSE
+    // ========================================
+
+    // ===============================
+// ATTENDANCE SUMMARY CALCULATION
+// ===============================
+
+const attendanceData = attendanceResult.rows;
+
+
+const totalWorkingDays =
+attendanceData.length;
+
+
+const presentDays =
+attendanceData.filter(
+(item:any)=>
+item.status === "P" ||
+item.status === "Present"
+).length;
+
+
+const absentDays =
+attendanceData.filter(
+(item:any)=>
+item.status === "A" ||
+item.status === "Absent"
+).length;
+
+
+const attendancePercentage =
+totalWorkingDays > 0
+?
+Math.round(
+(presentDays / totalWorkingDays) * 100
+)
+:
+0;
+
+
+// ===============================
+// RESPONSE
+// ===============================
+
+return res.json({
+
+ success:true,
+
+ student,
+
+ attendance:
+ attendanceResult.rows,
+
+ holidays:
+ calendarResult.rows,
+
+
+ summary:{
+    totalWorkingDays,
+    presentDays,
+    absentDays,
+    attendancePercentage
+ }
+
+});
+
+
+  } catch(error) {
+
+
+    console.error(
+      "Annual Attendance Error:",
+      error
+    );
+
+
+    return res.status(500).json({
+
+      success:false,
+
+      message:
+        "Unable to fetch annual attendance"
+
+    });
+
+  }
+
+};
+/* ===========================
+   PARENT ATTENDANCE CALENDAR
+=========================== */
+export const getParentAttendance = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { admission_no } = req.params;
+
+    const { month } = req.query;
+
+    if (!month || typeof month !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Month is required. Format: YYYY-MM",
+      });
+    }
+
+    // Find student
+    const studentRes = await pool.query(
+      `
+      SELECT
+        id,
+        student_name,
+        admission_no,
+        class,
+        section
+      FROM students
+      WHERE admission_no = $1
+      `,
+      [admission_no]
+    );
+
+    if (studentRes.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    const student = studentRes.rows[0];
+
+    // Fetch attendance for selected month
+    const attendanceRes = await pool.query(
+      `
+      SELECT
+        attendance_date,
+        status
+      FROM attendance
+      WHERE student_id = $1
+        AND attendance_date >= ($2 || '-01')::date
+        AND attendance_date < (($2 || '-01')::date + INTERVAL '1 month')
+      ORDER BY attendance_date
+      `,
+      [student.id, month]
+    );
+
+    res.json({
+      success: true,
+      student,
+      month,
+      attendance: attendanceRes.rows,
+    });
+  } catch (err) {
+    console.error("Parent Attendance Error:", err);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to fetch attendance",
+    });
+  }
+};

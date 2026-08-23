@@ -133,83 +133,81 @@ export default function ParentHomework() {
   };
 
   // ==========================================
-  // DOWNLOAD FILE
-  // ==========================================
-  const downloadFile = async (
-    filePath: string
-  ): Promise<void> => {
-    const url = getFileUrl(filePath);
+// DOWNLOAD FILE
+// ==========================================
+const downloadFile = async (
+  filePath: string
+): Promise<void> => {
+  const url = getFileUrl(filePath);
 
-    if (!url) {
-      alert("File not available.");
+  if (!url) {
+    alert("File not available.");
+    return;
+  }
+
+  try {
+    const fileName =
+      filePath.split("/").pop() ||
+      "download";
+
+    // ========================================
+    // ANDROID / CAPACITOR
+    // ========================================
+    if (Capacitor.isNativePlatform()) {
+      await Filesystem.downloadFile({
+        url,
+        path: fileName,
+        directory: Directory.Documents,
+      });
+
+      alert(
+        `Downloaded successfully:\n${fileName}`
+      );
+
       return;
     }
 
-    try {
-      const response = await fetch(url);
+    // ========================================
+    // DESKTOP / BROWSER
+    // ========================================
+    const response = await fetch(url);
 
-      if (!response.ok) {
-        throw new Error(
-          `Download failed: ${response.status}`
-        );
-      }
-
-      const blob = await response.blob();
-
-      const fileName =
-        filePath.split("/").pop() ||
-        `download-${Date.now()}`;
-
-      // ========================================
-      // ANDROID / CAPACITOR
-      // ========================================
-      if (Capacitor.isNativePlatform()) {
-        const base64Data =
-          await blobToBase64(blob);
-
-        await Filesystem.writeFile({
-          path: fileName,
-          data: base64Data,
-          directory: Directory.Documents,
-        });
-
-        alert(
-          `Downloaded successfully:\n${fileName}`
-        );
-
-        return;
-      }
-
-      // ========================================
-      // DESKTOP / NORMAL MOBILE BROWSER
-      // ========================================
-      const blobUrl =
-        window.URL.createObjectURL(blob);
-
-      const link =
-        document.createElement("a");
-
-      link.href = blobUrl;
-      link.download = fileName;
-
-      document.body.appendChild(link);
-
-      link.click();
-
-      document.body.removeChild(link);
-
-      window.URL.revokeObjectURL(blobUrl);
-    } catch (error) {
-      console.error(
-        "File download error:",
-        error
-      );
-
-      alert(
-        "Unable to download the file."
+    if (!response.ok) {
+      throw new Error(
+        `Download failed: ${response.status}`
       );
     }
-  };
+
+    const blob = await response.blob();
+
+    const blobUrl =
+      window.URL.createObjectURL(blob);
+
+    const link =
+      document.createElement("a");
+
+    link.href = blobUrl;
+    link.download = fileName;
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+
+    window.URL.revokeObjectURL(blobUrl);
+
+  } catch (error) {
+    console.error(
+      "File download error:",
+      error
+    );
+
+    alert(
+      "Unable to download the file."
+    );
+  }
+};
 
   // ==========================================
   // BLOB → BASE64

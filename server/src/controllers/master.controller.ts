@@ -130,3 +130,162 @@ export const getClasses = async (
   }
 
 };
+/* ===========================
+   SAVE MARKS PATTERN
+=========================== */
+
+export const saveMarksPattern = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const {
+      examName,
+      className,
+      subjectName,
+      subjectCategory,
+      theoryMarks,
+      practicalMarks,
+      passingMarks,
+      weightage,
+      status,
+    } = req.body;
+
+    if (!examName || !className || !subjectName) {
+      return res.status(400).json({
+        success: false,
+        message: "Exam, Class and Subject are required.",
+      });
+    }
+
+    const duplicate = await pool.query(
+      `
+      SELECT id
+      FROM marks_pattern_master
+      WHERE exam_name = $1
+        AND class_name = $2
+        AND subject_name = $3
+      `,
+      [examName, className, subjectName]
+    );
+
+    if (duplicate.rows.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Marks pattern already exists for this Exam, Class and Subject.",
+      });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO marks_pattern_master
+      (
+        exam_name,
+        class_name,
+        subject_name,
+        subject_category,
+        theory_marks,
+        practical_marks,
+        passing_marks,
+        weightage,
+        status
+      )
+      VALUES
+      ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+      RETURNING *
+      `,
+      [
+        examName,
+        className,
+        subjectName,
+        subjectCategory || "Major",
+        theoryMarks || 0,
+        practicalMarks || 0,
+        passingMarks || 0,
+        weightage || 100,
+        status || "Active",
+      ]
+    );
+
+    res.json({
+      success: true,
+      pattern: result.rows[0],
+    });
+  } catch (err) {
+    console.error("SAVE MARKS PATTERN ERROR:");
+    console.error(err);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to save marks pattern.",
+    });
+  }
+};
+
+
+/* ===========================
+   GET MARKS PATTERNS
+=========================== */
+
+export const getMarksPatterns = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM marks_pattern_master
+      ORDER BY class_name, subject_name, exam_name
+      `
+    );
+
+    res.json({
+      success: true,
+      patterns: result.rows,
+    });
+  } catch (err) {
+    console.error("GET MARKS PATTERNS ERROR:");
+    console.error(err);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to fetch marks patterns.",
+    });
+  }
+};
+
+
+/* ===========================
+   DELETE MARKS PATTERN
+=========================== */
+
+export const deleteMarksPattern = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+
+    await pool.query(
+      `
+      DELETE FROM marks_pattern_master
+      WHERE id = $1
+      `,
+      [id]
+    );
+
+    res.json({
+      success: true,
+      message: "Marks pattern deleted successfully.",
+    });
+  } catch (err) {
+    console.error("DELETE MARKS PATTERN ERROR:");
+    console.error(err);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to delete marks pattern.",
+    });
+  }
+};

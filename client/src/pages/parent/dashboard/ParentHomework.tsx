@@ -1,26 +1,47 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Capacitor } from "@capacitor/core";
+import { Filesystem, Directory } from "@capacitor/filesystem";
 import "./ParentDashboard.css";
+
 import {
   API_BASE_URL,
   HOMEWORK_FILE_BASE_URL,
 } from "@/config/api";
 
-type ViewerState = {
-  type: "image" | "pdf";
-  url: string;
-  title: string;
-} | null;
+type HomeworkItem = {
+  id?: number;
+  subject: string;
+  description?: string | null;
+  due_date: string;
+  pdf_url?: string | null;
+  image_url?: string | null;
+};
+
+type ParentData = {
+  admission_no: string;
+};
+
+type HomeworkResponse = {
+  success: boolean;
+  homework?: HomeworkItem[];
+  message?: string;
+};
 
 export default function ParentHomework() {
   const navigate = useNavigate();
 
-  const [homeworkList, setHomeworkList] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [viewer, setViewer] = useState<ViewerState>(null);
+  const [homeworkList, setHomeworkList] =
+    useState<HomeworkItem[]>([]);
 
+  const [loading, setLoading] = useState(true);
+
+  // ==========================================
+  // LOAD HOMEWORK
+  // ==========================================
   useEffect(() => {
-    const parentData = localStorage.getItem("parent");
+    const parentData =
+      localStorage.getItem("parent");
 
     if (!parentData) {
       navigate("/parent/login");
@@ -28,234 +49,238 @@ export default function ParentHomework() {
     }
 
     try {
-      const parent = JSON.parse(parentData);
+      const parent: ParentData =
+        JSON.parse(parentData);
+
+      if (!parent.admission_no) {
+        navigate("/parent/login");
+        return;
+      }
+
       fetchParentHomework(parent.admission_no);
-    } catch (err) {
-      console.error("Invalid parent data:", err);
+    } catch (error) {
+      console.error(
+        "Invalid parent data:",
+        error
+      );
+
       navigate("/parent/login");
     }
   }, [navigate]);
 
-  const fetchParentHomework = async (admissionNo: string) => {
+  // ==========================================
+  // FETCH HOMEWORK
+  // ==========================================
+  const fetchParentHomework = async (
+    admissionNo: string
+  ): Promise<void> => {
     try {
       const response = await fetch(
         `${API_BASE_URL}/homework/student/${admissionNo}`
       );
 
-      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(
+          `HTTP error: ${response.status}`
+        );
+      }
+
+      const result: HomeworkResponse =
+        await response.json();
 
       if (result.success) {
-        setHomeworkList(result.homework || []);
+        setHomeworkList(
+          result.homework ?? []
+        );
+      } else {
+        console.error(
+          result.message ||
+            "Failed to fetch homework."
+        );
+
+        setHomeworkList([]);
       }
-    } catch (err) {
-      console.error("Error fetching homework:", err);
+    } catch (error) {
+      console.error(
+        "Error fetching homework:",
+        error
+      );
+
+      setHomeworkList([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // ==============================
+  // ==========================================
   // FILE URL
-  // ==============================
-  const getFileUrl = (filePath: string) => {
-    if (!filePath) return "";
+  // ==========================================
+  const getFileUrl = (
+    filePath: string
+  ): string => {
+    if (!filePath) {
+      return "";
+    }
 
-    if (filePath.startsWith("http://") || filePath.startsWith("https://")) {
+    if (
+      filePath.startsWith("http://") ||
+      filePath.startsWith("https://")
+    ) {
       return filePath;
     }
 
     return `${HOMEWORK_FILE_BASE_URL}${filePath}`;
   };
 
-  // ==============================
-  // OPEN IMAGE
-  // ==============================
-  const openImage = (filePath: string) => {
-    setViewer({
-      type: "image",
-      url: getFileUrl(filePath),
-      title: "Homework Image",
-    });
-  };
-
-  // ==============================
-  // OPEN PDF
-  // ==============================
-  const openPdf = (filePath: string) => {
-    setViewer({
-      type: "pdf",
-      url: getFileUrl(filePath),
-      title: "Homework PDF",
-    });
-  };
-
-  // ==============================
-  // CLOSE VIEWER
-  // ==============================
-  const closeViewer = () => {
-    setViewer(null);
-  };
-
-  // ==============================
-  // DOWNLOAD PDF
-  // ==============================
-  const downloadPdf = async (filePath: string) => {
+  // ==========================================
+  // DOWNLOAD FILE
+  // ==========================================
+  const downloadFile = async (
+    filePath: string
+  ): Promise<void> => {
     const url = getFileUrl(filePath);
+
+    if (!url) {
+      alert("File not available.");
+      return;
+    }
 
     try {
       const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error(`Download failed: ${response.status}`);
+        throw new Error(
+          `Download failed: ${response.status}`
+        );
       }
 
       const blob = await response.blob();
 
-      const blobUrl = window.URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-      link.href = blobUrl;
-
       const fileName =
-        filePath.split("/").pop() || "homework.pdf";
+        filePath.split("/").pop() ||
+        `download-${Date.now()}`;
 
+      // ========================================
+      // ANDROID / CAPACITOR
+      // ========================================
+      if (Capacitor.isNativePlatform()) {
+        const base64Data =
+          await blobToBase64(blob);
+
+        await Filesystem.writeFile({
+          path: fileName,
+          data: base64Data,
+          directory: Directory.Documents,
+        });
+
+        alert(
+          `Downloaded successfully:\n${fileName}`
+        );
+
+        return;
+      }
+
+      // ========================================
+      // DESKTOP / NORMAL MOBILE BROWSER
+      // ========================================
+      const blobUrl =
+        window.URL.createObjectURL(blob);
+
+      const link =
+        document.createElement("a");
+
+      link.href = blobUrl;
       link.download = fileName;
 
       document.body.appendChild(link);
+
       link.click();
 
       document.body.removeChild(link);
 
       window.URL.revokeObjectURL(blobUrl);
-    } catch (err) {
-      console.error("PDF download error:", err);
+    } catch (error) {
+      console.error(
+        "File download error:",
+        error
+      );
 
-      // Fallback for Android/WebView
-      window.open(url, "_system");
+      alert(
+        "Unable to download the file."
+      );
     }
   };
 
-  // ==============================
-  // VIEWER
-  // ==============================
-  if (viewer) {
-    return (
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          zIndex: 99999,
-          background: "#0f172a",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        {/* Viewer Header */}
-        <div
-          style={{
-            height: "60px",
-            minHeight: "60px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "0 15px",
-            background: "#ffffff",
-            borderBottom: "1px solid #cbd5e1",
-          }}
-        >
-          <button
-            type="button"
-            onClick={closeViewer}
-            style={{
-              border: "none",
-              background: "#1e293b",
-              color: "#ffffff",
-              padding: "8px 15px",
-              borderRadius: "6px",
-              fontSize: "14px",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            ← Back
-          </button>
+  // ==========================================
+  // BLOB → BASE64
+  // ==========================================
+  const blobToBase64 = (
+    blob: Blob
+  ): Promise<string> => {
+    return new Promise(
+      (resolve, reject) => {
+        const reader =
+          new FileReader();
 
-          <strong
-            style={{
-              color: "#1e293b",
-              fontSize: "16px",
-            }}
-          >
-            {viewer.title}
-          </strong>
+        reader.onloadend = () => {
+          try {
+            const result =
+              reader.result;
 
-          {viewer.type === "pdf" ? (
-            <button
-              type="button"
-              onClick={() => downloadPdf(viewer.url)}
-              style={{
-                border: "none",
-                background: "#2563eb",
-                color: "#ffffff",
-                padding: "8px 13px",
-                borderRadius: "6px",
-                fontSize: "13px",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
-              Download
-            </button>
-          ) : (
-            <div style={{ width: "80px" }} />
-          )}
-        </div>
+            if (
+              typeof result !== "string"
+            ) {
+              reject(
+                new Error(
+                  "Unable to convert file."
+                )
+              );
 
-        {/* Viewer Content */}
-        <div
-          style={{
-            flex: 1,
-            minHeight: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "15px",
-            overflow: "auto",
-          }}
-        >
-          {viewer.type === "image" ? (
-            <img
-              src={viewer.url}
-              alt="Homework"
-              style={{
-                display: "block",
-                maxWidth: "100%",
-                maxHeight: "calc(100vh - 100px)",
-                width: "auto",
-                height: "auto",
-                objectFit: "contain",
-                borderRadius: "6px",
-              }}
-            />
-          ) : (
-            <iframe
-              src={viewer.url}
-              title="Homework PDF"
-              style={{
-                width: "100%",
-                height: "100%",
-                minHeight: "400px",
-                border: "none",
-                background: "#ffffff",
-                borderRadius: "6px",
-              }}
-            />
-          )}
-        </div>
-      </div>
+              return;
+            }
+
+            const base64 =
+              result.split(",")[1];
+
+            if (!base64) {
+              reject(
+                new Error(
+                  "Base64 conversion failed."
+                )
+              );
+
+              return;
+            }
+
+            resolve(base64);
+          } catch (error) {
+            reject(error);
+          }
+        };
+
+        reader.onerror = () => {
+          reject(
+            new Error(
+              "File reading failed."
+            )
+          );
+        };
+
+        reader.readAsDataURL(blob);
+      }
     );
-  }
+  };
 
+  // ==========================================
+  // BACK BUTTON
+  // ==========================================
+  const handleBack = (): void => {
+    navigate(-1);
+  };
+
+  // ==========================================
+  // PAGE
+  // ==========================================
   return (
     <div
       className="parent-dashboard"
@@ -263,9 +288,9 @@ export default function ParentHomework() {
         padding: "20px",
       }}
     >
-      {/* ============================
+      {/* ======================================
           PAGE HEADER
-      ============================ */}
+      ====================================== */}
       <div
         style={{
           display: "flex",
@@ -276,7 +301,7 @@ export default function ParentHomework() {
       >
         <button
           type="button"
-          onClick={() => navigate(-1)}
+          onClick={handleBack}
           style={{
             padding: "8px 16px",
             cursor: "pointer",
@@ -299,11 +324,13 @@ export default function ParentHomework() {
         </h1>
       </div>
 
-      {/* ============================
+      {/* ======================================
           LOADING
-      ============================ */}
+      ====================================== */}
       {loading ? (
-        <p>Loading homework...</p>
+        <p>
+          Loading homework...
+        </p>
       ) : homeworkList.length === 0 ? (
         <div
           style={{
@@ -330,139 +357,151 @@ export default function ParentHomework() {
             gap: "15px",
           }}
         >
-          {homeworkList.map((hw: any, index: number) => (
-            <div
-              key={hw.id ?? index}
-              style={{
-                background: "#fff",
-                padding: "20px",
-                borderRadius: "8px",
-                boxShadow:
-                  "0 4px 6px rgba(0,0,0,0.05)",
-              }}
-            >
-              {/* Subject + Due Date */}
+          {homeworkList.map(
+            (
+              hw: HomeworkItem,
+              index: number
+            ) => (
               <div
+                key={
+                  hw.id ??
+                  `homework-${index}`
+                }
                 style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: "10px",
-                  marginBottom: "10px",
-                  flexWrap: "wrap",
+                  background: "#fff",
+                  padding: "20px",
+                  borderRadius: "8px",
+                  boxShadow:
+                    "0 4px 6px rgba(0,0,0,0.05)",
                 }}
               >
-                <span
+                {/* ==================================
+                    SUBJECT + DUE DATE
+                ================================== */}
+                <div
                   style={{
-                    background: "#e0f2fe",
-                    color: "#0369a1",
-                    padding: "4px 10px",
-                    borderRadius: "4px",
-                    fontSize: "12px",
-                    fontWeight: "bold",
+                    display: "flex",
+                    justifyContent:
+                      "space-between",
+                    alignItems: "center",
+                    gap: "10px",
+                    marginBottom: "10px",
+                    flexWrap: "wrap",
                   }}
                 >
-                  {hw.subject}
-                </span>
-
-                <span
-                  style={{
-                    color: "#ef4444",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Due Date: {hw.due_date}
-                </span>
-              </div>
-
-              {/* Description */}
-              <p
-                style={{
-                  color: "#334155",
-                  margin: "10px 0",
-                  whiteSpace: "pre-wrap",
-                  lineHeight: 1.6,
-                }}
-              >
-                {hw.description ||
-                  "No description provided."}
-              </p>
-
-              {/* Attachments */}
-              <div
-                style={{
-                  display: "flex",
-                  gap: "10px",
-                  marginTop: "15px",
-                  flexWrap: "wrap",
-                }}
-              >
-                {hw.pdf_url && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        openPdf(hw.pdf_url)
-                      }
-                      style={{
-                        border: "none",
-                        background: "#2563eb",
-                        color: "#ffffff",
-                        padding: "9px 13px",
-                        borderRadius: "6px",
-                        cursor: "pointer",
-                        fontWeight: 600,
-                        fontSize: "13px",
-                      }}
-                    >
-                      📄 View PDF
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        downloadPdf(hw.pdf_url)
-                      }
-                      style={{
-                        border: "1px solid #2563eb",
-                        background: "#ffffff",
-                        color: "#2563eb",
-                        padding: "9px 13px",
-                        borderRadius: "6px",
-                        cursor: "pointer",
-                        fontWeight: 600,
-                        fontSize: "13px",
-                      }}
-                    >
-                      ⬇ Download PDF
-                    </button>
-                  </>
-                )}
-
-                {hw.image_url && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      openImage(hw.image_url)
-                    }
+                  <span
                     style={{
-                      border: "none",
-                      background: "#16a34a",
-                      color: "#ffffff",
-                      padding: "9px 13px",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      fontWeight: 600,
-                      fontSize: "13px",
+                      background:
+                        "#e0f2fe",
+                      color: "#0369a1",
+                      padding:
+                        "4px 10px",
+                      borderRadius: "4px",
+                      fontSize: "12px",
+                      fontWeight: "bold",
                     }}
                   >
-                    🖼 View Image
-                  </button>
-                )}
+                    {hw.subject}
+                  </span>
+
+                  <span
+                    style={{
+                      color: "#ef4444",
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Due Date:{" "}
+                    {hw.due_date}
+                  </span>
+                </div>
+
+                {/* ==================================
+                    DESCRIPTION
+                ================================== */}
+                <p
+                  style={{
+                    color: "#334155",
+                    margin: "10px 0",
+                    whiteSpace:
+                      "pre-wrap",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {hw.description ||
+                    "No description provided."}
+                </p>
+
+                {/* ==================================
+                    ATTACHMENTS
+                ================================== */}
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "10px",
+                    marginTop: "15px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {/* PDF */}
+                  {hw.pdf_url && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        downloadFile(
+                          hw.pdf_url as string
+                        )
+                      }
+                      style={{
+                        border:
+                          "1px solid #2563eb",
+                        background:
+                          "#ffffff",
+                        color: "#2563eb",
+                        padding:
+                          "9px 13px",
+                        borderRadius: "6px",
+                        cursor:
+                          "pointer",
+                        fontWeight: 600,
+                        fontSize: "13px",
+                      }}
+                    >
+                      📥 Download PDF
+                    </button>
+                  )}
+
+                  {/* IMAGE */}
+                  {hw.image_url && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        downloadFile(
+                          hw.image_url as string
+                        )
+                      }
+                      style={{
+                        border:
+                          "1px solid #16a34a",
+                        background:
+                          "#ffffff",
+                        color: "#16a34a",
+                        padding:
+                          "9px 13px",
+                        borderRadius: "6px",
+                        cursor:
+                          "pointer",
+                        fontWeight: 600,
+                        fontSize: "13px",
+                      }}
+                    >
+                      📥 Download Image
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          )}
         </div>
       )}
     </div>

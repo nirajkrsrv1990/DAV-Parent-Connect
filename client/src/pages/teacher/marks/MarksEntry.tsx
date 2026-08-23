@@ -1,5 +1,4 @@
-import { useMemo, useState } from "react";
-
+import { useEffect, useMemo, useState } from "react";
 import "./MarksEntry.css";
 import TeacherSidebar from "../../../components/teacher/TeacherSidebar";
 import { API_BASE_URL } from "@/config/api";

@@ -30,6 +30,7 @@ import TeacherDashboard from "../pages/teacher/TeacherDashboard";
 import Attendance from "../pages/teacher/attendance/Attendance";
 import Homework from "../pages/teacher/homework/Homework";
 import MarksEntry from "../pages/teacher/marks/MarksEntry";
+import TeacherParentMessages from "../pages/teacher/TeacherParentMessages";
 
 // ================= PARENTS =================
 import ParentSignup from "../pages/parent/ParentSignup";
@@ -77,10 +78,8 @@ export default function AppRoutes() {
         <Route path="homework" element={<Homework />} />
         <Route path="marks" element={<MarksEntry />} />
         <Route path="notices" element={<NoticeList />} />
-        <Route
-  path="students"
-  element={<TeacherStudentList />}
-/>
+        <Route path="parent-messages" element={<TeacherParentMessages />}/>
+        <Route path="students" element={<TeacherStudentList />}/>
         <Route path="profile" element={<TeacherDashboard />} />
         <Route path="change-password" element={<TeacherDashboard />} />
       </Route>

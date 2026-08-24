@@ -447,3 +447,80 @@ export const getAttendance = async (req: Request, res: Response) => {
     });
   }
 };
+/* =====================================================
+   TEACHER → PARENT MESSAGES
+   Get messages from parents of assigned class
+===================================================== */
+
+export const getTeacherParentMessages = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const teacher_id = String(
+      req.params.teacher_id
+    ).trim();
+
+    if (!teacher_id) {
+      return res.status(400).json({
+        success: false,
+        message: "Teacher ID is required",
+      });
+    }
+
+    const result = await pool.query(
+      `
+      SELECT
+        pm.id,
+        pm.student_id,
+        pm.parent_id,
+        pm.class_name,
+        pm.section,
+        pm.teacher_id,
+        pm.message_type,
+        pm.subject,
+        pm.message,
+        pm.status,
+        pm.teacher_read,
+        pm.created_at,
+
+        s.admission_no,
+        s.student_name,
+
+        p.parent_name,
+        p.mobile,
+        p.email
+
+      FROM parent_messages pm
+
+      INNER JOIN students s
+        ON s.id = pm.student_id
+
+      LEFT JOIN parents p
+        ON p.id = pm.parent_id
+
+      WHERE TRIM(pm.teacher_id) = $1
+
+      ORDER BY pm.created_at DESC
+      `,
+      [teacher_id]
+    );
+
+    res.json({
+      success: true,
+      messages: result.rows,
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Get Teacher Parent Messages Error:",
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to load parent messages",
+    });
+  }
+};

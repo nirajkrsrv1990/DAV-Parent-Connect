@@ -7,6 +7,7 @@ import {
   UserCircle,
   KeyRound,
   Bell,
+  MessageSquare,
   LogOut,
   X,
 } from "lucide-react";
@@ -122,6 +123,16 @@ export default function TeacherSidebar({
               <span>Notices</span>
             </div>
           </Link>
+          <Link
+  to="/teacher/parent-messages"
+  className="teacher-link"
+  onClick={onClose}
+>
+  <div className="teacher-item">
+    <MessageSquare size={20} />
+    <span>Parent Messages</span>
+  </div>
+</Link>
 
           <Link to="/" className="teacher-link" onClick={onClose}>
             <div className="teacher-item">

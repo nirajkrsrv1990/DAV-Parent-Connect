@@ -1,0 +1,260 @@
+.teacher-parent-messages {
+  padding: 0;
+  min-height: auto;
+}
+
+.teacher-parent-messages-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 25px;
+  background: #ffffff;
+  padding: 20px 22px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.teacher-parent-back,
+.teacher-parent-refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: #f1f5f9;
+  color: #0f4c81;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.teacher-parent-back:hover,
+.teacher-parent-refresh:hover {
+  background: #e2e8f0;
+}
+
+.teacher-parent-refresh {
+  margin-left: auto;
+}
+
+.teacher-parent-refresh:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.teacher-parent-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.teacher-parent-title-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  border-radius: 10px;
+  background: #e8f1fb;
+  color: #1565c0;
+}
+
+.teacher-parent-title h1 {
+  margin: 0;
+  color: #0f4c81;
+  font-size: 23px;
+}
+
+.teacher-parent-title p {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.teacher-message-list {
+  display: grid;
+  gap: 18px;
+}
+
+.teacher-message-card {
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 22px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.teacher-message-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 15px;
+}
+
+.teacher-message-card-header h2 {
+  margin: 9px 0 0;
+  color: #1e293b;
+  font-size: 18px;
+}
+
+.teacher-message-type {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #e8f1fb;
+  color: #1565c0;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.teacher-message-status {
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: #fff7ed;
+  color: #c2410c;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.teacher-message-student {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.teacher-message-student div {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.teacher-message-student strong,
+.teacher-message-parent strong {
+  display: block;
+  color: #64748b;
+  font-size: 11px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.teacher-message-student span {
+  color: #1e293b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.teacher-message-parent {
+  margin-top: 14px;
+  color: #334155;
+  font-size: 13px;
+}
+
+.teacher-message-parent strong {
+  display: inline;
+  margin-right: 8px;
+}
+
+.teacher-message-content {
+  margin-top: 18px;
+  padding: 15px;
+  border-radius: 9px;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.teacher-message-footer {
+  margin-top: 14px;
+  color: #94a3b8;
+  font-size: 12px;
+  text-align: right;
+}
+
+.teacher-parent-state,
+.teacher-parent-empty,
+.teacher-parent-error {
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 45px 25px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.teacher-parent-empty {
+  color: #64748b;
+}
+
+.teacher-parent-empty svg {
+  color: #94a3b8;
+}
+
+.teacher-parent-empty h2 {
+  margin: 15px 0 7px;
+  color: #334155;
+}
+
+.teacher-parent-empty p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.teacher-parent-error {
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
+.refresh-spinning {
+  animation: teacher-refresh-spin 1s linear infinite;
+}
+
+@keyframes teacher-refresh-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 700px) {
+  .teacher-parent-messages-header {
+    flex-wrap: wrap;
+    padding: 16px;
+  }
+
+  .teacher-parent-title {
+    order: 3;
+    width: 100%;
+  }
+
+  .teacher-parent-refresh {
+    margin-left: auto;
+  }
+
+  .teacher-parent-title h1 {
+    font-size: 20px;
+  }
+
+  .teacher-message-card {
+    padding: 16px;
+  }
+
+  .teacher-message-card-header {
+    flex-direction: column;
+  }
+
+  .teacher-message-student {
+    grid-template-columns: 1fr;
+  }
+
+  .teacher-message-footer {
+    text-align: left;
+  }
+}

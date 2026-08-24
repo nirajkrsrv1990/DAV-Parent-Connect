@@ -8,6 +8,7 @@ import {
   deleteTeacher,
   saveAttendance,
   getAttendance,
+  getTeacherParentMessages,
 } from "../controllers/teacher.controller";
 
 const router = Router();
@@ -27,5 +28,9 @@ router.get("/class-teacher/:teacher_id", getClassTeacher);
 // Attendance Routes
 router.post("/attendance", saveAttendance);
 router.get("/attendance", getAttendance);
+// Parent Messages
+
+router.get("/parent-messages/:teacher_id",
+  getTeacherParentMessages);
 
 export default router;

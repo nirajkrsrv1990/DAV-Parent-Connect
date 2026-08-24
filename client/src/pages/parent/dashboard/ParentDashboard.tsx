@@ -294,7 +294,7 @@ export default function ParentDashboard() {
   </div>
 
   <div
-  className="menu-item"
+  className="parent-menu-item"
   onClick={() => navigate("/parent/annual-calendar")}
 >
   <div className="menu-icon">📅</div>

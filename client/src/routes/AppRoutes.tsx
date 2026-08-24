@@ -39,6 +39,7 @@ import ParentHomework from "../pages/parent/dashboard/ParentHomework";
 import ParentAttendance from "../pages/parent/dashboard/ParentAttendance";
 import ParentAnnualCalendar from "../pages/parent/dashboard/ParentAnnualCalendar";
 import ParentAnnualAttendance from "../pages/parent/dashboard/ParentAnnualAttendance";
+import ParentResults from "../pages/parent/dashboard/ParentResults";
 
 export default function AppRoutes() {
   return (
@@ -95,6 +96,10 @@ export default function AppRoutes() {
 />
        <Route path="/parent/annual-calendar"  element={<ParentAnnualCalendar />} />
       <Route path="/parent/notices" element={<NoticeList />} />
+      <Route
+  path="/parent/results"
+  element={<ParentResults />}
+/>
      
 
       {/* ================= 404 ================= */}

@@ -103,9 +103,25 @@ export const getParentDashboard = async (req: Request, res: Response) => {
     const { admission_no } = req.params;
 
     const studentRes = await pool.query(
-      `SELECT id, student_name, admission_no, class, section FROM students WHERE admission_no = $1`,
-      [admission_no]
-    );
+  `
+  SELECT
+    id,
+    student_name,
+    admission_no,
+    father_name,
+    mother_name,
+    father_mobile,
+    mother_mobile,
+    class,
+    section,
+    roll_no,
+    house,
+    address
+  FROM students
+  WHERE admission_no = $1
+  `,
+  [admission_no]
+);
 
     if (studentRes.rows.length === 0) {
       return res.status(404).json({ success: false, message: "Student not found" });
@@ -593,6 +609,104 @@ export const createParentMessage = async (
     res.status(500).json({
       success: false,
       message: "Unable to submit message",
+    });
+  }
+};
+/* =====================================================
+   PARENT PROFILE → UPDATE CONTACT DETAILS
+===================================================== */
+
+export const updateParentProfile = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { admission_no } = req.params;
+
+    const {
+      father_mobile,
+      mother_mobile,
+      address,
+    } = req.body;
+
+    if (!admission_no) {
+      return res.status(400).json({
+        success: false,
+        message: "Admission number is required",
+      });
+    }
+
+    /* ============================
+       FIND STUDENT
+    ============================ */
+
+    const studentResult = await pool.query(
+      `
+      SELECT id
+      FROM students
+      WHERE admission_no = $1
+      LIMIT 1
+      `,
+      [String(admission_no).trim()]
+    );
+
+    if (studentResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    /* ============================
+       UPDATE ONLY ALLOWED FIELDS
+    ============================ */
+
+    const result = await pool.query(
+      `
+      UPDATE students
+      SET
+        father_mobile = $1,
+        mother_mobile = $2,
+        address = $3
+      WHERE admission_no = $4
+      RETURNING
+        id,
+        student_name,
+        admission_no,
+        father_name,
+        mother_name,
+        father_mobile,
+        mother_mobile,
+        class,
+        section,
+        roll_no,
+        house,
+        address
+      `,
+      [
+        father_mobile?.trim() || null,
+        mother_mobile?.trim() || null,
+        address?.trim() || null,
+        String(admission_no).trim(),
+      ]
+    );
+
+    return res.json({
+      success: true,
+      message: "Profile updated successfully",
+      student: result.rows[0],
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Update Parent Profile Error:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to update profile",
     });
   }
 };

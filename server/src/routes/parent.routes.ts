@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import {
   parentSignup,
   parentLogin,
@@ -6,7 +7,7 @@ import {
   markNotificationsAsRead,
   getAnnualAttendance,
   getParentAttendance,
-  createParentMessage
+  updateParentProfile,
 } from "../controllers/parent.controller";
 
 const router = Router();
@@ -14,44 +15,60 @@ const router = Router();
 /* ===========================
    PARENT SIGNUP
 =========================== */
-router.post("/signup", parentSignup);
+
+router.post(
+  "/signup",
+  parentSignup
+);
 
 /* ===========================
    PARENT LOGIN
 =========================== */
-router.post("/login", parentLogin);
+
+router.post(
+  "/login",
+  parentLogin
+);
 
 /* ===========================
    PARENT DASHBOARD & NOTIFICATIONS
 =========================== */
+
 router.get(
   "/annual-attendance/:admission_no",
   getAnnualAttendance
 );
-router.get(
- "/dashboard/:admission_no",
- getParentDashboard
-);
-// ============================
-// MONTHLY ATTENDANCE
-// ============================
 
 router.get(
- "/attendance/:admission_no",
- getParentAttendance
+  "/dashboard/:admission_no",
+  getParentDashboard
+);
+
+/* ===========================
+   MONTHLY ATTENDANCE
+=========================== */
+
+router.get(
+  "/attendance/:admission_no",
+  getParentAttendance
+);
+
+/* ===========================
+   UPDATE PARENT PROFILE
+=========================== */
+
+router.put(
+  "/profile/:admission_no",
+  updateParentProfile
 );
 
 /* ===========================
    MARK NOTIFICATIONS AS READ
 =========================== */
-router.put("/notifications/read/:admission_no", markNotificationsAsRead);
-/* ===========================
-   PARENT → SCHOOL MESSAGE
-=========================== */
 
-router.post(
-  "/messages",
-  createParentMessage
+router.put(
+  "/notifications/read/:admission_no",
+  markNotificationsAsRead
 );
 
 export default router;

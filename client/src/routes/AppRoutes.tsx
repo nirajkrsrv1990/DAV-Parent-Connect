@@ -42,6 +42,7 @@ import ParentAnnualCalendar from "../pages/parent/dashboard/ParentAnnualCalendar
 import ParentAnnualAttendance from "../pages/parent/dashboard/ParentAnnualAttendance";
 import ParentResults from "../pages/parent/dashboard/ParentResults";
 import ParentWriteToSchool from "../pages/parent/dashboard/ParentWriteToSchool";
+import ParentProfile from "../pages/parent/dashboard/ParentProfile";
 
 export default function AppRoutes() {
   return (
@@ -88,9 +89,8 @@ export default function AppRoutes() {
       <Route path="/parent/signup" element={<ParentSignup />} />
       <Route path="/parent/login" element={<ParentLogin />} />
       <Route path="/parent/dashboard" element={<ParentDashboard />} />
-      <Route
-  path="/parent/write-to-school"
-  element={<ParentWriteToSchool />}
+      <Route path="/parent/profile" element={<ParentProfile />} />
+      <Route path="/parent/write-to-school" element={<ParentWriteToSchool />}
 />
       <Route path="/parent/homework" element={<ParentHomework />} />
       <Route path="/parent/attendance" element={<ParentAttendance />} />

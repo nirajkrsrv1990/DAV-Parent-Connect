@@ -320,10 +320,13 @@ export default function ParentDashboard() {
     <div className="menu-title">Notice Board</div>
   </div>
 
-  <div className="parent-menu-item">
-    <div className="menu-icon">👤</div>
-    <div className="menu-title">Profile</div>
-  </div>
+  <div
+  className="parent-menu-item"
+  onClick={() => navigate("/parent/profile")}
+>
+  <div className="menu-icon">👤</div>
+  <div className="menu-title">Profile</div>
+</div>
 
   <div className="parent-menu-item">
     <div className="menu-icon">⚙️</div>

@@ -9,6 +9,7 @@ import {
   FileBarChart,
   IndianRupee,
   Bell,
+  MessageSquare,
   LogOut,
   X,
   ChevronDown,
@@ -368,6 +369,25 @@ export default function Sidebar({
 
             </div>
           </Link>
+          {/* =================================================
+    PARENT MESSAGES
+================================================= */}
+
+<Link
+  to="/admin/parent-messages"
+  className="menu-link"
+  onClick={onClose}
+>
+  <div className="menu-item">
+
+    <MessageSquare size={20} />
+
+    <span>
+      Parent Messages
+    </span>
+
+  </div>
+</Link>
 
 
           {/* =================================================

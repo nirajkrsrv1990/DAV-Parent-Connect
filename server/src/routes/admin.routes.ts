@@ -3,6 +3,7 @@ import { Router } from "express";
 import {
   adminLogin,
   getDashboardStats,
+  getAdminParentMessages,
 } from "../controllers/admin.controller";
 
 const router = Router();
@@ -19,6 +20,12 @@ router.post(
 router.get(
   "/dashboard-stats",
   getDashboardStats
+);
+/* Parent Messages */
+
+router.get(
+  "/parent-messages",
+  getAdminParentMessages
 );
 
 export default router;

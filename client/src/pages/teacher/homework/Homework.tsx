@@ -153,6 +153,7 @@ export default function Homework() {
                 onChange={(e) => setSubject(e.target.value)}
               >
                 <option>English</option>
+                <option>Sanskrit</option>
                 <option>Hindi</option>
                 <option>Mathematics</option>
                 <option>Science</option>
@@ -164,8 +165,8 @@ export default function Homework() {
                 <option>Chemistry</option>
                 <option>Biology</option>
                 <option>Economics</option>
-                <option>B.St</option>
-                <option>Accounts</option>
+                <option>B.St.</option>
+                <option>Accountancy</option>
                 <option>Physical Education</option>
                 <option>ART</option>
               </select>

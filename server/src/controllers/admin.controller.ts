@@ -83,3 +83,72 @@ export const getDashboardStats = async (
     });
   }
 };
+/* =====================================================
+   ADMIN → PARENT MESSAGES
+   Get all messages submitted by parents
+===================================================== */
+
+export const getAdminParentMessages = async (
+  _req: Request,
+  res: Response
+) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        pm.id,
+        pm.student_id,
+        pm.parent_id,
+        pm.class_name,
+        pm.section,
+        pm.teacher_id,
+        pm.message_type,
+        pm.subject,
+        pm.message,
+        pm.status,
+        pm.admin_read,
+        pm.teacher_read,
+        pm.created_at,
+
+        s.admission_no,
+        s.student_name,
+
+        p.parent_name,
+        p.mobile,
+        p.email,
+
+        t.teacher_name
+
+      FROM parent_messages pm
+
+      INNER JOIN students s
+        ON s.id = pm.student_id
+
+      LEFT JOIN parents p
+        ON p.id = pm.parent_id
+
+      LEFT JOIN teachers t
+        ON t.teacher_id = pm.teacher_id
+
+      ORDER BY pm.created_at DESC
+      `
+    );
+
+    res.json({
+      success: true,
+      messages: result.rows,
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Get Admin Parent Messages Error:",
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to load parent messages",
+    });
+  }
+};

@@ -330,10 +330,13 @@ export default function ParentDashboard() {
     <div className="menu-title">Settings</div>
   </div>
 
-  <div className="parent-menu-item">
-    <div className="menu-icon">✍️</div>
-    <div className="menu-title">Write To School</div>
-  </div>
+ <div
+  className="parent-menu-item"
+  onClick={() => navigate("/parent/write-to-school")}
+>
+  <div className="menu-icon">✍️</div>
+  <div className="menu-title">Write To School</div>
+</div>
 
   <div className="parent-menu-item">
     <div className="menu-icon">🎥</div>

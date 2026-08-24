@@ -1,11 +1,12 @@
 import { Router } from "express";
 import {
- parentSignup,
- parentLogin,
- getParentDashboard,
- markNotificationsAsRead,
- getAnnualAttendance,
- getParentAttendance
+  parentSignup,
+  parentLogin,
+  getParentDashboard,
+  markNotificationsAsRead,
+  getAnnualAttendance,
+  getParentAttendance,
+  createParentMessage
 } from "../controllers/parent.controller";
 
 const router = Router();
@@ -44,5 +45,13 @@ router.get(
    MARK NOTIFICATIONS AS READ
 =========================== */
 router.put("/notifications/read/:admission_no", markNotificationsAsRead);
+/* ===========================
+   PARENT → SCHOOL MESSAGE
+=========================== */
+
+router.post(
+  "/messages",
+  createParentMessage
+);
 
 export default router;

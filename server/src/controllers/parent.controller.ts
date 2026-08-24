@@ -460,3 +460,139 @@ export const getParentAttendance = async (
     });
   }
 };
+/* =====================================================
+   PARENT → SCHOOL MESSAGE
+===================================================== */
+
+export const createParentMessage = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const {
+      admission_no,
+      message_type,
+      subject,
+      message,
+    } = req.body;
+
+    if (
+      !admission_no ||
+      !message_type ||
+      !subject ||
+      !message
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
+      });
+    }
+
+    /* ============================
+       FIND PARENT + STUDENT
+    ============================ */
+
+    const parentResult = await pool.query(
+      `
+      SELECT
+        p.id AS parent_id,
+        s.id AS student_id,
+        s.class,
+        s.section
+      FROM parents p
+      INNER JOIN students s
+        ON s.admission_no = p.admission_no
+      WHERE p.admission_no = $1
+      AND p.status = 'Active'
+      AND s.student_status = 'Active'
+      LIMIT 1
+      `,
+      [String(admission_no).trim()]
+    );
+
+    if (parentResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Student/Parent record not found",
+      });
+    }
+
+    const {
+      parent_id,
+      student_id,
+      class: className,
+      section,
+    } = parentResult.rows[0];
+
+    /* ============================
+       FIND CLASS TEACHER
+    ============================ */
+
+    const teacherResult = await pool.query(
+      `
+      SELECT teacher_id
+      FROM class_teacher_master
+      WHERE TRIM(class_name) = TRIM($1)
+      AND TRIM(section) = TRIM($2)
+      LIMIT 1
+      `,
+      [className, section]
+    );
+
+    const teacherId =
+      teacherResult.rows.length > 0
+        ? teacherResult.rows[0].teacher_id
+        : null;
+
+    /* ============================
+       SAVE MESSAGE
+    ============================ */
+
+    const result = await pool.query(
+      `
+      INSERT INTO parent_messages
+      (
+        student_id,
+        parent_id,
+        class_name,
+        section,
+        teacher_id,
+        message_type,
+        subject,
+        message
+      )
+      VALUES
+      ($1,$2,$3,$4,$5,$6,$7,$8)
+      RETURNING *
+      `,
+      [
+        student_id,
+        parent_id,
+        className,
+        section,
+        teacherId,
+        message_type,
+        subject.trim(),
+        message.trim(),
+      ]
+    );
+
+    res.json({
+      success: true,
+      message: "Your message has been submitted successfully",
+      data: result.rows[0],
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Create Parent Message Error:",
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to submit message",
+    });
+  }
+};

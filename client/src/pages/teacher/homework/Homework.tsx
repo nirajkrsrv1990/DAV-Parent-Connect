@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Homework.css";
 import { API_BASE_URL } from "@/config/api";
 
 type HomeworkItem = {
   id: number;
+  teacher_id?: string;
   subject: string;
-  homework: string;
-  dueDate: string;
-  pdf: File | null;
-  image: File | null;
+  class: string;
+  section: string;
+  description: string | null;
+  due_date: string;
+  pdf_url: string | null;
+  image_url: string | null;
 };
 
 export default function Homework() {
@@ -20,94 +23,287 @@ export default function Homework() {
 
   const [pdf, setPdf] = useState<File | null>(null);
   const [image, setImage] = useState<File | null>(null);
+
   const [loading, setLoading] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(true);
 
   const [homeworkList, setHomeworkList] = useState<HomeworkItem[]>([]);
 
-  // Function to handle homework upload and backend API integration
+  /* =====================================================
+     GET LOGGED-IN TEACHER ID
+  ===================================================== */
+
+  const getTeacherId = (): string | null => {
+    try {
+      const teacherData = localStorage.getItem("teacher");
+
+      if (!teacherData) {
+        return null;
+      }
+
+      const teacher = JSON.parse(teacherData);
+
+      return teacher?.teacher_id || null;
+    } catch (error) {
+      console.error("Teacher data error:", error);
+      return null;
+    }
+  };
+
+  /* =====================================================
+     LOAD TEACHER HOMEWORK HISTORY
+  ===================================================== */
+
+  const loadHomeworkHistory = async () => {
+    try {
+      setHistoryLoading(true);
+
+      const teacherId = getTeacherId();
+
+      if (!teacherId) {
+        console.error("Teacher ID not found.");
+        setHomeworkList([]);
+        return;
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/homework/teacher/${encodeURIComponent(
+          teacherId
+        )}`
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        console.error(
+          result.message || "Failed to load homework history."
+        );
+
+        setHomeworkList([]);
+        return;
+      }
+
+      setHomeworkList(result.homework || []);
+    } catch (error) {
+      console.error(
+        "Homework History Error:",
+        error
+      );
+
+      setHomeworkList([]);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  /* =====================================================
+     LOAD HISTORY WHEN PAGE OPENS
+  ===================================================== */
+
+  useEffect(() => {
+    loadHomeworkHistory();
+  }, []);
+
+  /* =====================================================
+     SAVE / UPLOAD HOMEWORK
+  ===================================================== */
+
   const saveHomework = async () => {
-    // 1. Mandatory field check for due date
+    // Mandatory due date
     if (!dueDate) {
       alert("Please select a Due Date.");
       return;
     }
 
-    // 2. Flexible validation: at least ONE content item must be provided (Text, PDF, or Image)
+    // At least one content item
     if (!homework.trim() && !pdf && !image) {
-      alert("Please provide at least one content item: Homework Description, PDF, or Image.");
+      alert(
+        "Please provide at least one content item: Homework Description, PDF, or Image."
+      );
+      return;
+    }
+
+    const teacherId = getTeacherId();
+
+    if (!teacherId) {
+      alert(
+        "Teacher ID not found. Please login again."
+      );
       return;
     }
 
     setLoading(true);
 
-    // Prepare multipart form data payload for backend submission
     const formData = new FormData();
-    formData.append("class_name", selectedClass);
-    formData.append("section", selectedSection);
-    formData.append("subject", subject);
-    formData.append("due_date", dueDate);
-    if (homework.trim()) formData.append("description", homework);
-    if (pdf) formData.append("pdf", pdf);
-    if (image) formData.append("image", image);
+
+    // Teacher ID
+    formData.append(
+      "teacher_id",
+      teacherId
+    );
+
+    // Class
+    formData.append(
+      "class_name",
+      selectedClass
+    );
+
+    // Section
+    formData.append(
+      "section",
+      selectedSection
+    );
+
+    // Subject
+    formData.append(
+      "subject",
+      subject
+    );
+
+    // Due Date
+    formData.append(
+      "due_date",
+      dueDate
+    );
+
+    // Description
+    if (homework.trim()) {
+      formData.append(
+        "description",
+        homework
+      );
+    }
+
+    // PDF
+    if (pdf) {
+      formData.append(
+        "pdf",
+        pdf
+      );
+    }
+
+    // Image
+    if (image) {
+      formData.append(
+        "image",
+        image
+      );
+    }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/homework/create`, {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/homework/create`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const result = await response.json();
 
       if (result.success) {
-        // Add to local state list for instant UI preview
-        setHomeworkList([
-          {
-            id: result.homework?.id || Date.now(),
-            subject,
-            homework,
-            dueDate,
-            pdf,
-            image,
-          },
-          ...homeworkList,
-        ]);
+        /*
+          Backend से returned homework को
+          तुरंत history में add करें।
+        */
+        const savedHomework =
+          result.homework;
 
-        // Reset form fields
+        if (savedHomework) {
+          setHomeworkList(
+            (previous) => [
+              savedHomework,
+              ...previous,
+            ]
+          );
+        } else {
+          // Safety fallback:
+          // database से फिर history load करें
+          await loadHomeworkHistory();
+        }
+
+        // Reset form
         setHomework("");
         setDueDate("");
         setPdf(null);
         setImage(null);
 
-        alert("Homework Uploaded Successfully and parents notified!");
+        alert(
+          "Homework Uploaded Successfully and parents notified!"
+        );
       } else {
-        alert(result.message || "Failed to upload homework.");
+        alert(
+          result.message ||
+            "Failed to upload homework."
+        );
       }
-    } catch (err) {
-      console.error("Submission error:", err);
-      alert("An error occurred while uploading homework.");
+    } catch (error) {
+      console.error(
+        "Submission error:",
+        error
+      );
+
+      alert(
+        "An error occurred while uploading homework."
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  /* =====================================================
+     RENDER
+  ===================================================== */
+
   return (
     <>
       <main className="homework-page">
+
+        {/* =================================================
+            HEADER
+        ================================================= */}
+
         <div className="homework-header">
-          <h1>Homework Management</h1>
-          <button className="save-btn" onClick={saveHomework} disabled={loading}>
-            {loading ? "Uploading..." : "Upload Homework"}
+
+          <h1>
+            Homework Management
+          </h1>
+
+          <button
+            className="save-btn"
+            onClick={saveHomework}
+            disabled={loading}
+          >
+            {loading
+              ? "Uploading..."
+              : "Upload Homework"}
           </button>
+
         </div>
 
+
         <div className="homework-form">
-          {/* Main Form Fields Grid */}
+
+          {/* =================================================
+              FORM FIELDS
+          ================================================= */}
+
           <div className="form-grid">
+
+            {/* CLASS */}
+
             <div>
-              <label>Class</label>
+              <label>
+                Class
+              </label>
+
               <select
                 value={selectedClass}
-                onChange={(e) => setSelectedClass(e.target.value)}
+                onChange={(e) =>
+                  setSelectedClass(
+                    e.target.value
+                  )
+                }
               >
                 <option>NURSERY</option>
                 <option>LKG</option>
@@ -127,11 +323,21 @@ export default function Homework() {
               </select>
             </div>
 
+
+            {/* SECTION */}
+
             <div>
-              <label>Section</label>
+              <label>
+                Section
+              </label>
+
               <select
                 value={selectedSection}
-                onChange={(e) => setSelectedSection(e.target.value)}
+                onChange={(e) =>
+                  setSelectedSection(
+                    e.target.value
+                  )
+                }
               >
                 <option>A</option>
                 <option>B</option>
@@ -146,11 +352,21 @@ export default function Homework() {
               </select>
             </div>
 
+
+            {/* SUBJECT */}
+
             <div>
-              <label>Subject</label>
+              <label>
+                Subject
+              </label>
+
               <select
                 value={subject}
-                onChange={(e) => setSubject(e.target.value)}
+                onChange={(e) =>
+                  setSubject(
+                    e.target.value
+                  )
+                }
               >
                 <option>English</option>
                 <option>Sanskrit</option>
@@ -172,24 +388,51 @@ export default function Homework() {
               </select>
             </div>
 
+
+            {/* DUE DATE */}
+
             <div>
-              <label>Due Date</label>
+              <label>
+                Due Date
+              </label>
+
               <input
                 type="date"
                 value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
+                onChange={(e) =>
+                  setDueDate(
+                    e.target.value
+                  )
+                }
               />
             </div>
+
           </div>
 
-          {/* Homework Description Textarea */}
-          <div style={{ marginTop: "25px" }}>
-            <label>Homework Description (Optional if file attached)</label>
+
+          {/* =================================================
+              HOMEWORK DESCRIPTION
+          ================================================= */}
+
+          <div
+            style={{
+              marginTop: "25px",
+            }}
+          >
+            <label>
+              Homework Description
+              (Optional if file attached)
+            </label>
+
             <textarea
               rows={10}
               value={homework}
               placeholder="Enter today's homework for students..."
-              onChange={(e) => setHomework(e.target.value)}
+              onChange={(e) =>
+                setHomework(
+                  e.target.value
+                )
+              }
               style={{
                 width: "100%",
                 minHeight: "220px",
@@ -197,86 +440,124 @@ export default function Homework() {
             />
           </div>
 
-          {/* File Attachments Grid */}
-          <div className="form-grid" style={{ marginTop: "25px" }}>
+
+          {/* =================================================
+              FILE ATTACHMENTS
+          ================================================= */}
+
+          <div
+            className="form-grid"
+            style={{
+              marginTop: "25px",
+            }}
+          >
+
+            {/* PDF */}
+
             <div>
-              <label>Attach PDF (Optional)</label>
+              <label>
+                Attach PDF (Optional)
+              </label>
+
               <input
                 type="file"
                 accept=".pdf,application/pdf"
                 onChange={(e) =>
-                  setPdf(e.target.files ? e.target.files[0] : null)
+                  setPdf(
+                    e.target.files
+                      ? e.target.files[0]
+                      : null
+                  )
                 }
               />
             </div>
 
+
+            {/* IMAGE */}
+
             <div>
-              <label>Attach Image (Optional)</label>
+              <label>
+                Attach Image (Optional)
+              </label>
+
               <input
                 type="file"
                 accept="image/*"
                 onChange={(e) =>
-                  setImage(e.target.files ? e.target.files[0] : null)
+                  setImage(
+                    e.target.files
+                      ? e.target.files[0]
+                      : null
+                  )
                 }
               />
             </div>
+
           </div>
 
-          {/* Uploaded Homework Table Preview */}
-          <div className="homework-list" style={{ marginTop: "30px" }}>
-            <table>
-              <thead>
-                <tr>
-                  <th style={{ width: "70px" }}>#</th>
-                  <th>Subject</th>
-                  <th>Homework</th>
-                  <th>Due Date</th>
-                  <th>PDF</th>
-                  <th>Image</th>
-                </tr>
-              </thead>
-              <tbody>
-                {homeworkList.map((item, index) => (
-                  <tr key={item.id}>
-                    <td>{index + 1}</td>
-                    <td>{item.subject}</td>
-                    <td>{item.homework || "-"}</td>
-                    <td>{item.dueDate}</td>
-                    <td>
-                      {item.pdf ? (
-                        <span
-                          style={{
-                            color: "#1565C0",
-                            fontWeight: 600,
-                          }}
-                        >
-                          📄 {item.pdf.name}
-                        </span>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-                    <td>
-                      {item.image ? (
-                        <span
-                          style={{
-                            color: "#2E7D32",
-                            fontWeight: 600,
-                          }}
-                        >
-                          🖼 {item.image.name}
-                        </span>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-                  </tr>
-                ))}
 
-                {homeworkList.length === 0 && (
+          {/* =================================================
+              TEACHER HOMEWORK HISTORY
+          ================================================= */}
+
+          <div
+            className="homework-list"
+            style={{
+              marginTop: "30px",
+            }}
+          >
+
+            <table>
+
+              <thead>
+
+                <tr>
+
+                  <th
+                    style={{
+                      width: "60px",
+                    }}
+                  >
+                    #
+                  </th>
+
+                  <th>
+                    Subject
+                  </th>
+
+                  <th>
+                    Class
+                  </th>
+
+                  <th>
+                    Sec
+                  </th>
+
+                  <th>
+                    Homework
+                  </th>
+
+                  <th>
+                    PDF
+                  </th>
+
+                  <th>
+                    Image
+                  </th>
+
+                </tr>
+
+              </thead>
+
+
+              <tbody>
+
+                {/* HISTORY LOADING */}
+
+                {historyLoading && (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={7}
                       style={{
                         textAlign: "center",
                         padding: "40px",
@@ -284,14 +565,126 @@ export default function Homework() {
                         fontWeight: 600,
                       }}
                     >
-                      No Homework Uploaded Yet
+                      Loading Homework History...
                     </td>
                   </tr>
                 )}
+
+
+                {/* HOMEWORK LIST */}
+
+                {!historyLoading &&
+                  homeworkList.map(
+                    (item, index) => (
+                      <tr key={item.id}>
+
+                        <td>
+                          {index + 1}
+                        </td>
+
+                        <td>
+                          {item.subject}
+                        </td>
+
+                        <td>
+                          {item.class}
+                        </td>
+
+                        <td>
+                          {item.section}
+                        </td>
+
+                        <td>
+                          {item.description ||
+                            "-"}
+                        </td>
+
+                        <td>
+
+                          {item.pdf_url ? (
+                            <a
+                              href={`${API_BASE_URL.replace(
+                                /\/api$/,
+                                ""
+                              )}${item.pdf_url}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              style={{
+                                color:
+                                  "#1565C0",
+                                fontWeight: 600,
+                                textDecoration:
+                                  "none",
+                              }}
+                            >
+                              📄 View PDF
+                            </a>
+                          ) : (
+                            "-"
+                          )}
+
+                        </td>
+
+                        <td>
+
+                          {item.image_url ? (
+                            <a
+                              href={`${API_BASE_URL.replace(
+                                /\/api$/,
+                                ""
+                              )}${item.image_url}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              style={{
+                                color:
+                                  "#2E7D32",
+                                fontWeight: 600,
+                                textDecoration:
+                                  "none",
+                              }}
+                            >
+                              🖼 View Image
+                            </a>
+                          ) : (
+                            "-"
+                          )}
+
+                        </td>
+
+                      </tr>
+                    )
+                  )}
+
+
+                {/* EMPTY */}
+
+                {!historyLoading &&
+                  homeworkList.length === 0 && (
+                    <tr>
+
+                      <td
+                        colSpan={7}
+                        style={{
+                          textAlign: "center",
+                          padding: "40px",
+                          color: "#777",
+                          fontWeight: 600,
+                        }}
+                      >
+                        No Homework Uploaded Yet
+                      </td>
+
+                    </tr>
+                  )}
+
               </tbody>
+
             </table>
+
           </div>
+
         </div>
+
       </main>
     </>
   );

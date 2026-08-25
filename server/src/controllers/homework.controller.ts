@@ -6,7 +6,20 @@ import pool from "../config/db";
 ========================================== */
 export const createHomework = async (req: Request, res: Response) => {
   try {
-    const { class_name, section, subject, description, due_date } = req.body;
+    const {
+  class_name,
+  section,
+  subject,
+  description,
+  due_date,
+  teacher_id,
+} = req.body;
+if (!teacher_id) {
+  return res.status(400).json({
+    success: false,
+    message: "Teacher ID is required.",
+  });
+}
 
     // Handle uploaded files via Multer
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
@@ -35,39 +48,42 @@ export const createHomework = async (req: Request, res: Response) => {
     const homeworkRes = await pool.query(
   `
   INSERT INTO homework
-  (
-    class,
-    section,
-    subject,
-    title,
-    description,
-    due_date,
-    pdf_url,
-    image_url
-  )
+(
+  teacher_id,
+  class,
+  section,
+  subject,
+  title,
+  description,
+  due_date,
+  pdf_url,
+  image_url
+)
   VALUES
-  (
-    $1,
-    $2,
-    $3,
-    $4,
-    $5,
-    $6,
-    $7,
-    $8
-  )
+(
+  $1,
+  $2,
+  $3,
+  $4,
+  $5,
+  $6,
+  $7,
+  $8,
+  $9
+)
   RETURNING *
   `,
   [
-    class_name,
-    section,
-    subject,
-    title,
-    description || null,
-    due_date,
-    pdfFile,
-    imageFile,
-  ]
+  teacher_id,
+  class_name,
+  section,
+  subject,
+  title,
+  description || null,
+  due_date,
+  pdfFile,
+  imageFile,
+]
 );
     const newHomework = homeworkRes.rows[0];
 
@@ -103,6 +119,60 @@ export const createHomework = async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       message: "Internal server error while uploading homework.",
+    });
+  }
+};
+/* ==========================================
+   FETCH HOMEWORK UPLOADED BY TEACHER
+========================================== */
+export const getTeacherHomework = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { teacher_id } = req.params;
+
+    if (!teacher_id) {
+      return res.status(400).json({
+        success: false,
+        message: "Teacher ID is required.",
+      });
+    }
+
+    const homeworkRes = await pool.query(
+      `
+      SELECT
+        id,
+        teacher_id,
+        subject,
+        class,
+        section,
+        description,
+        pdf_url,
+        image_url,
+        due_date,
+        created_at
+      FROM homework
+      WHERE teacher_id = $1
+      ORDER BY created_at DESC
+      `,
+      [teacher_id]
+    );
+
+    return res.json({
+      success: true,
+      homework: homeworkRes.rows,
+    });
+
+  } catch (err) {
+    console.error(
+      "Get Teacher Homework Error:",
+      err
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch teacher homework.",
     });
   }
 };

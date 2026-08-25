@@ -1,7 +1,11 @@
 import { Router } from "express";
 import multer from "multer";
 import path from "path";
-import { createHomework, getStudentHomework } from "../controllers/homework.controller";
+import {
+  createHomework,
+  getStudentHomework,
+  getTeacherHomework,
+} from "../controllers/homework.controller";
 
 const router = Router();
 
@@ -28,5 +32,6 @@ router.post(
 
 // Yeh route frontend ke naye fetch URL ke sath match ho raha hai
 router.get("/student/:admission_no", getStudentHomework);
+router.get("/teacher/:teacher_id", getTeacherHomework);
 
 export default router;

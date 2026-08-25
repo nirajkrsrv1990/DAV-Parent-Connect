@@ -579,3 +579,301 @@
     font-size: 11px;
   }
 }
+/* =========================================================
+   EDIT STUDENT MODAL
+   ========================================================= */
+
+.student-edit-overlay {
+  position: fixed;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background: rgba(15, 23, 42, 0.65);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+  box-sizing: border-box;
+
+  z-index: 99999;
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.student-edit-modal {
+  width: 100%;
+  max-width: 850px;
+
+  max-height: 90vh;
+  overflow-y: auto;
+
+  background: #ffffff;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.30);
+
+  position: relative;
+}
+
+
+/* =========================================================
+   MODAL HEADER
+   ========================================================= */
+
+.student-edit-header {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 18px 22px;
+
+  background: #0f4c81;
+
+  color: #ffffff;
+
+  border-radius: 14px 14px 0 0;
+}
+
+.student-edit-header h2 {
+  margin: 0;
+
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.student-edit-header p {
+  margin: 5px 0 0;
+
+  font-size: 12px;
+
+  color: rgba(255, 255, 255, 0.85);
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+   ========================================================= */
+
+.student-edit-close {
+  width: 36px;
+  height: 36px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.15);
+
+  color: #ffffff;
+
+  font-size: 26px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.student-edit-close:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.student-edit-form {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 16px;
+
+  padding: 22px;
+}
+
+.edit-form-group {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.edit-form-full {
+  grid-column: 1 / -1;
+}
+
+.edit-form-group label {
+  font-size: 12px;
+
+  font-weight: 600;
+
+  color: #344054;
+}
+
+.edit-form-group input,
+.edit-form-group select {
+  width: 100%;
+
+  min-height: 42px;
+
+  padding: 9px 12px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #d0d5dd;
+
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #101828;
+
+  font-size: 14px;
+
+  outline: none;
+}
+
+.edit-form-group input:focus,
+.edit-form-group select:focus {
+  border-color: #1565c0;
+
+  box-shadow:
+    0 0 0 3px rgba(21, 101, 192, 0.12);
+}
+
+
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+
+.student-edit-actions {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  padding: 16px 22px;
+
+  border-top: 1px solid #eaecf0;
+
+  background: #f8fafc;
+
+  border-radius: 0 0 14px 14px;
+}
+
+.student-edit-cancel,
+.student-edit-save {
+  min-width: 130px;
+
+  min-height: 40px;
+
+  padding: 9px 18px;
+
+  border: none;
+
+  border-radius: 7px;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.student-edit-cancel {
+  background: #e2e8f0;
+
+  color: #344054;
+}
+
+.student-edit-cancel:hover {
+  background: #cbd5e1;
+}
+
+.student-edit-save {
+  background: #1565c0;
+
+  color: #ffffff;
+}
+
+.student-edit-save:hover {
+  background: #0d47a1;
+}
+
+.student-edit-save:disabled,
+.student-edit-cancel:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   MOBILE MODAL
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  .student-edit-overlay {
+    padding: 10px;
+
+    align-items: flex-start;
+  }
+
+  .student-edit-modal {
+    max-height: 95vh;
+
+    border-radius: 12px;
+  }
+
+  .student-edit-header {
+    padding: 15px 16px;
+
+    border-radius: 12px 12px 0 0;
+  }
+
+  .student-edit-header h2 {
+    font-size: 18px;
+  }
+
+  .student-edit-form {
+    grid-template-columns: 1fr;
+
+    padding: 16px;
+
+    gap: 13px;
+  }
+
+  .edit-form-full {
+    grid-column: auto;
+  }
+
+  .student-edit-actions {
+    padding: 14px 16px;
+
+    flex-direction: column-reverse;
+
+    border-radius: 0 0 12px 12px;
+  }
+
+  .student-edit-cancel,
+  .student-edit-save {
+    width: 100%;
+  }
+}

@@ -197,6 +197,7 @@ const handleEdit = (student: Student) => {
       ? student.dob.substring(0, 10)
       : "",
   });
+  console.log("EDITING STUDENT SET:", student);
 };
 
 

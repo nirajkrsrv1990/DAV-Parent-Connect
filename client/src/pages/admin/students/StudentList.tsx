@@ -22,12 +22,16 @@ type Student = {
   dob: string;
   house: string;
   status: string;
+  student_status?: string;
+  removal_reason?: string | null;
 };
 
 export default function StudentList() {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+  const [savingStudent, setSavingStudent] = useState(false);
 
   // =====================================================
   // FILTER STATES
@@ -181,23 +185,94 @@ export default function StudentList() {
   };
 
   // =====================================================
-  // EDIT STUDENT
-  // =====================================================
+// EDIT STUDENT
+// =====================================================
 
-  const handleEdit = (
-    student: Student
-  ) => {
+const handleEdit = (student: Student) => {
+  console.log("Edit Student:", student);
+
+  setEditingStudent({
+    ...student,
+    dob: student.dob
+      ? student.dob.substring(0, 10)
+      : "",
+  });
+};
+
+
+// =====================================================
+// SAVE EDITED STUDENT
+// =====================================================
+
+const handleSaveStudent = async () => {
+  if (!editingStudent) return;
+
+  try {
+    setSavingStudent(true);
+
+    const response = await apiClient.put(
+      `/students/${editingStudent.id}`,
+      {
+        admission_no: editingStudent.admission_no,
+        student_name: editingStudent.student_name,
+        father_name: editingStudent.father_name,
+        mother_name: editingStudent.mother_name,
+        mobile_no: editingStudent.mobile_no,
+        class: editingStudent.class,
+        section: editingStudent.section,
+        roll_no: editingStudent.roll_no,
+        gender: editingStudent.gender,
+        dob: editingStudent.dob || null,
+        house: editingStudent.house,
+        status: editingStudent.status,
+        student_status:
+          editingStudent.student_status || "Active",
+        removal_reason:
+          editingStudent.removal_reason || null,
+      }
+    );
+
+    const result = response.data;
+
     console.log(
-      "Edit Student:",
-      student
+      "Update Student Response:",
+      result
+    );
+
+    if (!result.success) {
+      alert(
+        result.message ||
+          "Unable to update student."
+      );
+      return;
+    }
+
+    setStudents((previousStudents) =>
+      previousStudents.map((student) =>
+        student.id === editingStudent.id
+          ? result.student
+          : student
+      )
+    );
+
+    setEditingStudent(null);
+
+    alert("Student Updated Successfully.");
+
+  } catch (error) {
+    console.error(
+      "Update Student Error:",
+      error
     );
 
     alert(
-      `Edit option selected for:\n\n` +
-      `Student: ${student.student_name}\n` +
-      `Admission No.: ${student.admission_no}`
+      "Unable to update student. Please try again."
     );
-  };
+
+  } finally {
+    setSavingStudent(false);
+  }
+};
 
   // =====================================================
   // DELETE STUDENT
@@ -249,7 +324,6 @@ export default function StudentList() {
 
   return (
     <div className="student-list-page">
-
       {/* =================================================
           PAGE HEADER
       ================================================= */}
@@ -769,6 +843,444 @@ export default function StudentList() {
 
           </div>
         )}
+
+  
+      
+      {/* =====================================================
+          EDIT STUDENT MODAL
+      ===================================================== */}
+
+      {editingStudent && (
+        <div className="student-edit-overlay">
+
+          <div className="student-edit-modal">
+
+            {/* HEADER */}
+
+            <div className="student-edit-header">
+
+              <div>
+                <h2>Edit Student</h2>
+
+                <p>
+                  Admission No.:{" "}
+                  <strong>
+                    {editingStudent.admission_no}
+                  </strong>
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="student-edit-close"
+                onClick={() =>
+                  setEditingStudent(null)
+                }
+              >
+                ×
+              </button>
+
+            </div>
+
+
+            {/* FORM */}
+
+            <div className="student-edit-form">
+
+              {/* Admission No. */}
+
+              <div className="edit-form-group">
+                <label>
+                  Admission No.
+                </label>
+
+                <input
+                  type="text"
+                  value={
+                    editingStudent.admission_no
+                  }
+                  onChange={(e) =>
+                    setEditingStudent({
+                      ...editingStudent,
+                      admission_no:
+                        e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+
+              {/* Student Name */}
+
+              <div className="edit-form-group">
+                <label>
+                  Student Name
+                </label>
+
+                <input
+                  type="text"
+                  value={
+                    editingStudent.student_name
+                  }
+                  onChange={(e) =>
+                    setEditingStudent({
+                      ...editingStudent,
+                      student_name:
+                        e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+
+              {/* Father's Name */}
+
+              <div className="edit-form-group">
+                <label>
+                  Father's Name
+                </label>
+
+                <input
+                  type="text"
+                  value={
+                    editingStudent.father_name
+                  }
+                  onChange={(e) =>
+                    setEditingStudent({
+                      ...editingStudent,
+                      father_name:
+                        e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+
+              {/* Mother's Name */}
+
+              <div className="edit-form-group">
+                <label>
+                  Mother's Name
+                </label>
+
+                <input
+                  type="text"
+                  value={
+                    editingStudent.mother_name
+                  }
+                  onChange={(e) =>
+                    setEditingStudent({
+                      ...editingStudent,
+                      mother_name:
+                        e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+
+              {/* Mobile */}
+
+              <div className="edit-form-group">
+                <label>
+                  Mobile No.
+                </label>
+
+                <input
+                  type="text"
+                  value={
+                    editingStudent.mobile_no
+                  }
+                  onChange={(e) =>
+                    setEditingStudent({
+                      ...editingStudent,
+                      mobile_no:
+                        e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+
+              {/* Class */}
+
+              <div className="edit-form-group">
+                <label>
+                  Class
+                </label>
+
+                <input
+                  type="text"
+                  value={
+                    editingStudent.class
+                  }
+                  onChange={(e) =>
+                    setEditingStudent({
+                      ...editingStudent,
+                      class:
+                        e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+
+              {/* Section */}
+
+              <div className="edit-form-group">
+                <label>
+                  Section
+                </label>
+
+                <input
+                  type="text"
+                  value={
+                    editingStudent.section
+                  }
+                  onChange={(e) =>
+                    setEditingStudent({
+                      ...editingStudent,
+                      section:
+                        e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+
+              {/* Roll No. */}
+
+              <div className="edit-form-group">
+                <label>
+                  Roll No.
+                </label>
+
+                <input
+                  type="number"
+                  value={
+                    editingStudent.roll_no ?? ""
+                  }
+                  onChange={(e) =>
+                    setEditingStudent({
+                      ...editingStudent,
+                      roll_no:
+                        Number(e.target.value),
+                    })
+                  }
+                />
+              </div>
+
+
+              {/* Gender */}
+
+              <div className="edit-form-group">
+                <label>
+                  Gender
+                </label>
+
+                <select
+                  value={
+                    editingStudent.gender
+                  }
+                  onChange={(e) =>
+                    setEditingStudent({
+                      ...editingStudent,
+                      gender:
+                        e.target.value,
+                    })
+                  }
+                >
+                  <option value="">
+                    Select Gender
+                  </option>
+
+                  <option value="M">
+                    Male
+                  </option>
+
+                  <option value="F">
+                    Female
+                  </option>
+                </select>
+              </div>
+
+
+              {/* DOB */}
+
+              <div className="edit-form-group">
+                <label>
+                  Date of Birth
+                </label>
+
+                <input
+                  type="date"
+                  value={
+                    editingStudent.dob || ""
+                  }
+                  onChange={(e) =>
+                    setEditingStudent({
+                      ...editingStudent,
+                      dob:
+                        e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+
+              {/* House */}
+
+              <div className="edit-form-group">
+                <label>
+                  House
+                </label>
+
+                <input
+                  type="text"
+                  value={
+                    editingStudent.house
+                  }
+                  onChange={(e) =>
+                    setEditingStudent({
+                      ...editingStudent,
+                      house:
+                        e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+
+              {/* Status */}
+
+              <div className="edit-form-group">
+                <label>
+                  Status
+                </label>
+
+                <select
+                  value={
+                    editingStudent.status
+                  }
+                  onChange={(e) =>
+                    setEditingStudent({
+                      ...editingStudent,
+                      status:
+                        e.target.value,
+                    })
+                  }
+                >
+                  <option value="Active">
+                    Active
+                  </option>
+
+                  <option value="Inactive">
+                    Inactive
+                  </option>
+                </select>
+              </div>
+
+
+              {/* Student Status */}
+
+              <div className="edit-form-group">
+                <label>
+                  Student Status
+                </label>
+
+                <select
+                  value={
+                    editingStudent.student_status ||
+                    "Active"
+                  }
+                  onChange={(e) =>
+                    setEditingStudent({
+                      ...editingStudent,
+                      student_status:
+                        e.target.value,
+                    })
+                  }
+                >
+                  <option value="Active">
+                    Active
+                  </option>
+
+                  <option value="Inactive">
+                    Inactive
+                  </option>
+
+                  <option value="Transferred">
+                    Transferred
+                  </option>
+
+                  <option value="School Left">
+                    School Left
+                  </option>
+                </select>
+              </div>
+
+
+              {/* Removal Reason */}
+
+              <div className="edit-form-group edit-form-full">
+
+                <label>
+                  Removal Reason
+                </label>
+
+                <input
+                  type="text"
+                  value={
+                    editingStudent.removal_reason ||
+                    ""
+                  }
+                  onChange={(e) =>
+                    setEditingStudent({
+                      ...editingStudent,
+                      removal_reason:
+                        e.target.value,
+                    })
+                  }
+                  placeholder="Optional"
+                />
+
+              </div>
+
+            </div>
+
+
+            {/* ACTION BUTTONS */}
+
+            <div className="student-edit-actions">
+
+              <button
+                type="button"
+                className="student-edit-cancel"
+                onClick={() =>
+                  setEditingStudent(null)
+                }
+                disabled={savingStudent}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="student-edit-save"
+                onClick={handleSaveStudent}
+                disabled={savingStudent}
+              >
+                {savingStudent
+                  ? "Saving..."
+                  : "Save Changes"}
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
 
     </div>
   );

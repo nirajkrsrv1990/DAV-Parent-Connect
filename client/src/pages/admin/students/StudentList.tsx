@@ -331,7 +331,7 @@ const handleSaveStudent = async () => {
 
       <div className="student-list-header">
         <div>
-          <h1>Student List TEST</h1>
+          <h1>Student List</h1>
 
           {!loading && !error && (
             <p className="student-subtitle">

@@ -344,6 +344,7 @@ export default function Homework() {
                 <option>C</option>
                 <option>D</option>
                 <option>E</option>
+                <option>F</option>
                 <option>NEET</option>
                 <option>JEE</option>
                 <option>PCB</option>

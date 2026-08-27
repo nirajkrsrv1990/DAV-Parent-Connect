@@ -50,19 +50,10 @@ const [attendanceMarked, setAttendanceMarked] = useState(false);
   try {
     setLoading(true);
 
-    // 1. Load class students
-    const studentsResponse = await fetch(
-      `${API_BASE_URL}/students?class=${selectedClass}&section=${selectedSection}`
-    );
+    /* =====================================================
+       1. GET LOGGED-IN TEACHER
+    ===================================================== */
 
-    const studentsResult = await studentsResponse.json();
-
-    if (!studentsResult.success) {
-      setStudents([]);
-      return;
-    }
-
-    // 2. Load saved attendance for selected date
     const teacherData = localStorage.getItem("teacher");
 
     if (!teacherData) {
@@ -72,46 +63,113 @@ const [attendanceMarked, setAttendanceMarked] = useState(false);
 
     const teacher = JSON.parse(teacherData);
 
-    const attendanceResponse = await fetch(
-      `/api/teachers/attendance?attendanceDate=${attendanceDate}&teacher_id=${teacher.teacher_id}`
+    /* =====================================================
+       2. LOAD ONLY ACTIVE STUDENTS
+          OF TEACHER'S ASSIGNED CLASS + SECTION
+    ===================================================== */
+
+    const studentsResponse = await fetch(
+      `${API_BASE_URL}/teacher-students/${teacher.teacher_id}`
     );
 
-    const attendanceResult = await attendanceResponse.json();
+    const studentsResult = await studentsResponse.json();
 
-    // 3. Convert saved attendance into a quick lookup
-    const attendanceMap = new Map<number, "P" | "A">();
+    console.log(
+      "Teacher Students API Response:",
+      studentsResult
+    );
+
+    if (
+      !studentsResponse.ok ||
+      !studentsResult.success
+    ) {
+      setStudents([]);
+      return;
+    }
+
+    /* =====================================================
+       3. LOAD SAVED ATTENDANCE FOR SELECTED DATE
+    ===================================================== */
+
+    const attendanceResponse = await fetch(
+      `${API_BASE_URL}/teachers/attendance?attendanceDate=${attendanceDate}&teacher_id=${teacher.teacher_id}`
+    );
+
+    const attendanceResult =
+      await attendanceResponse.json();
+
+    /* =====================================================
+       4. CONVERT SAVED ATTENDANCE INTO MAP
+    ===================================================== */
+
+    const attendanceMap =
+      new Map<number, "P" | "A">();
 
     if (
       attendanceResult.success &&
-      Array.isArray(attendanceResult.attendance)
+      Array.isArray(
+        attendanceResult.attendance
+      )
     ) {
       attendanceResult.attendance.forEach(
-        (item: { student_id: number; status: "P" | "A" }) => {
-          attendanceMap.set(item.student_id, item.status);
+        (
+          item: {
+            student_id: number;
+            status: "P" | "A";
+          }
+        ) => {
+          attendanceMap.set(
+            item.student_id,
+            item.status
+          );
         }
       );
     }
-    setAttendanceMarked(
-  attendanceResult.success &&
-  Array.isArray(attendanceResult.attendance) &&
-  attendanceResult.attendance.length > 0
-);
 
-    // 4. Apply saved attendance to students
-    const data: Student[] = studentsResult.students.map(
-      (item: Student) => ({
-        ...item,
-        status: attendanceMap.get(item.id) || "P",
-      })
+    /* =====================================================
+       5. CHECK WHETHER ATTENDANCE IS ALREADY MARKED
+    ===================================================== */
+
+    setAttendanceMarked(
+      attendanceResult.success &&
+      Array.isArray(
+        attendanceResult.attendance
+      ) &&
+      attendanceResult.attendance.length > 0
     );
 
+    /* =====================================================
+       6. APPLY SAVED ATTENDANCE
+          ONLY TO ACTIVE STUDENTS
+    ===================================================== */
+
+    const data: Student[] =
+      studentsResult.students.map(
+        (item: Student) => ({
+          ...item,
+          status:
+            attendanceMap.get(item.id) || "P",
+        })
+      );
+
     setStudents(data);
+
   } catch (err) {
-    console.log("Attendance Load Error:", err);
+    console.log(
+      "Attendance Load Error:",
+      err
+    );
+
+    setStudents([]);
+
   } finally {
     setLoading(false);
   }
-}, [selectedClass, selectedSection, attendanceDate]);
+}, [
+  selectedClass,
+  selectedSection,
+  attendanceDate,
+]);
 
   useEffect(() => {
     const fetchData = async () => {

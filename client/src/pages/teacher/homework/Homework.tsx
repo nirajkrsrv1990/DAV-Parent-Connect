@@ -349,7 +349,7 @@ export default function Homework() {
                 <option>JEE</option>
                 <option>PCB</option>
                 <option>PCM</option>
-                <option>COMM.</option>
+                <option>COMM</option>
               </select>
             </div>
 

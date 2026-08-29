@@ -140,24 +140,26 @@ export const getTeacherHomework = async (
     }
 
     const homeworkRes = await pool.query(
-      `
-      SELECT
-        id,
-        teacher_id,
-        subject,
-        class,
-        section,
-        description,
-        pdf_url,
-        image_url,
-        due_date,
-        created_at
-      FROM homework
-      WHERE teacher_id = $1
-      ORDER BY created_at DESC
-      `,
-      [teacher_id]
-    );
+  `
+  SELECT
+    id,
+    teacher_id,
+    subject,
+    class,
+    section,
+    description,
+    pdf_url,
+    image_url,
+    due_date,
+    created_at
+  FROM homework
+  WHERE teacher_id = $1
+    AND created_at::date =
+        (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata')::date
+  ORDER BY created_at DESC
+  `,
+  [teacher_id]
+);
 
     return res.json({
       success: true,

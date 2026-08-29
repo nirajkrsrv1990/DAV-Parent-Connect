@@ -29,6 +29,7 @@ import TeacherLayout from "../components/layout/TeacherLayout";
 import TeacherDashboard from "../pages/teacher/TeacherDashboard";
 import Attendance from "../pages/teacher/attendance/Attendance";
 import Homework from "../pages/teacher/homework/Homework";
+import ClassHomework from "../pages/teacher/class-homework/ClassHomework";
 import MarksEntry from "../pages/teacher/marks/MarksEntry";
 import TeacherParentMessages from "../pages/teacher/TeacherParentMessages";
 
@@ -79,6 +80,7 @@ export default function AppRoutes() {
         <Route path=":teacherId" element={<TeacherDashboard />} />
         <Route path="attendance" element={<Attendance />} />
         <Route path="homework" element={<Homework />} />
+        <Route path="class-homework" element={<ClassHomework />}/>
         <Route path="marks" element={<MarksEntry />} />
         <Route path="notices" element={<NoticeList />} />
         <Route path="parent-messages" element={<TeacherParentMessages />}/>

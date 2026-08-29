@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   LayoutDashboard,
   ClipboardCheck,
@@ -10,6 +11,8 @@ import {
   MessageSquare,
   LogOut,
   X,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
@@ -25,6 +28,8 @@ export default function TeacherSidebar({
   isOpen = false,
   onClose,
 }: TeacherSidebarProps) {
+  const [homeworkOpen, setHomeworkOpen] =
+  useState(false);
   return (
     <>
       {/* Mobile view background overlay */}
@@ -82,12 +87,53 @@ export default function TeacherSidebar({
             </div>
           </Link>
 
-          <Link to="/teacher/homework" className="teacher-link" onClick={onClose}>
-            <div className="teacher-item">
-              <BookOpen size={20} />
-              <span>Homework</span>
-            </div>
-          </Link>
+          {/* ==========================================
+    HOMEWORK MANAGEMENT
+========================================== */}
+
+<div className="teacher-link">
+  <div
+    className="teacher-item"
+    onClick={() =>
+      setHomeworkOpen((previous) => !previous)
+    }
+    style={{ cursor: "pointer" }}
+  >
+    <BookOpen size={20} />
+
+    <span style={{ flex: 1 }}>
+      Homework Management
+    </span>
+
+    {homeworkOpen ? (
+      <ChevronDown size={18} />
+    ) : (
+      <ChevronRight size={18} />
+    )}
+  </div>
+</div>
+
+{homeworkOpen && (
+  <div className="teacher-submenu">
+
+    <Link
+      to="/teacher/class-homework"
+      className="teacher-submenu-link"
+      onClick={onClose}
+    >
+      📋 Class Homework
+    </Link>
+
+    <Link
+      to="/teacher/homework"
+      className="teacher-submenu-link"
+      onClick={onClose}
+    >
+      ⬆️ Upload Homework
+    </Link>
+
+  </div>
+)}
 
           <Link to="/teacher/marks" className="teacher-link" onClick={onClose}>
             <div className="teacher-item">

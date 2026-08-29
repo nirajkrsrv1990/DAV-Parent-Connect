@@ -5,6 +5,7 @@ import {
   createHomework,
   getStudentHomework,
   getTeacherHomework,
+  getClassTeacherHomework,
 } from "../controllers/homework.controller";
 
 const router = Router();
@@ -33,5 +34,6 @@ router.post(
 // Yeh route frontend ke naye fetch URL ke sath match ho raha hai
 router.get("/student/:admission_no", getStudentHomework);
 router.get("/teacher/:teacher_id", getTeacherHomework);
+router.get("/class-teacher/:teacher_id", getClassTeacherHomework);
 
 export default router;

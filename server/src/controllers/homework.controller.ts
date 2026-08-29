@@ -224,3 +224,92 @@ export const getStudentHomework = async (req: Request, res: Response) => {
     });
   }
 };
+/* ==========================================
+   FETCH TODAY'S HOMEWORK FOR CLASS TEACHER
+========================================== */
+export const getClassTeacherHomework = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const teacher_id = String(req.params.teacher_id).trim();
+
+    if (!teacher_id) {
+      return res.status(400).json({
+        success: false,
+        message: "Teacher ID is required.",
+      });
+    }
+
+    // Find the class and section assigned to this Class Teacher
+    const assignmentRes = await pool.query(
+      `
+      SELECT
+        class_name,
+        section
+      FROM class_teacher_master
+      WHERE TRIM(teacher_id) = $1
+      LIMIT 1
+      `,
+      [teacher_id]
+    );
+
+    if (assignmentRes.rows.length === 0) {
+      return res.json({
+        success: false,
+        assignment: null,
+        homework: [],
+        message: "This teacher is not assigned as a Class Teacher.",
+      });
+    }
+
+    const {
+      class_name,
+      section,
+    } = assignmentRes.rows[0];
+
+    // Fetch ONLY TODAY'S homework for the assigned class/section
+    const homeworkRes = await pool.query(
+      `
+      SELECT
+        id,
+        teacher_id,
+        subject,
+        class,
+        section,
+        description,
+        pdf_url,
+        image_url,
+        due_date,
+        created_at
+      FROM homework
+      WHERE class = $1
+        AND section = $2
+        AND created_at::date =
+            (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata')::date
+      ORDER BY created_at DESC
+      `,
+      [class_name, section]
+    );
+
+    return res.json({
+      success: true,
+      assignment: {
+        class_name,
+        section,
+      },
+      homework: homeworkRes.rows,
+    });
+
+  } catch (err) {
+    console.error(
+      "Get Class Teacher Homework Error:",
+      err
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch class teacher homework.",
+    });
+  }
+};

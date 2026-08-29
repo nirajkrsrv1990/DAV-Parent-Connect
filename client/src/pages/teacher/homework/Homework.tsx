@@ -54,47 +54,87 @@ export default function Homework() {
      LOAD TEACHER HOMEWORK HISTORY
   ===================================================== */
 
-  const loadHomeworkHistory = async () => {
-    try {
-      setHistoryLoading(true);
+  /* =====================================================
+   LOAD TODAY'S HOMEWORK
+   - Subject Teacher → Own homework
+   - Class Teacher   → All homework of assigned class
+===================================================== */
 
-      const teacherId = getTeacherId();
+const loadHomeworkHistory = async () => {
+  try {
+    setHistoryLoading(true);
 
-      if (!teacherId) {
-        console.error("Teacher ID not found.");
-        setHomeworkList([]);
-        return;
-      }
+    const teacherId = getTeacherId();
 
-      const response = await fetch(
-        `${API_BASE_URL}/homework/teacher/${encodeURIComponent(
-          teacherId
-        )}`
-      );
+    if (!teacherId) {
+      console.error("Teacher ID not found.");
+      setHomeworkList([]);
+      return;
+    }
 
-      const result = await response.json();
+    /* =================================================
+       STEP 1: CHECK WHETHER TEACHER IS A CLASS TEACHER
+    ================================================= */
 
-      if (!response.ok || !result.success) {
-        console.error(
-          result.message || "Failed to load homework history."
-        );
+    const classTeacherResponse = await fetch(
+      `${API_BASE_URL}/class-teacher/${encodeURIComponent(
+        teacherId
+      )}`
+    );
 
-        setHomeworkList([]);
-        return;
-      }
+    const classTeacherResult =
+      await classTeacherResponse.json();
 
-      setHomeworkList(result.homework || []);
-    } catch (error) {
+    let homeworkUrl = `${API_BASE_URL}/homework/teacher/${encodeURIComponent(
+      teacherId
+    )}`;
+
+    /* =================================================
+       STEP 2: IF CLASS TEACHER
+       LOAD ALL TODAY'S HOMEWORK OF ASSIGNED CLASS
+    ================================================= */
+
+    if (
+      classTeacherResponse.ok &&
+      classTeacherResult.success &&
+      classTeacherResult.assignment
+    ) {
+      homeworkUrl = `${API_BASE_URL}/homework/class-teacher/${encodeURIComponent(
+        teacherId
+      )}`;
+    }
+
+    /* =================================================
+       STEP 3: LOAD HOMEWORK
+    ================================================= */
+
+    const response = await fetch(homeworkUrl);
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
       console.error(
-        "Homework History Error:",
-        error
+        result.message || "Failed to load homework."
       );
 
       setHomeworkList([]);
-    } finally {
-      setHistoryLoading(false);
+      return;
     }
-  };
+
+    setHomeworkList(result.homework || []);
+
+  } catch (error) {
+    console.error(
+      "Homework History Error:",
+      error
+    );
+
+    setHomeworkList([]);
+
+  } finally {
+    setHistoryLoading(false);
+  }
+};
 
   /* =====================================================
      LOAD HISTORY WHEN PAGE OPENS
@@ -206,21 +246,7 @@ export default function Homework() {
           Backend से returned homework को
           तुरंत history में add करें।
         */
-        const savedHomework =
-          result.homework;
-
-        if (savedHomework) {
-          setHomeworkList(
-            (previous) => [
-              savedHomework,
-              ...previous,
-            ]
-          );
-        } else {
-          // Safety fallback:
-          // database से फिर history load करें
-          await loadHomeworkHistory();
-        }
+        await loadHomeworkHistory();
 
         // Reset form
         setHomework("");

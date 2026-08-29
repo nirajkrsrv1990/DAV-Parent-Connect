@@ -43,14 +43,16 @@ import ParentAnnualAttendance from "../pages/parent/dashboard/ParentAnnualAttend
 import ParentResults from "../pages/parent/dashboard/ParentResults";
 import ParentWriteToSchool from "../pages/parent/dashboard/ParentWriteToSchool";
 import ParentProfile from "../pages/parent/dashboard/ParentProfile";
+import ForgotPassword from "../pages/auth/ForgotPassword";
 
 export default function AppRoutes() {
   return (
     <Routes>
       {/* ================= LOGIN & NOTICES ================= */}
-      <Route path="/" element={<LoginPage />} />
-      <Route path="/admin/notices" element={<NoticeList />} />
-      <Route path="/admin/notices/add" element={<AddNotice />} />
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/admin/notices" element={<NoticeList />} />
+        <Route path="/admin/notices/add" element={<AddNotice />} />
 
       {/* ================= ADMIN ================= */}
       <Route element={<AdminLayout />}>

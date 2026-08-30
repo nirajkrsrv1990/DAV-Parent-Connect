@@ -126,3 +126,66 @@
         z-index: 1100;
     }
 }
+/* =========================
+   HOMEWORK MANAGEMENT
+========================= */
+
+.teacher-homework-menu {
+  width: 100%;
+}
+
+.teacher-homework-toggle {
+  width: 100%;
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 22px;
+  border: none;
+  background: transparent;
+  color: white;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.teacher-homework-toggle span {
+  flex: 1;
+}
+
+.teacher-homework-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* =========================
+   HOMEWORK SUBMENU
+========================= */
+
+.teacher-submenu {
+  width: 100%;
+  padding: 4px 0 8px;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.teacher-submenu-link {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px 0 56px;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.teacher-submenu-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+.teacher-submenu-link span:first-child {
+  width: 20px;
+  text-align: center;
+}

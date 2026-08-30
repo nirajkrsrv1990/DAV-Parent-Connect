@@ -87,53 +87,49 @@ export default function TeacherSidebar({
             </div>
           </Link>
 
-          {/* ==========================================
-    HOMEWORK MANAGEMENT
-========================================== */}
+{/* ================= HOMEWORK MANAGEMENT ================= */}
 
-<div className="teacher-link">
-  <div
-    className="teacher-item"
+<div className="teacher-homework-menu">
+  <button
+    type="button"
+    className="teacher-homework-toggle"
     onClick={() =>
       setHomeworkOpen((previous) => !previous)
     }
-    style={{ cursor: "pointer" }}
   >
     <BookOpen size={20} />
 
-    <span style={{ flex: 1 }}>
-      Homework Management
-    </span>
+    <span>Homework Management</span>
 
     {homeworkOpen ? (
       <ChevronDown size={18} />
     ) : (
       <ChevronRight size={18} />
     )}
-  </div>
+  </button>
+
+  {homeworkOpen && (
+    <div className="teacher-submenu">
+      <Link
+        to="/teacher/class-homework"
+        className="teacher-submenu-link"
+        onClick={onClose}
+      >
+        <span>📋</span>
+        <span>Class Homework</span>
+      </Link>
+
+      <Link
+        to="/teacher/homework"
+        className="teacher-submenu-link"
+        onClick={onClose}
+      >
+        <span>⬆️</span>
+        <span>Upload Homework</span>
+      </Link>
+    </div>
+  )}
 </div>
-
-{homeworkOpen && (
-  <div className="teacher-submenu">
-
-    <Link
-      to="/teacher/class-homework"
-      className="teacher-submenu-link"
-      onClick={onClose}
-    >
-      📋 Class Homework
-    </Link>
-
-    <Link
-      to="/teacher/homework"
-      className="teacher-submenu-link"
-      onClick={onClose}
-    >
-      ⬆️ Upload Homework
-    </Link>
-
-  </div>
-)}
 
           <Link to="/teacher/marks" className="teacher-link" onClick={onClose}>
             <div className="teacher-item">

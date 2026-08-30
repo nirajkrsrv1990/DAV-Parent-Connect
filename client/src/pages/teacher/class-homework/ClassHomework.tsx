@@ -30,12 +30,25 @@ export default function ClassHomework() {
   const [error, setError] = useState("");
 
   const getTeacherId = () => {
-    return (
-      localStorage.getItem("teacherId") ||
-      localStorage.getItem("teacher_id") ||
-      ""
-    ).trim();
-  };
+  const teacherData = localStorage.getItem("teacher");
+
+  if (teacherData) {
+    try {
+      const teacher = JSON.parse(teacherData);
+
+      return String(
+        teacher.teacher_id || ""
+      ).trim();
+    } catch (error) {
+      console.error(
+        "Failed to parse teacher localStorage:",
+        error
+      );
+    }
+  }
+
+  return "";
+};
 
   const loadClassHomework = async () => {
     try {

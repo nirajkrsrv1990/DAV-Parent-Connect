@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { BookOpen, CalendarDays, RefreshCw } from "lucide-react";
+import {
+  BookOpen,
+  CalendarDays,
+  RefreshCw,
+} from "lucide-react";
 import { API_BASE_URL } from "../../../config/api";
 import "./ClassHomework.css";
 
@@ -22,35 +26,81 @@ type Assignment = {
 };
 
 export default function ClassHomework() {
-  const [homework, setHomework] = useState<Homework[]>([]);
+  const [homework, setHomework] =
+    useState<Homework[]>([]);
+
   const [assignment, setAssignment] =
     useState<Assignment | null>(null);
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [selectedDate, setSelectedDate] =
+    useState("");
+
+  const [minDate, setMinDate] =
+    useState("");
+
+  const [maxDate, setMaxDate] =
+    useState("");
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
+
+  /* ==========================================
+     GET TEACHER ID FROM LOCAL STORAGE
+  ========================================== */
 
   const getTeacherId = () => {
-  const teacherData = localStorage.getItem("teacher");
+    const teacherData =
+      localStorage.getItem("teacher");
 
-  if (teacherData) {
-    try {
-      const teacher = JSON.parse(teacherData);
+    if (teacherData) {
+      try {
+        const teacher =
+          JSON.parse(teacherData);
 
-      return String(
-        teacher.teacher_id || ""
-      ).trim();
-    } catch (error) {
-      console.error(
-        "Failed to parse teacher localStorage:",
-        error
-      );
+        return String(
+          teacher.teacher_id || ""
+        ).trim();
+
+      } catch (error) {
+        console.error(
+          "Failed to parse teacher localStorage:",
+          error
+        );
+      }
     }
-  }
 
-  return "";
-};
+    return "";
+  };
 
-  const loadClassHomework = async () => {
+  /* ==========================================
+     FORMAT YYYY-MM-DD → DD/MM/YYYY
+  ========================================== */
+
+  const formatDate = (
+    dateString: string
+  ) => {
+    if (!dateString) return "";
+
+    const [year, month, day] =
+      dateString.split("-");
+
+    if (!year || !month || !day) {
+      return dateString;
+    }
+
+    return `${day}/${month}/${year}`;
+  };
+
+  /* ==========================================
+     LOAD CLASS HOMEWORK
+  ========================================== */
+
+  const loadClassHomework = async (
+    date?: string
+  ) => {
     try {
       setLoading(true);
       setError("");
@@ -59,19 +109,37 @@ export default function ClassHomework() {
 
       if (!teacherId) {
         setError("Teacher ID not found.");
+        setHomework([]);
         return;
       }
 
-      const response = await fetch(
-        `${API_BASE_URL}/homework/class-teacher/${encodeURIComponent(
-          teacherId
-        )}`
-      );
+      const requestedDate =
+        date || selectedDate;
 
-      const result = await response.json();
+      let url =
+        `${API_BASE_URL}/homework/class-teacher/` +
+        `${encodeURIComponent(teacherId)}`;
 
-      if (!response.ok || !result.success) {
-        setAssignment(null);
+      if (requestedDate) {
+        url += `?date=${encodeURIComponent(
+          requestedDate
+        )}`;
+      }
+
+      const response =
+        await fetch(url);
+
+      const result =
+        await response.json();
+
+      if (
+        !response.ok ||
+        !result.success
+      ) {
+        setAssignment(
+          result.assignment || null
+        );
+
         setHomework([]);
 
         setError(
@@ -82,8 +150,40 @@ export default function ClassHomework() {
         return;
       }
 
-      setAssignment(result.assignment || null);
-      setHomework(result.homework || []);
+      setAssignment(
+        result.assignment || null
+      );
+
+      setHomework(
+        result.homework || []
+      );
+
+      /* ======================================
+         SAVE DATE RANGE FROM BACKEND
+      ====================================== */
+
+      if (result.min_date) {
+        setMinDate(
+          result.min_date
+        );
+      }
+
+      if (result.max_date) {
+        setMaxDate(
+          result.max_date
+        );
+      }
+
+      /* ======================================
+         SAVE ACTUAL SELECTED DATE
+      ====================================== */
+
+      if (result.selected_date) {
+        setSelectedDate(
+          result.selected_date
+        );
+      }
+
     } catch (err) {
       console.error(
         "Class Homework Error:",
@@ -95,38 +195,68 @@ export default function ClassHomework() {
       );
 
       setHomework([]);
+
     } finally {
       setLoading(false);
     }
   };
+
+  /* ==========================================
+     INITIAL LOAD
+  ========================================== */
 
   useEffect(() => {
     loadClassHomework();
   }, []);
 
   /* ==========================================
+     DATE CHANGE
+  ========================================== */
+
+  const handleDateChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newDate =
+      event.target.value;
+
+    if (!newDate) return;
+
+    setSelectedDate(newDate);
+
+    loadClassHomework(newDate);
+  };
+
+  /* ==========================================
      GROUP HOMEWORK BY SUBJECT
   ========================================== */
 
-  const groupedHomework = homework.reduce(
-    (groups, item) => {
-      const subject = item.subject || "Other";
+  const groupedHomework =
+    homework.reduce(
+      (groups, item) => {
+        const subject =
+          item.subject || "Other";
 
-      if (!groups[subject]) {
-        groups[subject] = [];
-      }
+        if (!groups[subject]) {
+          groups[subject] = [];
+        }
 
-      groups[subject].push(item);
+        groups[subject].push(item);
 
-      return groups;
-    },
-    {} as Record<string, Homework[]>
-  );
+        return groups;
+      },
+      {} as Record<
+        string,
+        Homework[]
+      >
+    );
 
   return (
     <div className="class-homework-page">
 
-      {/* PAGE HEADER */}
+      {/* ======================================
+          PAGE HEADER
+      ====================================== */}
+
       <div className="class-homework-title">
         <div>
           <h1>
@@ -135,14 +265,18 @@ export default function ClassHomework() {
           </h1>
 
           <p>
-            Homework assigned to your class by
-            all subject teachers.
+            Homework assigned to your class
+            by all subject teachers.
           </p>
         </div>
 
         <button
           className="class-homework-refresh"
-          onClick={loadClassHomework}
+          onClick={() =>
+            loadClassHomework(
+              selectedDate
+            )
+          }
           disabled={loading}
         >
           <RefreshCw
@@ -153,13 +287,18 @@ export default function ClassHomework() {
                 : ""
             }
           />
+
           Refresh
         </button>
       </div>
 
-      {/* CLASS INFORMATION */}
+      {/* ======================================
+          CLASS INFORMATION
+      ====================================== */}
+
       {assignment && (
         <div className="class-homework-info">
+
           <div>
             <CalendarDays size={20} />
 
@@ -180,57 +319,102 @@ export default function ClassHomework() {
             </span>
           </div>
 
-          <div>
-            <span>
-              Date:{" "}
-              <strong>
-                {new Date().toLocaleDateString(
-                  "en-GB",
-                  {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  }
-                )}
-              </strong>
-            </span>
-          </div>
         </div>
       )}
 
-      {/* LOADING */}
+      {/* ======================================
+          DATE SELECTOR
+      ====================================== */}
+
+      {assignment && (
+        <div className="class-homework-date-card">
+
+          <div className="class-homework-date-label">
+            <CalendarDays size={20} />
+
+            <div>
+              <strong>
+                Select Date
+              </strong>
+
+              <span>
+                Showing homework for{" "}
+                {formatDate(
+                  selectedDate
+                )}
+              </span>
+            </div>
+          </div>
+
+          <input
+            type="date"
+            value={selectedDate}
+            min={minDate}
+            max={maxDate}
+            lang="en-GB"
+            onChange={
+              handleDateChange
+            }
+            disabled={loading}
+            className="class-homework-date-input"
+          />
+
+        </div>
+      )}
+
+      {/* ======================================
+          LOADING
+      ====================================== */}
+
       {loading && (
         <div className="class-homework-message">
-          Loading today's homework...
+          Loading homework...
         </div>
       )}
 
-      {/* ERROR */}
+      {/* ======================================
+          ERROR
+      ====================================== */}
+
       {!loading && error && (
         <div className="class-homework-error">
           {error}
         </div>
       )}
 
-      {/* NO HOMEWORK */}
+      {/* ======================================
+          NO HOMEWORK
+      ====================================== */}
+
       {!loading &&
         !error &&
         homework.length === 0 && (
           <div className="class-homework-empty">
+
             <BookOpen size={42} />
 
             <h3>
-              No Homework Assigned Today
+              No Homework Assigned
             </h3>
 
             <p>
               No subject teacher has assigned
-              homework to your class today.
+              homework for{" "}
+              <strong>
+                {formatDate(
+                  selectedDate
+                )}
+              </strong>
+              .
             </p>
+
           </div>
         )}
 
-      {/* HOMEWORK LIST */}
+      {/* ======================================
+          HOMEWORK LIST
+      ====================================== */}
+
       {!loading &&
         !error &&
         homework.length > 0 && (
@@ -247,13 +431,20 @@ export default function ClassHomework() {
                   className="class-homework-card"
                   key={subject}
                 >
+
                   <div className="class-homework-card-header">
-                    <h2>{subject}</h2>
+
+                    <h2>
+                      {subject}
+                    </h2>
 
                     <span>
-                      {subjectHomework.length}{" "}
+                      {
+                        subjectHomework.length
+                      }{" "}
                       Homework
                     </span>
+
                   </div>
 
                   {subjectHomework.map(
@@ -262,19 +453,20 @@ export default function ClassHomework() {
                         className="class-homework-item"
                         key={item.id}
                       >
+
                         {item.description && (
                           <p className="homework-description">
-                            {item.description}
+                            {
+                              item.description
+                            }
                           </p>
                         )}
 
                         {item.due_date && (
                           <p className="homework-due-date">
                             Due Date:{" "}
-                            {new Date(
+                            {formatDate(
                               item.due_date
-                            ).toLocaleDateString(
-                              "en-GB"
                             )}
                           </p>
                         )}
@@ -300,14 +492,18 @@ export default function ClassHomework() {
                             View Image
                           </a>
                         )}
+
                       </div>
                     )
                   )}
+
                 </div>
               )
             )}
+
           </div>
         )}
+
     </div>
   );
 }

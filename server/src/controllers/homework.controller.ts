@@ -225,14 +225,21 @@ export const getStudentHomework = async (req: Request, res: Response) => {
   }
 };
 /* ==========================================
-   FETCH TODAY'S HOMEWORK FOR CLASS TEACHER
+   FETCH HOMEWORK FOR CLASS TEACHER
+   DYNAMIC DATE + 7 DAY WINDOW
 ========================================== */
 export const getClassTeacherHomework = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const teacher_id = String(req.params.teacher_id).trim();
+    const teacher_id = String(
+      req.params.teacher_id
+    ).trim();
+
+    const selectedDate = String(
+      req.query.date || ""
+    ).trim();
 
     if (!teacher_id) {
       return res.status(400).json({
@@ -241,7 +248,25 @@ export const getClassTeacherHomework = async (
       });
     }
 
-    // Find the class and section assigned to this Class Teacher
+    /* ==========================================
+       VALIDATE DATE FORMAT
+    ========================================== */
+
+    if (
+      selectedDate &&
+      !/^\d{4}-\d{2}-\d{2}$/.test(selectedDate)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid date format. Use YYYY-MM-DD.",
+      });
+    }
+
+    /* ==========================================
+       FIND CLASS & SECTION OF CLASS TEACHER
+    ========================================== */
+
     const assignmentRes = await pool.query(
       `
       SELECT
@@ -259,7 +284,8 @@ export const getClassTeacherHomework = async (
         success: false,
         assignment: null,
         homework: [],
-        message: "This teacher is not assigned as a Class Teacher.",
+        message:
+          "This teacher is not assigned as a Class Teacher.",
       });
     }
 
@@ -268,7 +294,86 @@ export const getClassTeacherHomework = async (
       section,
     } = assignmentRes.rows[0];
 
-    // Fetch ONLY TODAY'S homework for the assigned class/section
+    /* ==========================================
+       GET CURRENT DATE + 7 DAY WINDOW
+       USING INDIA TIME
+    ========================================== */
+
+    const dateRes = await pool.query(`
+      SELECT
+        (
+          CURRENT_TIMESTAMP
+          AT TIME ZONE 'Asia/Kolkata'
+        )::date AS today,
+
+        (
+          (
+            CURRENT_TIMESTAMP
+            AT TIME ZONE 'Asia/Kolkata'
+          )::date - INTERVAL '6 days'
+        )::date AS min_date
+    `);
+
+    const today = String(
+      dateRes.rows[0].today
+    );
+
+    const minDate = String(
+      dateRes.rows[0].min_date
+    );
+
+    /* ==========================================
+       IF NO DATE IS PROVIDED
+       → USE TODAY
+    ========================================== */
+
+    const requestedDate =
+      selectedDate || today;
+
+    /* ==========================================
+       DATE MUST NOT BE FUTURE
+    ========================================== */
+
+    if (requestedDate > today) {
+      return res.status(400).json({
+        success: false,
+        assignment: {
+          class_name,
+          section,
+        },
+        homework: [],
+        message:
+          "Future dates are not allowed.",
+      });
+    }
+
+    /* ==========================================
+       DATE MUST BE WITHIN LAST 7 DAYS
+    ========================================== */
+
+    if (requestedDate < minDate) {
+      return res.status(400).json({
+        success: false,
+        assignment: {
+          class_name,
+          section,
+        },
+        homework: [],
+        message:
+          "Homework is available only for the last 7 days.",
+      });
+    }
+
+    /* ==========================================
+       FETCH HOMEWORK FOR SELECTED DATE
+
+       created_at is stored as UTC timestamp
+       without timezone.
+
+       Convert:
+       UTC → Asia/Kolkata
+    ========================================== */
+
     const homeworkRes = await pool.query(
       `
       SELECT
@@ -285,19 +390,34 @@ export const getClassTeacherHomework = async (
       FROM homework
       WHERE class = $1
         AND section = $2
-        AND created_at::date =
-            (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata')::date
+        AND (
+          created_at
+          AT TIME ZONE 'UTC'
+          AT TIME ZONE 'Asia/Kolkata'
+        )::date = $3::date
       ORDER BY created_at DESC
       `,
-      [class_name, section]
+      [
+        class_name,
+        section,
+        requestedDate,
+      ]
     );
 
     return res.json({
       success: true,
+
       assignment: {
         class_name,
         section,
       },
+
+      selected_date: requestedDate,
+
+      min_date: minDate,
+
+      max_date: today,
+
       homework: homeworkRes.rows,
     });
 
@@ -309,7 +429,8 @@ export const getClassTeacherHomework = async (
 
     return res.status(500).json({
       success: false,
-      message: "Failed to fetch class teacher homework.",
+      message:
+        "Failed to fetch class teacher homework.",
     });
   }
 };

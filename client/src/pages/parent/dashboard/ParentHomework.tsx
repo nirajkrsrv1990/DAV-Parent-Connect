@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
@@ -14,9 +14,10 @@ type HomeworkItem = {
   id?: number;
   subject: string;
   description?: string | null;
-  due_date: string;
+  due_date?: string | null;
   pdf_url?: string | null;
   image_url?: string | null;
+  created_at?: string;
 };
 
 type ParentData = {
@@ -27,6 +28,12 @@ type HomeworkResponse = {
   success: boolean;
   homework?: HomeworkItem[];
   message?: string;
+};
+
+type GroupedHomework = {
+  dateKey: string;
+  displayDate: string;
+  items: HomeworkItem[];
 };
 
 export default function ParentHomework() {
@@ -76,8 +83,12 @@ export default function ParentHomework() {
     admissionNo: string
   ): Promise<void> => {
     try {
+      setLoading(true);
+
       const response = await fetch(
-        `${API_BASE_URL}/homework/student/${admissionNo}`
+        `${API_BASE_URL}/homework/student/${encodeURIComponent(
+          admissionNo
+        )}`
       );
 
       if (!response.ok) {
@@ -114,6 +125,128 @@ export default function ParentHomework() {
   };
 
   // ==========================================
+  // DATE KEY
+  //
+  // IMPORTANT:
+  // created_at is stored as UTC.
+  // We convert it to India date.
+  // ==========================================
+  const getIndiaDateKey = (
+    dateString?: string
+  ): string => {
+    if (!dateString) {
+      return "unknown";
+    }
+
+    try {
+      const date = new Date(dateString);
+
+      const parts = new Intl.DateTimeFormat(
+        "en-CA",
+        {
+          timeZone: "Asia/Kolkata",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }
+      ).formatToParts(date);
+
+      const year =
+        parts.find(
+          (part) => part.type === "year"
+        )?.value || "";
+
+      const month =
+        parts.find(
+          (part) => part.type === "month"
+        )?.value || "";
+
+      const day =
+        parts.find(
+          (part) => part.type === "day"
+        )?.value || "";
+
+      return `${year}-${month}-${day}`;
+    } catch {
+      return "unknown";
+    }
+  };
+
+  // ==========================================
+  // DISPLAY DATE
+  // DD/MM/YYYY
+  // ==========================================
+  const formatDisplayDate = (
+    dateString?: string
+  ): string => {
+    if (!dateString) {
+      return "";
+    }
+
+    try {
+      const date = new Date(dateString);
+
+      return new Intl.DateTimeFormat(
+        "en-GB",
+        {
+          timeZone: "Asia/Kolkata",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        }
+      ).format(date);
+    } catch {
+      return "";
+    }
+  };
+
+  // ==========================================
+  // GROUP HOMEWORK DATE-WISE
+  //
+  // created_at = homework upload date
+  // ==========================================
+  const groupedHomework =
+    useMemo<GroupedHomework[]>(() => {
+      const groups: Record<
+        string,
+        GroupedHomework
+      > = {};
+
+      homeworkList.forEach((homework) => {
+        const dateKey =
+          getIndiaDateKey(
+            homework.created_at
+          );
+
+        if (dateKey === "unknown") {
+          return;
+        }
+
+        if (!groups[dateKey]) {
+          groups[dateKey] = {
+            dateKey,
+            displayDate:
+              formatDisplayDate(
+                homework.created_at
+              ),
+            items: [],
+          };
+        }
+
+        groups[dateKey].items.push(
+          homework
+        );
+      });
+
+      return Object.values(groups).sort(
+        (a, b) =>
+          b.dateKey.localeCompare(
+            a.dateKey
+          )
+      );
+    }, [homeworkList]);
+
+  // ==========================================
   // FILE URL
   // ==========================================
   const getFileUrl = (
@@ -133,170 +266,117 @@ export default function ParentHomework() {
     return `${HOMEWORK_FILE_BASE_URL}${filePath}`;
   };
 
-const downloadFile = async (
-  filePath: string
-): Promise<void> => {
-  const url = getFileUrl(filePath);
+  // ==========================================
+  // DOWNLOAD FILE
+  // ==========================================
+  const downloadFile = async (
+    filePath: string
+  ): Promise<void> => {
+    const url = getFileUrl(filePath);
 
-  if (!url) {
-    alert("File not available.");
-    return;
-  }
-
-  try {
-    const fileName =
-      decodeURIComponent(
-        filePath.split("/").pop() || "download"
-      );
-
-    // ========================================
-    // ANDROID / CAPACITOR
-    // ========================================
-    if (Capacitor.isNativePlatform()) {
-
-      // Request Documents permission if required
-      const permission =
-        await Filesystem.checkPermissions();
-
-      if (
-        permission.publicStorage !== "granted"
-      ) {
-        const requested =
-          await Filesystem.requestPermissions();
-
-        if (
-          requested.publicStorage !== "granted"
-        ) {
-          throw new Error(
-            "Storage permission was not granted."
-          );
-        }
-      }
-
-      // Get the real native file URI
-      const fileInfo =
-        await Filesystem.getUri({
-          directory: Directory.Documents,
-          path: fileName,
-        });
-
-      // Download using FileTransfer
-      await FileTransfer.downloadFile({
-        url,
-        path: fileInfo.uri,
-      });
-
-      alert(
-        `Downloaded successfully:\n${fileName}`
-      );
-
+    if (!url) {
+      alert("File not available.");
       return;
     }
 
-    // ========================================
-    // DESKTOP / NORMAL BROWSER
-    // ========================================
-    const response = await fetch(url);
+    try {
+      const fileName =
+        decodeURIComponent(
+          filePath.split("/").pop() ||
+            "download"
+        );
 
-    if (!response.ok) {
-      throw new Error(
-        `Download failed: ${response.status}`
+      // ========================================
+      // ANDROID / CAPACITOR
+      // ========================================
+      if (Capacitor.isNativePlatform()) {
+        const permission =
+          await Filesystem.checkPermissions();
+
+        if (
+          permission.publicStorage !==
+          "granted"
+        ) {
+          const requested =
+            await Filesystem.requestPermissions();
+
+          if (
+            requested.publicStorage !==
+            "granted"
+          ) {
+            throw new Error(
+              "Storage permission was not granted."
+            );
+          }
+        }
+
+        const fileInfo =
+          await Filesystem.getUri({
+            directory: Directory.Documents,
+            path: fileName,
+          });
+
+        await FileTransfer.downloadFile({
+          url,
+          path: fileInfo.uri,
+        });
+
+        alert(
+          `Downloaded successfully:\n${fileName}`
+        );
+
+        return;
+      }
+
+      // ========================================
+      // DESKTOP / BROWSER
+      // ========================================
+      const response =
+        await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(
+          `Download failed: ${response.status}`
+        );
+      }
+
+      const blob =
+        await response.blob();
+
+      const blobUrl =
+        window.URL.createObjectURL(
+          blob
+        );
+
+      const link =
+        document.createElement("a");
+
+      link.href = blobUrl;
+      link.download = fileName;
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      document.body.removeChild(link);
+
+      window.URL.revokeObjectURL(
+        blobUrl
+      );
+    } catch (error) {
+      console.error(
+        "File download error:",
+        error
+      );
+
+      alert(
+        "Unable to download the file."
       );
     }
-
-    const blob = await response.blob();
-
-    const blobUrl =
-      window.URL.createObjectURL(blob);
-
-    const link =
-      document.createElement("a");
-
-    link.href = blobUrl;
-    link.download = fileName;
-
-    document.body.appendChild(link);
-
-    link.click();
-
-    document.body.removeChild(link);
-
-    window.URL.revokeObjectURL(blobUrl);
-
-  } catch (error) {
-    console.error(
-      "File download error:",
-      error
-    );
-
-    alert(
-      "Unable to download the file."
-    );
-  }
-};
-
-  // ==========================================
-  // BLOB → BASE64
-  // ==========================================
-  const blobToBase64 = (
-    blob: Blob
-  ): Promise<string> => {
-    return new Promise(
-      (resolve, reject) => {
-        const reader =
-          new FileReader();
-
-        reader.onloadend = () => {
-          try {
-            const result =
-              reader.result;
-
-            if (
-              typeof result !== "string"
-            ) {
-              reject(
-                new Error(
-                  "Unable to convert file."
-                )
-              );
-
-              return;
-            }
-
-            const base64 =
-              result.split(",")[1];
-
-            if (!base64) {
-              reject(
-                new Error(
-                  "Base64 conversion failed."
-                )
-              );
-
-              return;
-            }
-
-            resolve(base64);
-          } catch (error) {
-            reject(error);
-          }
-        };
-
-        reader.onerror = () => {
-          reject(
-            new Error(
-              "File reading failed."
-            )
-          );
-        };
-
-        reader.readAsDataURL(blob);
-      }
-    );
   };
 
   // ==========================================
-  // BACK BUTTON
+  // BACK
   // ==========================================
   const handleBack = (): void => {
     navigate(-1);
@@ -309,7 +389,9 @@ const downloadFile = async (
     <div
       className="parent-dashboard"
       style={{
-        padding: "20px",
+        padding: "16px",
+        minHeight: "100vh",
+        background: "#f1f5f9",
       }}
     >
       {/* ======================================
@@ -319,32 +401,36 @@ const downloadFile = async (
         style={{
           display: "flex",
           alignItems: "center",
-          marginBottom: "20px",
-          gap: "15px",
+          gap: "12px",
+          marginBottom: "18px",
         }}
       >
         <button
           type="button"
           onClick={handleBack}
           style={{
-            padding: "8px 16px",
-            cursor: "pointer",
-            background: "#1e293b",
-            color: "#fff",
             border: "none",
-            borderRadius: "6px",
+            background: "#1e3a8a",
+            color: "#ffffff",
+            width: "40px",
+            height: "40px",
+            borderRadius: "8px",
+            fontSize: "22px",
+            cursor: "pointer",
           }}
         >
-          ← Back
+          ←
         </button>
 
         <h1
           style={{
             margin: 0,
-            fontSize: "22px",
+            fontSize: "24px",
+            color: "#0f172a",
+            fontWeight: 700,
           }}
         >
-          Assigned Homework
+          Homework
         </h1>
       </div>
 
@@ -352,175 +438,254 @@ const downloadFile = async (
           LOADING
       ====================================== */}
       {loading ? (
-        <p>
-          Loading homework...
-        </p>
-      ) : homeworkList.length === 0 ? (
         <div
           style={{
-            background: "#fff",
+            background: "#ffffff",
+            borderRadius: "10px",
             padding: "30px",
             textAlign: "center",
-            borderRadius: "8px",
+            color: "#64748b",
           }}
         >
+          Loading homework...
+        </div>
+      ) : homeworkList.length === 0 ? (
+        /* ======================================
+           NO HOMEWORK
+        ====================================== */
+        <div
+          style={{
+            background: "#ffffff",
+            borderRadius: "10px",
+            padding: "35px 20px",
+            textAlign: "center",
+            color: "#64748b",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "38px",
+              marginBottom: "10px",
+            }}
+          >
+            📚
+          </div>
+
           <p
             style={{
-              color: "#64748b",
               margin: 0,
+              fontSize: "15px",
             }}
           >
             No homework assigned yet.
           </p>
         </div>
       ) : (
+        /* ======================================
+           DATE-WISE HOMEWORK
+        ====================================== */
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: "15px",
+            gap: "18px",
           }}
         >
-          {homeworkList.map(
-            (
-              hw: HomeworkItem,
-              index: number
-            ) => (
+          {groupedHomework.map(
+            (group) => (
               <div
-                key={
-                  hw.id ??
-                  `homework-${index}`
-                }
+                key={group.dateKey}
                 style={{
-                  background: "#fff",
-                  padding: "20px",
-                  borderRadius: "8px",
+                  background: "#ffffff",
+                  borderRadius: "10px",
+                  overflow: "hidden",
                   boxShadow:
-                    "0 4px 6px rgba(0,0,0,0.05)",
+                    "0 2px 8px rgba(15,23,42,0.08)",
                 }}
               >
                 {/* ==================================
-                    SUBJECT + DUE DATE
+                    DATE HEADER
                 ================================== */}
                 <div
                   style={{
+                    background:
+                      "#f97316",
+                    color: "#ffffff",
+                    padding:
+                      "11px 14px",
+                    fontSize: "16px",
+                    fontWeight: 700,
                     display: "flex",
-                    justifyContent:
-                      "space-between",
                     alignItems: "center",
-                    gap: "10px",
-                    marginBottom: "10px",
-                    flexWrap: "wrap",
+                    gap: "8px",
                   }}
                 >
-                  <span
-                    style={{
-                      background:
-                        "#e0f2fe",
-                      color: "#0369a1",
-                      padding:
-                        "4px 10px",
-                      borderRadius: "4px",
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {hw.subject}
+                  <span>
+                    📅
                   </span>
 
-                  <span
-                    style={{
-                      color: "#ef4444",
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Due Date:{" "}
-                    {hw.due_date}
+                  <span>
+                    {group.displayDate}
                   </span>
                 </div>
 
                 {/* ==================================
-                    DESCRIPTION
-                ================================== */}
-                <p
-                  style={{
-                    color: "#334155",
-                    margin: "10px 0",
-                    whiteSpace:
-                      "pre-wrap",
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {hw.description ||
-                    "No description provided."}
-                </p>
-
-                {/* ==================================
-                    ATTACHMENTS
+                    SUBJECT LIST
                 ================================== */}
                 <div
                   style={{
-                    display: "flex",
-                    gap: "10px",
-                    marginTop: "15px",
-                    flexWrap: "wrap",
+                    padding:
+                      "8px 14px 12px",
                   }}
                 >
-                  {/* PDF */}
-                  {hw.pdf_url && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        downloadFile(
-                          hw.pdf_url as string
-                        )
-                      }
-                      style={{
-                        border:
-                          "1px solid #2563eb",
-                        background:
-                          "#ffffff",
-                        color: "#2563eb",
-                        padding:
-                          "9px 13px",
-                        borderRadius: "6px",
-                        cursor:
-                          "pointer",
-                        fontWeight: 600,
-                        fontSize: "13px",
-                      }}
-                    >
-                      📥 Download PDF
-                    </button>
-                  )}
+                  {group.items.map(
+                    (
+                      homework,
+                      index
+                    ) => (
+                      <div
+                        key={
+                          homework.id ??
+                          `${group.dateKey}-${index}`
+                        }
+                        style={{
+                          padding:
+                            "11px 0",
+                          borderBottom:
+                            index <
+                            group.items
+                              .length -
+                              1
+                              ? "1px solid #e2e8f0"
+                              : "none",
+                        }}
+                      >
+                        {/* SUBJECT + DESCRIPTION */}
+                        <div
+                          style={{
+                            display:
+                              "flex",
+                            alignItems:
+                              "flex-start",
+                            gap: "5px",
+                            lineHeight:
+                              1.55,
+                          }}
+                        >
+                          <span
+                            style={{
+                              color:
+                                "#1d4ed8",
+                              fontWeight:
+                                700,
+                              minWidth:
+                                "78px",
+                              flexShrink: 0,
+                            }}
+                          >
+                            {homework.subject}
+                          </span>
 
-                  {/* IMAGE */}
-                  {hw.image_url && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        downloadFile(
-                          hw.image_url as string
-                        )
-                      }
-                      style={{
-                        border:
-                          "1px solid #16a34a",
-                        background:
-                          "#ffffff",
-                        color: "#16a34a",
-                        padding:
-                          "9px 13px",
-                        borderRadius: "6px",
-                        cursor:
-                          "pointer",
-                        fontWeight: 600,
-                        fontSize: "13px",
-                      }}
-                    >
-                      📥 Download Image
-                    </button>
+                          <span
+                            style={{
+                              color:
+                                "#111827",
+                              fontSize:
+                                "15px",
+                              whiteSpace:
+                                "pre-wrap",
+                            }}
+                          >
+                            :
+                            {" "}
+                            {homework.description ||
+                              "No description provided."}
+                          </span>
+                        </div>
+
+                        {/* ==================================
+                            ATTACHMENTS
+                        ================================== */}
+                        {(homework.pdf_url ||
+                          homework.image_url) && (
+                          <div
+                            style={{
+                              display:
+                                "flex",
+                              gap: "8px",
+                              flexWrap:
+                                "wrap",
+                              marginTop:
+                                "8px",
+                              marginLeft:
+                                "83px",
+                            }}
+                          >
+                            {homework.pdf_url && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  downloadFile(
+                                    homework.pdf_url as string
+                                  )
+                                }
+                                style={{
+                                  border:
+                                    "1px solid #2563eb",
+                                  background:
+                                    "#eff6ff",
+                                  color:
+                                    "#1d4ed8",
+                                  padding:
+                                    "6px 10px",
+                                  borderRadius:
+                                    "6px",
+                                  cursor:
+                                    "pointer",
+                                  fontSize:
+                                    "12px",
+                                  fontWeight:
+                                    600,
+                                }}
+                              >
+                                📥 PDF
+                              </button>
+                            )}
+
+                            {homework.image_url && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  downloadFile(
+                                    homework.image_url as string
+                                  )
+                                }
+                                style={{
+                                  border:
+                                    "1px solid #16a34a",
+                                  background:
+                                    "#f0fdf4",
+                                  color:
+                                    "#15803d",
+                                  padding:
+                                    "6px 10px",
+                                  borderRadius:
+                                    "6px",
+                                  cursor:
+                                    "pointer",
+                                  fontSize:
+                                    "12px",
+                                  fontWeight:
+                                    600,
+                                }}
+                              >
+                                📥 Image
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )
                   )}
                 </div>
               </div>

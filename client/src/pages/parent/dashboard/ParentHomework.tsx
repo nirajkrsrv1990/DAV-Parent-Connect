@@ -22,6 +22,18 @@ type HomeworkItem = {
 
 type ParentData = {
   admission_no: string;
+  student_name?: string;
+  studentName?: string;
+  student?: {
+    name?: string;
+    student_name?: string;
+    class?: string;
+    class_name?: string;
+    section?: string;
+  };
+  class?: string;
+  class_name?: string;
+  section?: string;
 };
 
 type HomeworkResponse = {
@@ -244,6 +256,41 @@ export default function ParentHomework() {
     }, [homeworkList]);
 
   // ==========================================
+  // STUDENT DISPLAY INFORMATION
+  // ==========================================
+  const parentData = useMemo(() => {
+    try {
+      const stored = localStorage.getItem("parent");
+      return stored ? (JSON.parse(stored) as ParentData) : null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const studentName =
+    parentData?.student_name ||
+    parentData?.studentName ||
+    parentData?.student?.student_name ||
+    parentData?.student?.name ||
+    "";
+
+  const studentClass =
+    parentData?.class ||
+    parentData?.class_name ||
+    parentData?.student?.class ||
+    parentData?.student?.class_name ||
+    "";
+
+  const studentSection =
+    parentData?.section ||
+    parentData?.student?.section ||
+    "";
+
+  const studentClassInfo = [studentClass, studentSection]
+    .filter(Boolean)
+    .join(", ");
+
+  // ==========================================
   // SUBJECT COLOUR
   // ==========================================
   const getSubjectStyle = (
@@ -422,259 +469,311 @@ export default function ParentHomework() {
   // ==========================================
   return (
     <div
-      className="parent-dashboard"
+      className="parent-homework-page"
       style={{
-        padding: "16px",
         minHeight: "100vh",
-        background: "#f1f5f9",
+        background: "#f4f8fa",
+        paddingBottom: "24px",
       }}
     >
       {/* ======================================
-          PAGE HEADER
+          TOP HEADER
       ====================================== */}
       <div
         style={{
+          height: "64px",
+          background: "linear-gradient(90deg, #0d8fa3, #1595aa)",
+          color: "#ffffff",
           display: "flex",
           alignItems: "center",
-          gap: "12px",
-          marginBottom: "18px",
+          justifyContent: "space-between",
+          padding: "0 18px",
+          boxSizing: "border-box",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
         }}
       >
         <button
           type="button"
           onClick={handleBack}
+          aria-label="Back"
           style={{
             border: "none",
-            background: "#1e3a8a",
+            background: "transparent",
             color: "#ffffff",
-            width: "40px",
-            height: "40px",
-            borderRadius: "8px",
-            fontSize: "22px",
+            width: "42px",
+            height: "42px",
+            fontSize: "34px",
+            lineHeight: 1,
             cursor: "pointer",
+            padding: 0,
           }}
         >
-          ←
+          ‹
         </button>
 
         <h1
           style={{
             margin: 0,
-            fontSize: "24px",
-            color: "#0f172a",
+            fontSize: "28px",
             fontWeight: 700,
+            letterSpacing: "0.2px",
           }}
         >
           Homework
         </h1>
+
+        <div
+          aria-hidden="true"
+          style={{
+            width: "42px",
+            textAlign: "center",
+            fontSize: "27px",
+          }}
+        >
+          ▣
+        </div>
       </div>
 
-      {/* ======================================
-          LOADING
-      ====================================== */}
-      {loading ? (
-        <div
-          style={{
-            background: "#ffffff",
-            borderRadius: "10px",
-            padding: "30px",
-            textAlign: "center",
-            color: "#64748b",
-          }}
-        >
-          Loading homework...
-        </div>
-      ) : homeworkList.length === 0 ? (
-        /* ======================================
-           NO HOMEWORK
-        ====================================== */
-        <div
-          style={{
-            background: "#ffffff",
-            borderRadius: "10px",
-            padding: "35px 20px",
-            textAlign: "center",
-            color: "#64748b",
-          }}
-        >
+      <div
+        style={{
+          maxWidth: "980px",
+          margin: "0 auto",
+          padding: "16px 14px 0",
+          boxSizing: "border-box",
+        }}
+      >
+        {/* ======================================
+            STUDENT INFORMATION
+        ====================================== */}
+        {(studentName || studentClassInfo) && (
           <div
             style={{
-              fontSize: "38px",
-              marginBottom: "10px",
+              background: "#ffffff",
+              borderRadius: "12px",
+              padding: "16px 18px",
+              marginBottom: "18px",
+              boxShadow: "0 3px 12px rgba(15,23,42,0.08)",
+              display: "flex",
+              alignItems: "center",
+              gap: "14px",
+              minHeight: "58px",
+              boxSizing: "border-box",
             }}
           >
-            📚
-          </div>
+            <div
+              style={{
+                fontSize: "32px",
+                lineHeight: 1,
+                flexShrink: 0,
+              }}
+            >
+              🎓
+            </div>
 
-          <p
+            <div
+              style={{
+                color: "#111827",
+                fontSize: "20px",
+                fontWeight: 700,
+                lineHeight: 1.35,
+              }}
+            >
+              {studentName}
+              {studentName && studentClassInfo ? " , " : ""}
+              {studentClassInfo}
+            </div>
+          </div>
+        )}
+
+        {/* ======================================
+            LOADING
+        ====================================== */}
+        {loading ? (
+          <div
             style={{
-              margin: 0,
-              fontSize: "15px",
+              background: "#ffffff",
+              borderRadius: "12px",
+              padding: "40px 20px",
+              textAlign: "center",
+              color: "#64748b",
+              boxShadow: "0 3px 12px rgba(15,23,42,0.08)",
             }}
           >
-            No homework assigned yet.
-          </p>
-        </div>
-      ) : (
-        /* ======================================
-           DATE-WISE HOMEWORK
-        ====================================== */
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "18px",
-          }}
-        >
-          {groupedHomework.map(
-            (group) => (
+            Loading homework...
+          </div>
+        ) : homeworkList.length === 0 ? (
+          /* ======================================
+             NO HOMEWORK
+          ====================================== */
+          <div
+            style={{
+              background: "#ffffff",
+              borderRadius: "12px",
+              padding: "42px 20px",
+              textAlign: "center",
+              color: "#64748b",
+              boxShadow: "0 3px 12px rgba(15,23,42,0.08)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "42px",
+                marginBottom: "12px",
+              }}
+            >
+              📚
+            </div>
+
+            <p
+              style={{
+                margin: 0,
+                fontSize: "16px",
+              }}
+            >
+              No homework assigned yet.
+            </p>
+          </div>
+        ) : (
+          /* ======================================
+             DATE-WISE HOMEWORK
+          ====================================== */
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "18px",
+            }}
+          >
+            {groupedHomework.map((group) => (
               <div
                 key={group.dateKey}
                 style={{
                   background: "#ffffff",
-                  borderRadius: "10px",
+                  borderRadius: "12px",
                   overflow: "hidden",
-                  boxShadow:
-                    "0 2px 8px rgba(15,23,42,0.08)",
+                  boxShadow: "0 3px 12px rgba(15,23,42,0.10)",
                 }}
               >
-                {/* ==================================
-                    DATE HEADER
-                ================================== */}
+                {/* DATE HEADER */}
                 <div
                   style={{
                     background:
-                      "#f97316",
+                      "linear-gradient(90deg, #118fa4, #1697ac)",
                     color: "#ffffff",
-                    padding:
-                      "11px 14px",
-                    fontSize: "16px",
-                    fontWeight: 700,
+                    minHeight: "58px",
+                    padding: "10px 18px",
                     display: "flex",
                     alignItems: "center",
-                    gap: "8px",
+                    gap: "14px",
+                    boxSizing: "border-box",
                   }}
                 >
-                  <span>
-                    📅
+                  <span
+                    style={{
+                      fontSize: "28px",
+                      lineHeight: 1,
+                      flexShrink: 0,
+                    }}
+                  >
+                    ▣
                   </span>
 
-                  <span>
-                    {group.displayDate}
+                  <span
+                    style={{
+                      fontSize: "21px",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Date : {group.displayDate}
                   </span>
                 </div>
 
-                {/* ==================================
-                    SUBJECT LIST
-                ================================== */}
+                {/* SUBJECT LIST */}
                 <div
                   style={{
-                    padding:
-                      "8px 14px 12px",
+                    padding: "8px 18px 10px",
+                    boxSizing: "border-box",
                   }}
                 >
-                  {group.items.map(
-                    (
-                      homework,
-                      index
-                    ) => (
-                      <div
-                        key={
-                          homework.id ??
-                          `${group.dateKey}-${index}`
-                        }
+                  {group.items.map((homework, index) => (
+                    <div
+                      key={
+                        homework.id ??
+                        `${group.dateKey}-${index}`
+                      }
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns:
+                          "minmax(105px, 156px) 20px minmax(0, 1fr)",
+                        columnGap: "10px",
+                        alignItems: "start",
+                        padding: "12px 0",
+                        borderBottom:
+                          index < group.items.length - 1
+                            ? "1px solid #e2e8f0"
+                            : "none",
+                      }}
+                    >
+                      {/* SUBJECT */}
+                      <span
                         style={{
-                          padding:
-                            "11px 0",
-                          borderBottom:
-                            index <
-                            group.items
-                              .length -
-                              1
-                              ? "1px solid #e2e8f0"
-                              : "none",
+                          ...getSubjectStyle(
+                            homework.subject
+                          ),
+                          width: "100%",
+                          minHeight: "38px",
+                          padding: "7px 10px",
+                          borderRadius: "6px",
+                          fontWeight: 700,
+                          fontSize: "15px",
+                          lineHeight: 1.35,
+                          textAlign: "center",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          boxSizing: "border-box",
+                          wordBreak: "break-word",
                         }}
                       >
-                        {/* SUBJECT + DESCRIPTION */}
-                        <div
-                          style={{
-                            display:
-                              "flex",
-                            alignItems:
-                              "flex-start",
-                            gap: "10px",
-                            lineHeight:
-                              1.55,
-                          }}
-                        >
-                          {/* ==================================
-                              SUBJECT COLOURED LABEL
-                          ================================== */}
-                          <span
-                            style={{
-                              ...getSubjectStyle(
-                                homework.subject
-                              ),
-                              padding:
-                                "6px 12px",
-                              borderRadius:
-                                "6px",
-                              fontWeight:
-                                700,
-                              fontSize:
-                                "14px",
-                              minWidth:
-                                "95px",
-                              textAlign:
-                                "center",
-                              flexShrink: 0,
-                              display:
-                                "inline-block",
-                              boxSizing:
-                                "border-box",
-                            }}
-                          >
-                            {homework.subject}
-                          </span>
+                        {homework.subject}
+                      </span>
 
-                          {/* ==================================
-                              DESCRIPTION
-                          ================================== */}
-                          <span
-                            style={{
-                              color:
-                                "#111827",
-                              fontSize:
-                                "15px",
-                              whiteSpace:
-                                "pre-wrap",
-                              paddingTop:
-                                "5px",
-                            }}
-                          >
-                            :
-                            {" "}
-                            {homework.description ||
-                              "No description provided."}
-                          </span>
-                        </div>
+                      {/* COLON */}
+                      <span
+                        style={{
+                          color: "#111827",
+                          fontSize: "20px",
+                          lineHeight: "38px",
+                          textAlign: "center",
+                        }}
+                      >
+                        :
+                      </span>
 
-                        {/* ==================================
-                            ATTACHMENTS
-                        ================================== */}
+                      {/* HOMEWORK DESCRIPTION */}
+                      <div
+                        style={{
+                          color: "#111827",
+                          fontSize: "16px",
+                          lineHeight: 1.55,
+                          paddingTop: "5px",
+                          whiteSpace: "pre-wrap",
+                          overflowWrap: "anywhere",
+                          minWidth: 0,
+                        }}
+                      >
+                        {homework.description ||
+                          "No description provided."}
+
+                        {/* ATTACHMENTS */}
                         {(homework.pdf_url ||
                           homework.image_url) && (
                           <div
                             style={{
-                              display:
-                                "flex",
+                              display: "flex",
                               gap: "8px",
-                              flexWrap:
-                                "wrap",
-                              marginTop:
-                                "8px",
-                              marginLeft:
-                                "105px",
+                              flexWrap: "wrap",
+                              marginTop: "9px",
                             }}
                           >
                             {homework.pdf_url && (
@@ -688,20 +787,13 @@ export default function ParentHomework() {
                                 style={{
                                   border:
                                     "1px solid #2563eb",
-                                  background:
-                                    "#eff6ff",
-                                  color:
-                                    "#1d4ed8",
-                                  padding:
-                                    "6px 10px",
-                                  borderRadius:
-                                    "6px",
-                                  cursor:
-                                    "pointer",
-                                  fontSize:
-                                    "12px",
-                                  fontWeight:
-                                    600,
+                                  background: "#eff6ff",
+                                  color: "#1d4ed8",
+                                  padding: "6px 10px",
+                                  borderRadius: "6px",
+                                  cursor: "pointer",
+                                  fontSize: "12px",
+                                  fontWeight: 600,
                                 }}
                               >
                                 📥 PDF
@@ -719,20 +811,13 @@ export default function ParentHomework() {
                                 style={{
                                   border:
                                     "1px solid #16a34a",
-                                  background:
-                                    "#f0fdf4",
-                                  color:
-                                    "#15803d",
-                                  padding:
-                                    "6px 10px",
-                                  borderRadius:
-                                    "6px",
-                                  cursor:
-                                    "pointer",
-                                  fontSize:
-                                    "12px",
-                                  fontWeight:
-                                    600,
+                                  background: "#f0fdf4",
+                                  color: "#15803d",
+                                  padding: "6px 10px",
+                                  borderRadius: "6px",
+                                  cursor: "pointer",
+                                  fontSize: "12px",
+                                  fontWeight: 600,
                                 }}
                               >
                                 📥 Image
@@ -741,14 +826,15 @@ export default function ParentHomework() {
                           </div>
                         )}
                       </div>
-                    )
-                  )}
+                    </div>
+                  ))}
                 </div>
               </div>
-            )
-          )}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
+
 }

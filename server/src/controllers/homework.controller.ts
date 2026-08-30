@@ -300,27 +300,28 @@ export const getClassTeacherHomework = async (
     ========================================== */
 
     const dateRes = await pool.query(`
-      SELECT
+  SELECT
+    TO_CHAR(
+      (
+        CURRENT_TIMESTAMP
+        AT TIME ZONE 'Asia/Kolkata'
+      )::date,
+      'YYYY-MM-DD'
+    ) AS today,
+
+    TO_CHAR(
+      (
         (
           CURRENT_TIMESTAMP
           AT TIME ZONE 'Asia/Kolkata'
-        )::date AS today,
+        )::date - INTERVAL '6 days'
+      )::date,
+      'YYYY-MM-DD'
+    ) AS min_date
+`);
 
-        (
-          (
-            CURRENT_TIMESTAMP
-            AT TIME ZONE 'Asia/Kolkata'
-          )::date - INTERVAL '6 days'
-        )::date AS min_date
-    `);
-
-    const today = String(
-      dateRes.rows[0].today
-    );
-
-    const minDate = String(
-      dateRes.rows[0].min_date
-    );
+const today = dateRes.rows[0].today;
+const minDate = dateRes.rows[0].min_date;
 
     /* ==========================================
        IF NO DATE IS PROVIDED

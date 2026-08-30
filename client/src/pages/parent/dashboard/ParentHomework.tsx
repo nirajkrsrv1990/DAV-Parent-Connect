@@ -127,9 +127,8 @@ export default function ParentHomework() {
   // ==========================================
   // DATE KEY
   //
-  // IMPORTANT:
   // created_at is stored as UTC.
-  // We convert it to India date.
+  // Convert to India date.
   // ==========================================
   const getIndiaDateKey = (
     dateString?: string
@@ -202,8 +201,6 @@ export default function ParentHomework() {
 
   // ==========================================
   // GROUP HOMEWORK DATE-WISE
-  //
-  // created_at = homework upload date
   // ==========================================
   const groupedHomework =
     useMemo<GroupedHomework[]>(() => {
@@ -245,6 +242,44 @@ export default function ParentHomework() {
           )
       );
     }, [homeworkList]);
+
+  // ==========================================
+  // SUBJECT COLOUR
+  // ==========================================
+  const getSubjectStyle = (
+  subject: string
+): React.CSSProperties => {
+  const name = subject.toLowerCase().trim();
+
+  const subjectColors: Record<
+    string,
+    string
+  > = {
+    english: "#22A900",
+    sanskrit: "#00897B",
+    hindi: "#F57C00",
+    mathematics: "#1565E8",
+    science: "#7028C8",
+    "social science": "#8E44AD",
+    computer: "#0077B6",
+    "m.ed.": "#795548",
+    "g.k.": "#C2185B",
+    physics: "#3949AB",
+    chemistry: "#00838F",
+    biology: "#2E7D32",
+    economics: "#6D4C41",
+    "b.st.": "#5E35B1",
+    accountancy: "#455A64",
+    "physical education": "#EF6C00",
+    art: "#D81B60",
+  };
+
+  return {
+    background:
+      subjectColors[name] || "#008FA3",
+    color: "#FFFFFF",
+  };
+};
 
   // ==========================================
   // FILE URL
@@ -567,25 +602,44 @@ export default function ParentHomework() {
                               "flex",
                             alignItems:
                               "flex-start",
-                            gap: "5px",
+                            gap: "10px",
                             lineHeight:
                               1.55,
                           }}
                         >
+                          {/* ==================================
+                              SUBJECT COLOURED LABEL
+                          ================================== */}
                           <span
                             style={{
-                              color:
-                                "#1d4ed8",
+                              ...getSubjectStyle(
+                                homework.subject
+                              ),
+                              padding:
+                                "6px 12px",
+                              borderRadius:
+                                "6px",
                               fontWeight:
                                 700,
+                              fontSize:
+                                "14px",
                               minWidth:
-                                "78px",
+                                "95px",
+                              textAlign:
+                                "center",
                               flexShrink: 0,
+                              display:
+                                "inline-block",
+                              boxSizing:
+                                "border-box",
                             }}
                           >
                             {homework.subject}
                           </span>
 
+                          {/* ==================================
+                              DESCRIPTION
+                          ================================== */}
                           <span
                             style={{
                               color:
@@ -594,6 +648,8 @@ export default function ParentHomework() {
                                 "15px",
                               whiteSpace:
                                 "pre-wrap",
+                              paddingTop:
+                                "5px",
                             }}
                           >
                             :
@@ -618,7 +674,7 @@ export default function ParentHomework() {
                               marginTop:
                                 "8px",
                               marginLeft:
-                                "83px",
+                                "105px",
                             }}
                           >
                             {homework.pdf_url && (

@@ -3,6 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { FileTransfer } from "@capacitor/file-transfer";
+import {
+  ArrowLeft,
+  CalendarDays,
+  GraduationCap,
+  ClipboardList,
+} from "lucide-react";
 import "./ParentDashboard.css";
 
 import {
@@ -508,7 +514,7 @@ export default function ParentHomework() {
             padding: 0,
           }}
         >
-          ‹
+          <ArrowLeft size={30} />
         </button>
 
         <h1
@@ -530,7 +536,7 @@ export default function ParentHomework() {
             fontSize: "27px",
           }}
         >
-          ▣
+          <CalendarDays size={28} />
         </div>
       </div>
 
@@ -704,8 +710,8 @@ export default function ParentHomework() {
                       style={{
                         display: "grid",
                         gridTemplateColumns:
-                          "minmax(105px, 156px) 20px minmax(0, 1fr)",
-                        columnGap: "10px",
+                        "125px 18px minmax(0, 1fr)",
+                        columnGap: "8px",
                         alignItems: "start",
                         padding: "12px 0",
                         borderBottom:
@@ -721,12 +727,12 @@ export default function ParentHomework() {
                             homework.subject
                           ),
                           width: "100%",
-                          minHeight: "38px",
-                          padding: "7px 10px",
+                          minHeight: "36px",
+                          padding: "6px 7px",
                           borderRadius: "6px",
                           fontWeight: 700,
-                          fontSize: "15px",
-                          lineHeight: 1.35,
+                          fontSize: "14px",
+                          lineHeight: 1.25,
                           textAlign: "center",
                           display: "flex",
                           alignItems: "center",
@@ -743,7 +749,7 @@ export default function ParentHomework() {
                         style={{
                           color: "#111827",
                           fontSize: "20px",
-                          lineHeight: "38px",
+                          lineHeight: "36px",
                           textAlign: "center",
                         }}
                       >
@@ -755,7 +761,7 @@ export default function ParentHomework() {
                         style={{
                           color: "#111827",
                           fontSize: "16px",
-                          lineHeight: 1.55,
+                          lineHeight: 1.5,
                           paddingTop: "5px",
                           whiteSpace: "pre-wrap",
                           overflowWrap: "anywhere",

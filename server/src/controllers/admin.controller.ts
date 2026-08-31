@@ -6,7 +6,7 @@ export const adminLogin = async (
   res: Response
 ) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
 
     const result = await pool.query(
       `
@@ -14,7 +14,7 @@ export const adminLogin = async (
       FROM admin_users
       WHERE email = $1
       AND password = $2
-      AND status='Active'
+      AND status = 'Active'
       `,
       [email, password]
     );
@@ -26,14 +26,28 @@ export const adminLogin = async (
       });
     }
 
-    res.json({
-      success: true,
-      admin: result.rows[0],
-    });
-  } catch (err) {
-    console.log(err);
+    const admin = result.rows[0];
 
-    res.status(500).json({
+    const { generateToken } = await import("../utils/auth");
+
+    const token = generateToken(
+      {
+        id: String(admin.id),
+        role: "admin",
+      },
+      Boolean(rememberMe)
+    );
+
+    return res.json({
+      success: true,
+      admin,
+      token,
+    });
+
+  } catch (err) {
+    console.error("Admin Login Error:", err);
+
+    return res.status(500).json({
       success: false,
       message: "Server Error",
     });

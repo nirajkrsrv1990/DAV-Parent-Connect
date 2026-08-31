@@ -89,11 +89,23 @@ export default function LoginPage() {
         const result = await response.json();
 
         if (response.ok && result.success) {
-          saveRememberMe();
-          localStorage.setItem("admin", JSON.stringify(result.admin));
-          navigate("/admin");
-          return;
-        }
+  saveRememberMe();
+
+  localStorage.setItem(
+    "admin",
+    JSON.stringify(result.admin)
+  );
+
+  if (result.token) {
+    localStorage.setItem(
+      "auth_token",
+      result.token
+    );
+  }
+
+  navigate("/admin");
+  return;
+}
       } catch (error) {
         console.log("Admin login request failed", error);
       }
@@ -110,6 +122,7 @@ export default function LoginPage() {
           body: JSON.stringify({
             email: loginId,
             password,
+            rememberMe,
           }),
         });
 

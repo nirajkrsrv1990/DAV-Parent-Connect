@@ -1,5 +1,6 @@
 import TeacherStudentList from "../pages/teacher/TeacherStudentList";
 import { Routes, Route } from "react-router-dom";
+import ProtectedRoute from "../components/auth/ProtectedRoute";
 
 import LoginPage from "../pages/auth/LoginPage";
 import AdminLayout from "../components/layout/AdminLayout";
@@ -56,23 +57,31 @@ export default function AppRoutes() {
         <Route path="/admin/notices/add" element={<AddNotice />} />
 
       {/* ================= ADMIN ================= */}
-      <Route element={<AdminLayout />}>
-        <Route path="/admin" element={<Dashboard />} />
-        <Route path="/admin/master" element={<MasterDashboard />} />
-        <Route path="/admin/master/session" element={<SessionMaster />} />
-        <Route path="/admin/master/class-section" element={<ClassSectionMaster />} />
-        <Route path="/admin/master/subject" element={<SubjectMaster />} />
-        <Route path="/admin/master/exam" element={<ExamMaster />} />
-        <Route
-  path="/admin/master/marks-pattern"
-  element={<MarksPatternMaster />}
-/>
-        <Route path="/admin/students/upload" element={<StudentUpload />} />
-        <Route path="/admin/students/list" element={<StudentList />} />
-        <Route path="/admin/teachers" element={<TeacherList />} />
-        <Route path="/admin/teachers/add" element={<AddTeacher />} />
-        <Route path="/admin/teacher-assignment" element={<TeacherAssignment />} />
-      </Route>
+<Route element={<ProtectedRoute role="admin" />}>
+  <Route element={<AdminLayout />}>
+    <Route path="/admin" element={<Dashboard />} />
+    <Route path="/admin/master" element={<MasterDashboard />} />
+    <Route path="/admin/master/session" element={<SessionMaster />} />
+    <Route
+      path="/admin/master/class-section"
+      element={<ClassSectionMaster />}
+    />
+    <Route path="/admin/master/subject" element={<SubjectMaster />} />
+    <Route path="/admin/master/exam" element={<ExamMaster />} />
+    <Route
+      path="/admin/master/marks-pattern"
+      element={<MarksPatternMaster />}
+    />
+    <Route path="/admin/students/upload" element={<StudentUpload />} />
+    <Route path="/admin/students/list" element={<StudentList />} />
+    <Route path="/admin/teachers" element={<TeacherList />} />
+    <Route path="/admin/teachers/add" element={<AddTeacher />} />
+    <Route
+      path="/admin/teacher-assignment"
+      element={<TeacherAssignment />}
+    />
+  </Route>
+</Route>
 
       {/* ================= TEACHER PORTAL ================= */}
       <Route path="/teacher" element={<TeacherLayout />}>

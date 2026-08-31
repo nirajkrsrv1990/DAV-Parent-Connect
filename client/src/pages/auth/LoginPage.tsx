@@ -156,30 +156,34 @@ export default function LoginPage() {
         <div className="login-form">
           {/* USER ID */}
           <input
-            type="text"
-            placeholder="Enter ID / Email"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleLogin();
-              }
-            }}
-          />
+  type="text"
+  name="username"
+  autoComplete="username"
+  placeholder="Enter ID / Email"
+  value={userId}
+  onChange={(e) => setUserId(e.target.value)}
+  onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      handleLogin();
+    }
+  }}
+/>
 
           {/* PASSWORD WITH EYE ICON */}
           <div className="password-box">
             <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleLogin();
-                }
-              }}
-            />
+  type={showPassword ? "text" : "password"}
+  name="password"
+  autoComplete="current-password"
+  placeholder="Password"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+  onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      handleLogin();
+    }
+  }}
+/>
 
             <button
               type="button"

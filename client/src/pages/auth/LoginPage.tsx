@@ -190,7 +190,14 @@ export default function LoginPage() {
         <div className="divider"></div>
 
         {/* LOGIN FORM */}
-        <div className="login-form">
+        <form
+  className="login-form"
+  onSubmit={(e) => {
+    e.preventDefault();
+    handleLogin();
+  }}
+  autoComplete="on"
+>
           {/* USER ID */}
           <input
   type="text"
@@ -253,10 +260,9 @@ export default function LoginPage() {
 
           {/* LOGIN BUTTON */}
           <button
-            type="button"
-            className="login-btn"
-            onClick={handleLogin}
-            disabled={loading}
+          type="submit"
+          className="login-btn"
+          disabled={loading}
           >
             {loading ? "LOGGING IN..." : "LOGIN"}
           </button>
@@ -283,7 +289,7 @@ export default function LoginPage() {
               Register
             </button>
           </div>
-        </div>
+        </form>
 
         {/* FOOTER */}
         <div className="footer">

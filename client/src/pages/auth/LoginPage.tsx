@@ -1,50 +1,13 @@
 import "./LoginPage.css";
 import logo from "@/assets/logo/dav_logo.png";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { API_BASE_URL } from "@/config/api";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-    useEffect(() => {
-    const token = localStorage.getItem("auth_token");
-
-    if (!token) return;
-
-    try {
-      const payload = JSON.parse(
-        atob(token.split(".")[1])
-      );
-
-      // Token expired
-      if (
-        payload.exp &&
-        payload.exp * 1000 < Date.now()
-      ) {
-        localStorage.removeItem("auth_token");
-        return;
-      }
-
-      // Automatically open correct dashboard
-      if (payload.role === "admin") {
-        navigate("/admin", { replace: true });
-      } else if (payload.role === "teacher") {
-        navigate("/teacher", { replace: true });
-      } else if (payload.role === "parent") {
-        navigate("/parent/dashboard", { replace: true });
-      }
-    } catch (error) {
-      console.error(
-        "Invalid authentication token:",
-        error
-      );
-
-      localStorage.removeItem("auth_token");
-    }
-  }, [navigate]);
-
-  // Initialize state directly from localStorage to avoid useEffect setState error
+    // Initialize state directly from localStorage to avoid useEffect setState error
   const [userId, setUserId] = useState(() => localStorage.getItem("remembered_user_id") || "");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -89,9 +52,10 @@ export default function LoginPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            teacher_id: loginId,
-            password,
-          }),
+  teacher_id: loginId,
+  password,
+  rememberMe,
+}),
         });
 
         const result = await response.json();
@@ -129,8 +93,8 @@ export default function LoginPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-  teacher_id: loginId,
-  password,
+  email: loginId.trim(),
+  password: password.trim(),
   rememberMe,
 }),
         });

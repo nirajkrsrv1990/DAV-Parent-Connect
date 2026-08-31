@@ -391,24 +391,38 @@ export default function Sidebar({
 
 
           {/* =================================================
-              LOGOUT
-          ================================================= */}
+    LOGOUT
+================================================= */}
 
-          <Link
-            to="/"
-            className="menu-link"
-            onClick={onClose}
-          >
-            <div className="menu-item">
+<button
+  type="button"
+  className="menu-link"
+  onClick={() => {
+    // Clear active login session
+    localStorage.removeItem("auth_token");
 
-              <LogOut size={20} />
+    // Clear saved role sessions
+    localStorage.removeItem("admin");
+    localStorage.removeItem("teacher");
+    localStorage.removeItem("parent");
 
-              <span>
-                Logout
-              </span>
+    // Keep remembered_user_id so ID can still be autofilled
+    onClose();
 
-            </div>
-          </Link>
+    // Go to login page
+    window.location.href = "/";
+  }}
+>
+  <div className="menu-item">
+
+    <LogOut size={20} />
+
+    <span>
+      Logout
+    </span>
+
+  </div>
+</button>
 
         </nav>
 

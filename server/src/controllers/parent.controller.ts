@@ -56,13 +56,20 @@ export const parentSignup = async (req: Request, res: Response) => {
 };
 
 /* ===========================
-   PARENT LOGIN (ONLY THIS IS FIXED)
+   PARENT LOGIN
 =========================== */
 export const parentLogin = async (req: Request, res: Response) => {
   try {
-    // Yahan 'email' ko bhi add kar liya kyunki frontend wahi bhej raha hai
-    const { admission_no, mobile, email, password } = req.body;
-    const loginIdentifier = admission_no || mobile || email;
+    const {
+      admission_no,
+      mobile,
+      email,
+      password,
+      rememberMe,
+    } = req.body;
+
+    const loginIdentifier =
+      admission_no || mobile || email;
 
     if (!loginIdentifier || !password) {
       return res.json({
@@ -72,9 +79,22 @@ export const parentLogin = async (req: Request, res: Response) => {
     }
 
     const parent = await pool.query(
-      `SELECT * FROM parents WHERE (CAST(admission_no AS TEXT) = $1 OR mobile = $1 OR email = $1) AND password = $2`,
-      [String(loginIdentifier).trim(), String(password).trim()]
+      `
+      SELECT *
+      FROM parents
+      WHERE (
+        CAST(admission_no AS TEXT) = $1
+        OR mobile = $1
+        OR email = $1
+      )
+      AND password = $2
+      `,
+      [
+        String(loginIdentifier).trim(),
+        String(password).trim(),
+      ]
     );
+
     if (parent.rows.length === 0) {
       return res.json({
         success: false,
@@ -82,13 +102,31 @@ export const parentLogin = async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
+    const parentData = parent.rows[0];
+
+    // ===========================
+    // GENERATE JWT TOKEN
+    // ===========================
+    const { generateToken } = await import("../utils/auth");
+
+    const token = generateToken(
+      {
+        id: String(parentData.id),
+        role: "parent",
+      },
+      Boolean(rememberMe)
+    );
+
+    return res.json({
       success: true,
-      parent: parent.rows[0],
+      parent: parentData,
+      token,
     });
+
   } catch (err) {
-    console.log("Login Error:", err);
-    res.status(500).json({
+    console.error("Login Error:", err);
+
+    return res.status(500).json({
       success: false,
       message: "Login Failed",
     });

@@ -232,17 +232,19 @@ export const getClassTeacher = async (req: Request, res: Response) => {
   }
 };
 
-export const teacherLogin = async (req: Request, res: Response) => {
+export const teacherLogin = async (
+  req: Request,
+  res: Response
+) => {
   try {
-    const { teacher_id, password } = req.body;
+    const { teacher_id, password, rememberMe } = req.body;
 
     const result = await pool.query(
       `
       SELECT *
       FROM teachers
-      WHERE teacher_id=$1
-      AND password=$2
-      AND status='Active'
+      WHERE teacher_id = $1
+      AND password = $2
       `,
       [teacher_id, password]
     );
@@ -254,14 +256,30 @@ export const teacherLogin = async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
+    const teacher = result.rows[0];
+
+    const { generateToken } = await import("../utils/auth");
+
+    const token = generateToken(
+      {
+        id: String(teacher.teacher_id),
+        role: "teacher",
+      },
+      Boolean(rememberMe)
+    );
+
+    return res.json({
       success: true,
-      teacher: result.rows[0],
+      teacher,
+      token,
     });
+
   } catch (err) {
-    console.log(err);
-    res.status(500).json({
+    console.error("Teacher Login Error:", err);
+
+    return res.status(500).json({
       success: false,
+      message: "Server Error",
     });
   }
 };

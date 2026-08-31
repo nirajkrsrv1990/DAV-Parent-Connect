@@ -97,11 +97,23 @@ export default function LoginPage() {
         const result = await response.json();
 
         if (response.ok && result.success) {
-          saveRememberMe();
-          localStorage.setItem("teacher", JSON.stringify(result.teacher));
-          navigate("/teacher");
-          return;
-        }
+  saveRememberMe();
+
+  localStorage.setItem(
+    "teacher",
+    JSON.stringify(result.teacher)
+  );
+
+  if (result.token) {
+    localStorage.setItem(
+      "auth_token",
+      result.token
+    );
+  }
+
+  navigate("/teacher");
+  return;
+}
 
         alert(result.message || "Invalid Teacher ID or Password");
         return;
@@ -117,9 +129,10 @@ export default function LoginPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            email: loginId,
-            password,
-          }),
+  teacher_id: loginId,
+  password,
+  rememberMe,
+}),
         });
 
         const result = await response.json();
@@ -165,11 +178,22 @@ export default function LoginPage() {
         const result = await response.json();
 
         if (response.ok && result.success) {
-          saveRememberMe();
-          localStorage.setItem("parent", JSON.stringify(result.parent));
-          navigate("/parent/dashboard");
-          return;
-        }
+  saveRememberMe();
+
+  localStorage.setItem(
+    "parent",
+    JSON.stringify(result.parent)
+  );
+
+  if (result.token) {
+    localStorage.setItem(
+      "auth_token",
+      result.token
+    );
+  }
+  navigate("/parent/dashboard");
+  return;
+}
       } catch (error) {
         console.log("Parent login request failed", error);
       }

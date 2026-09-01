@@ -73,42 +73,20 @@ const loadHomeworkHistory = async () => {
     }
 
     /* =================================================
-       STEP 1: CHECK WHETHER TEACHER IS A CLASS TEACHER
+       UPLOAD HOMEWORK HISTORY
+       
+       ALWAYS LOAD ONLY THE LOGGED-IN TEACHER'S
+       OWN HOMEWORK.
+
+       Even if the teacher is also a Class Teacher,
+       this page must NOT load class-wide homework.
     ================================================= */
 
-    const classTeacherResponse = await fetch(
-      `${API_BASE_URL}/class-teacher/${encodeURIComponent(
+    const response = await fetch(
+      `${API_BASE_URL}/homework/teacher/${encodeURIComponent(
         teacherId
       )}`
     );
-
-    const classTeacherResult =
-      await classTeacherResponse.json();
-
-    let homeworkUrl = `${API_BASE_URL}/homework/teacher/${encodeURIComponent(
-      teacherId
-    )}`;
-
-    /* =================================================
-       STEP 2: IF CLASS TEACHER
-       LOAD ALL TODAY'S HOMEWORK OF ASSIGNED CLASS
-    ================================================= */
-
-    if (
-      classTeacherResponse.ok &&
-      classTeacherResult.success &&
-      classTeacherResult.assignment
-    ) {
-      homeworkUrl = `${API_BASE_URL}/homework/class-teacher/${encodeURIComponent(
-        teacherId
-      )}`;
-    }
-
-    /* =================================================
-       STEP 3: LOAD HOMEWORK
-    ================================================= */
-
-    const response = await fetch(homeworkUrl);
 
     const result = await response.json();
 

@@ -1,6 +1,6 @@
 const API_BASE_URL =
   import.meta.env.DEV
-    ? "http://10.120.183.108:5000/api"
+    ? "http://10.109.91.108:5000/api"
     : "http://200.141.0.100/api";
 
 const FILE_BASE_URL = "http://200.141.0.100";

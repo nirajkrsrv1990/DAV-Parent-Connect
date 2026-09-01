@@ -11,7 +11,7 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log("==================================");
   console.log(`🚀 DAV ERP Server Running`);
   console.log(`🌐 http://localhost:${PORT}`);
-  console.log(`📱 Network: http://10.120.183.108:${PORT}`);
+  console.log(`📱 Network: http://10.109.91.108:${PORT}`);
   console.log("==================================");
 
   // Run cleanup immediately when server starts

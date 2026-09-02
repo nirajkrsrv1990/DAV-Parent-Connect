@@ -29,6 +29,12 @@ export default function Homework() {
 
   const [homeworkList, setHomeworkList] = useState<HomeworkItem[]>([]);
 
+const [editingHomeworkId, setEditingHomeworkId] =
+  useState<number | null>(null);
+
+const [deletingHomeworkId, setDeletingHomeworkId] =
+  useState<number | null>(null);
+
   /* =====================================================
      GET LOGGED-IN TEACHER ID
   ===================================================== */
@@ -121,12 +127,220 @@ const loadHomeworkHistory = async () => {
   useEffect(() => {
     loadHomeworkHistory();
   }, []);
-
   /* =====================================================
-     SAVE / UPLOAD HOMEWORK
-  ===================================================== */
+   EDIT HOMEWORK
+===================================================== */
 
-  const saveHomework = async () => {
+const updateHomework = async () => {
+  if (!editingHomeworkId) {
+    return;
+  }
+
+  if (!dueDate) {
+    alert("Please select a Due Date.");
+    return;
+  }
+
+  if (!homework.trim() && !pdf && !image) {
+    alert(
+      "Please provide at least one content item: Homework Description, PDF, or Image."
+    );
+    return;
+  }
+
+  const teacherId = getTeacherId();
+
+  if (!teacherId) {
+    alert("Teacher ID not found. Please login again.");
+    return;
+  }
+
+  setLoading(true);
+
+  const formData = new FormData();
+
+  formData.append("teacher_id", teacherId);
+  formData.append("class_name", selectedClass);
+  formData.append("section", selectedSection);
+  formData.append("subject", subject);
+  formData.append("due_date", dueDate);
+
+  formData.append("description", homework);
+
+  /*
+    New PDF/Image is optional during edit.
+    If no new file is selected, backend will retain
+    the existing file.
+  */
+
+  if (pdf) {
+    formData.append("pdf", pdf);
+  }
+
+  if (image) {
+    formData.append("image", image);
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/homework/${editingHomeworkId}`,
+      {
+        method: "PUT",
+        body: formData,
+      }
+    );
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      await loadHomeworkHistory();
+
+      setEditingHomeworkId(null);
+
+      setHomework("");
+      setDueDate("");
+      setPdf(null);
+      setImage(null);
+
+      alert("Homework updated successfully.");
+    } else {
+      alert(
+        result.message ||
+          "Failed to update homework."
+      );
+    }
+  } catch (error) {
+    console.error(
+      "Update homework error:",
+      error
+    );
+
+    alert(
+      "An error occurred while updating homework."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+/* =====================================================
+   DELETE HOMEWORK
+===================================================== */
+
+const deleteHomework = async (id: number) => {
+  const teacherId = getTeacherId();
+
+  if (!teacherId) {
+    alert("Teacher ID not found. Please login again.");
+    return;
+  }
+
+  const confirmed = window.confirm(
+    "Are you sure you want to delete this homework?"
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  setDeletingHomeworkId(id);
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/homework/${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          teacher_id: teacherId,
+        }),
+      }
+    );
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      await loadHomeworkHistory();
+
+      alert("Homework deleted successfully.");
+    } else {
+      alert(
+        result.message ||
+          "Failed to delete homework."
+      );
+    }
+  } catch (error) {
+    console.error(
+      "Delete homework error:",
+      error
+    );
+
+    alert(
+      "An error occurred while deleting homework."
+    );
+  } finally {
+    setDeletingHomeworkId(null);
+  }
+};
+
+
+/* =====================================================
+   START EDIT HOMEWORK
+===================================================== */
+
+const startEditHomework = (item: HomeworkItem) => {
+  setEditingHomeworkId(item.id);
+
+  setSelectedClass(item.class);
+  setSelectedSection(item.section);
+  setSubject(item.subject);
+
+  setHomework(item.description || "");
+
+  setDueDate(
+    item.due_date
+      ? item.due_date.substring(0, 10)
+      : ""
+  );
+
+  /*
+    Existing PDF/Image are NOT put into File state.
+    Therefore, if teacher does not select a new file,
+    backend will preserve the old file.
+  */
+
+  setPdf(null);
+  setImage(null);
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
+
+
+/* =====================================================
+   CANCEL EDIT
+===================================================== */
+
+const cancelEditHomework = () => {
+  setEditingHomeworkId(null);
+
+  setHomework("");
+  setDueDate("");
+  setPdf(null);
+  setImage(null);
+};
+
+
+/* =====================================================
+   SAVE / UPLOAD HOMEWORK
+===================================================== */
+
+const saveHomework = async () => {
     // Mandatory due date
     if (!dueDate) {
       alert("Please select a Due Date.");
@@ -274,14 +488,41 @@ const loadHomeworkHistory = async () => {
           </h1>
 
           <button
-            className="save-btn"
-            onClick={saveHomework}
-            disabled={loading}
-          >
-            {loading
-              ? "Uploading..."
-              : "Upload Homework"}
-          </button>
+  className="save-btn"
+  onClick={
+    editingHomeworkId
+      ? updateHomework
+      : saveHomework
+  }
+  disabled={loading}
+>
+  {loading
+    ? editingHomeworkId
+      ? "Updating..."
+      : "Uploading..."
+    : editingHomeworkId
+      ? "Update Homework"
+      : "Upload Homework"}
+</button>
+
+{editingHomeworkId && (
+  <button
+    type="button"
+    onClick={cancelEditHomework}
+    disabled={loading}
+    style={{
+      marginLeft: "10px",
+      padding: "10px 18px",
+      borderRadius: "6px",
+      border: "1px solid #999",
+      background: "#fff",
+      cursor: "pointer",
+      fontWeight: 600,
+    }}
+  >
+    Cancel Edit
+  </button>
+)}
 
         </div>
 
@@ -550,6 +791,10 @@ const loadHomeworkHistory = async () => {
                     Image
                   </th>
 
+                  <th>
+                    Action
+                  </th>
+
                 </tr>
 
               </thead>
@@ -562,7 +807,7 @@ const loadHomeworkHistory = async () => {
                 {historyLoading && (
                   <tr>
                     <td
-                      colSpan={7}
+                      colSpan={8}
                       style={{
                         textAlign: "center",
                         padding: "40px",
@@ -632,29 +877,85 @@ const loadHomeworkHistory = async () => {
 
                         <td>
 
-                          {item.image_url ? (
-                            <a
-                              href={`${API_BASE_URL.replace(
-                                /\/api$/,
-                                ""
-                              )}${item.image_url}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              style={{
-                                color:
-                                  "#2E7D32",
-                                fontWeight: 600,
-                                textDecoration:
-                                  "none",
-                              }}
-                            >
-                              🖼 View Image
-                            </a>
-                          ) : (
-                            "-"
-                          )}
+  {item.image_url ? (
+    <a
+      href={`${API_BASE_URL.replace(
+        /\/api$/,
+        ""
+      )}${item.image_url}`}
+      target="_blank"
+      rel="noreferrer"
+      style={{
+        color:
+          "#2E7D32",
+        fontWeight: 600,
+        textDecoration:
+          "none",
+      }}
+    >
+      🖼 View Image
+    </a>
+  ) : (
+    "-"
+  )}
 
-                        </td>
+</td>
+
+<td>
+  <div
+    style={{
+      display: "flex",
+      gap: "8px",
+      alignItems: "center",
+      justifyContent: "center",
+      flexWrap: "wrap",
+    }}
+  >
+    <button
+      type="button"
+      onClick={() =>
+        startEditHomework(item)
+      }
+      disabled={
+        deletingHomeworkId === item.id
+      }
+      style={{
+        padding: "6px 12px",
+        borderRadius: "5px",
+        border: "none",
+        background: "#1565C0",
+        color: "#fff",
+        cursor: "pointer",
+        fontWeight: 600,
+      }}
+    >
+      ✏️ Edit
+    </button>
+
+    <button
+      type="button"
+      onClick={() =>
+        deleteHomework(item.id)
+      }
+      disabled={
+        deletingHomeworkId === item.id
+      }
+      style={{
+        padding: "6px 12px",
+        borderRadius: "5px",
+        border: "none",
+        background: "#C62828",
+        color: "#fff",
+        cursor: "pointer",
+        fontWeight: 600,
+      }}
+    >
+      {deletingHomeworkId === item.id
+        ? "Deleting..."
+        : "🗑 Delete"}
+    </button>
+  </div>
+</td>
 
                       </tr>
                     )
@@ -668,7 +969,7 @@ const loadHomeworkHistory = async () => {
                     <tr>
 
                       <td
-                        colSpan={7}
+                        colSpan={8}
                         style={{
                           textAlign: "center",
                           padding: "40px",
